@@ -350,7 +350,7 @@
 
             padding: 3px 6px !important;
 
-            font-size: 10px !important;
+            font-size: 11px !important;
             font-weight: 700 !important;
         }
 
@@ -388,7 +388,7 @@
 
             padding: 3px 6px !important;
 
-            font-size: 10px !important;
+            font-size: 11px !important;
             font-weight: 700 !important;
 
             box-shadow: none !important;
@@ -486,7 +486,7 @@
 
             text-shadow: none !important;
 
-            font-size: 11px !important;
+            font-size: 12px !important;
             font-weight: 700 !important;
             line-height: 1.25 !important;
 
@@ -685,7 +685,7 @@
         .th-upro-room-box label {
             color: #914F69 !important;
 
-            font-size: 11px !important;
+            font-size: 12px !important;
             font-weight: 700 !important;
         }
 
@@ -724,7 +724,7 @@
             border: 1px solid #E0CCD5 !important;
             border-radius: 6px !important;
 
-            font-size: 11px !important;
+            font-size: 12px !important;
             line-height: 1.5 !important;
 
             box-shadow: none !important;
@@ -770,7 +770,7 @@
             border: 1px solid #D9BCCA !important;
             border-radius: 7px !important;
 
-            font-size: 11px !important;
+            font-size: 12px !important;
             font-weight: 700 !important;
 
             box-shadow: none !important;
@@ -807,7 +807,7 @@
             > center > a.th-upro-action-no-margin {
                 height: 35px !important;
                 min-height: 35px !important;
-                font-size: 10px !important;
+                font-size: 11px !important;
             }
 
             .saudi-rose-scope
