@@ -2,25 +2,25 @@
 (function () {
     "use strict";
 
-    /* ==========================================
-       SH PEARL PROFILE V6
-       Crystal White Edition
-
+    /*
+       SH PEARL PROFILE V7
+       Crystal Colors Edition
        العضوة: ⠀ SH
 
-       - ثلاثة أزرار بكل صف
-       - خلفية كريستالية موحدة
-       - ألوان النصوص والأيقونات متنوعة
-       - عدم إظهار أزرار الزائر المخفية
+       - ألوان مستقلة للنصوص والأيقونات
+       - خلفيات كريستالية ناعمة
+       - ثلاثة أزرار في كل صف
+       - احترام الأزرار المخفية
        - حقول الإدارة متصلة
-       ========================================== */
+       - خاص بالعضوة المحددة
+    */
 
     const TARGET = "\u2800 SH";
     const BODY_CLASS = "sh-pearl-profile";
     const SCOPE_CLASS = "sh-pearl-scope";
     const STYLE_ID = "sh-pearl-style";
 
-    /* تحديد العضوة بالاسم الأصلي */
+    /* تحديد العضوة */
 
     function isTarget(profile) {
         if (!profile) return false;
@@ -29,19 +29,17 @@
             ".th-upro-profile-name"
         );
 
-        if (!name) return false;
-
-        return name.textContent.replace(
-            /^[ \t\r\n]+|[ \t\r\n]+$/g,
-            ""
-        ) === TARGET;
+        return !!name &&
+            name.textContent.replace(
+                /^[ \t\r\n]+|[ \t\r\n]+$/g,
+                ""
+            ) === TARGET;
     }
 
-    /* أقرب حاوية تشمل البروفايل والإدارة */
+    /* الحاوية المشتركة */
 
     function getScope(profile) {
         const modal = profile.closest(".modal");
-
         if (modal) return modal;
 
         let parent = profile.parentElement;
@@ -64,13 +62,10 @@
         return profile;
     }
 
-    /* ==========================================
-       CSS
-       ========================================== */
+    /* CSS */
 
     function addStyles() {
         const old = document.getElementById(STYLE_ID);
-
         if (old) old.remove();
 
         const style = document.createElement("style");
@@ -78,52 +73,42 @@
 
         style.textContent = `
 
-        /* =====================================
-           01 - ألوان اللؤلؤة
-           ===================================== */
+        /* ================================
+           الهوية الكريستالية
+           ================================ */
 
         .sh-pearl-scope {
-            --sp-white: #FFFFFF;
+            --sp-main: #40576D;
             --sp-bg: #F8FAFC;
-            --sp-soft: #EDF3F7;
             --sp-border: #D5E0E9;
-            --sp-text: #40576D;
             --sp-gold: #C4AC86;
         }
 
-        /* =====================================
-           02 - الشريط العلوي
-           ===================================== */
+        /* الشريط العلوي */
 
         .sh-pearl-scope .th-upro-header {
-            background:
-                linear-gradient(
-                    135deg,
-                    #FFFFFF,
-                    #EDF3F7
-                ) !important;
+            background: linear-gradient(
+                135deg,
+                #FFFFFF,
+                #EDF3F7
+            ) !important;
 
             color: #40576D !important;
-
             border: 0 !important;
-            border-bottom:
-                2px solid #C4AC86 !important;
-
+            border-bottom: 2px solid #C4AC86 !important;
             padding: 7px 9px !important;
             box-shadow: none !important;
         }
 
-        .sh-pearl-scope
-        .th-upro-header .th-upro-title {
+        .sh-pearl-scope .th-upro-title {
             color: #40576D !important;
             font-size: 12px !important;
             font-weight: 800 !important;
         }
 
-        .sh-pearl-scope
-        .th-upro-title img {
-            border-radius: 5px !important;
+        .sh-pearl-scope .th-upro-title img {
             vertical-align: middle !important;
+            border-radius: 5px !important;
             margin-left: 4px !important;
         }
 
@@ -131,10 +116,8 @@
         .th-upro-header .clickable.badge {
             background: #E4ECF2 !important;
             color: #40576D !important;
-
             border: 1px solid #CBD8E2 !important;
             border-radius: 6px !important;
-
             box-shadow: none !important;
         }
 
@@ -143,17 +126,13 @@
             color: #40576D !important;
         }
 
-        /* =====================================
-           03 - جسم البروفايل
-           ===================================== */
+        /* جسم البروفايل */
 
         .th-upro-pro.sh-pearl-profile {
             background: #F8FAFC !important;
             color: #40576D !important;
-
             border: 1px solid #D5E0E9 !important;
             border-radius: 12px !important;
-
             box-shadow:
                 0 3px 12px rgba(45,68,88,.08)
                 !important;
@@ -165,14 +144,11 @@
             border-radius: 10px !important;
         }
 
-        /* الغلاف */
+        /* الغلاف والصورة */
 
         .sh-pearl-profile .th-upro-cover {
-            border-bottom:
-                3px solid #C4AC86 !important;
+            border-bottom: 3px solid #C4AC86 !important;
         }
-
-        /* الصورة الشخصية */
 
         .sh-pearl-profile .th-upro-picture {
             border: 3px solid #E3D2B4 !important;
@@ -184,29 +160,21 @@
                 !important;
         }
 
-        /* =====================================
-           04 - الاسم والتوثيق
-           ===================================== */
+        /* الاسم */
 
         .sh-pearl-profile
         .th-upro-profile-content {
             background: #FCFDFE !important;
-
-            border-bottom:
-                1px solid #E1E7ED !important;
+            border-bottom: 1px solid #E1E7ED !important;
         }
 
         .sh-pearl-profile
         .th-upro-profile-name {
             color: #40576D !important;
-
             font-size: 17px !important;
             font-weight: 800 !important;
-
             line-height: 1.6 !important;
-
-            text-shadow:
-                0 1px 0 #FFFFFF !important;
+            text-shadow: 0 1px 0 #FFFFFF !important;
         }
 
         .sh-pearl-profile
@@ -215,21 +183,16 @@
         .th-upro-name-wrap::after {
             content: "✧";
             color: #BAA17C;
-
             font-size: 14px;
             margin: 0 5px;
         }
 
-        /* =====================================
-           05 - المشاهدات والنقاط
-           ===================================== */
+        /* المشاهدات والنقاط */
 
         .sh-pearl-profile .thProfileStat {
             background: #FFFFFF !important;
-
             border: 1px solid #DAE2E9 !important;
             border-radius: 9px !important;
-
             box-shadow:
                 0 1px 4px rgba(45,68,88,.05)
                 !important;
@@ -250,24 +213,18 @@
             color: #BAA17C !important;
         }
 
-        /* =====================================
-           06 - الدولة والعلم
-           ===================================== */
+        /* الدولة والعلم */
 
-        .sh-pearl-profile
-        .th-upro-meta-label {
+        .sh-pearl-profile .th-upro-meta-label {
             background: #F8FAFC !important;
         }
 
         .sh-pearl-profile .th-upro-co {
             background: #FFFFFF !important;
             color: #40576D !important;
-
             border: 1px solid #D7E0E8 !important;
             border-radius: 8px !important;
-
             padding: 3px 6px !important;
-
             font-size: 10px !important;
             font-weight: 700 !important;
         }
@@ -276,39 +233,29 @@
             max-width: 27px !important;
             width: auto !important;
             height: auto !important;
-
-            background: #FFFFFF !important;
-
             padding: 2px !important;
             margin: 0 3px !important;
-
+            background: #FFFFFF !important;
             border: 1px solid #D8E1E8 !important;
             border-radius: 5px !important;
         }
 
-        /* =====================================
-           07 - الغرفة
-           ===================================== */
+        /* الغرفة */
 
         .sh-pearl-profile
         .th-upro-meta-label .roomh {
-            background:
-                linear-gradient(
-                    135deg,
-                    #FFFFFF,
-                    #EAF1F5
-                ) !important;
+            background: linear-gradient(
+                135deg,
+                #FFFFFF,
+                #EAF1F5
+            ) !important;
 
             color: #40576D !important;
-
             border: 1px solid #CCD8E2 !important;
             border-radius: 8px !important;
-
             padding: 3px 6px !important;
-
             font-size: 10px !important;
             font-weight: 700 !important;
-
             text-shadow: none !important;
             box-shadow: none !important;
         }
@@ -317,82 +264,65 @@
         .th-upro-meta-label .roomh img {
             max-width: 24px !important;
             max-height: 24px !important;
-
             width: auto !important;
             height: auto !important;
-
             margin-left: 4px !important;
             vertical-align: middle !important;
-
             border-radius: 5px !important;
         }
 
-        /* =====================================
-           08 - النبذة والألعاب
-           ===================================== */
+        /* النبذة */
 
         .sh-pearl-profile .th-upro-bio {
             background: #FFFFFF !important;
             color: #566B7D !important;
-
             border: 1px solid #DBE4EB !important;
-            border-right:
-                3px solid #C4AC86 !important;
-
+            border-right: 3px solid #C4AC86 !important;
             border-radius: 8px !important;
-
             padding: 8px !important;
             line-height: 1.6 !important;
-
             box-shadow: none !important;
         }
+
+        /* الألعاب */
 
         .sh-pearl-profile .th-upro-game-xo,
         .sh-pearl-profile .th-upro-game-ludo {
             background: #EDF3F7 !important;
             color: #40576D !important;
-
             border: 1px solid #CEDAE3 !important;
             border-radius: 8px !important;
-
             font-weight: 700 !important;
             box-shadow: none !important;
         }
 
-        /* =====================================
-           09 - شبكة الأزرار
+        /* ================================
+           شبكة الأزرار
+           ================================ */
 
-           ثلاثة أزرار بكل صف
-           مع المحافظة على float الأصلي
-
-           لا نغيّر display نهائيًا
-           ===================================== */
-
-        .sh-pearl-profile > center >
+        .th-upro-pro.sh-pearl-profile > center >
         a.th-upro-action,
-        .sh-pearl-profile > center >
+        .th-upro-pro.sh-pearl-profile > center >
         a.th-upro-action-no-margin {
             float: left !important;
 
-            width: calc(33.333% - 6px) !important;
+            width: calc(33.333333% - 6px) !important;
             min-width: 0 !important;
 
             height: 36px !important;
             min-height: 36px !important;
 
             box-sizing: border-box !important;
-
             margin: 2px 3px !important;
             padding: 5px 2px !important;
 
-            background:
-                linear-gradient(
-                    145deg,
-                    #FFFFFF 0%,
-                    #EFF4F8 100%
-                ) !important;
+            background: linear-gradient(
+                145deg,
+                #FFFFFF,
+                #EFF4F8
+            ) !important;
 
-            color: #344A60 !important;
+            background-color: #F4F8FB !important;
 
             border: 1px solid #D0DBE4 !important;
             border-radius: 5px !important;
@@ -402,129 +332,162 @@
                 !important;
 
             text-shadow: none !important;
-
             font-size: 11px !important;
             font-weight: 700 !important;
             line-height: 1.25 !important;
-
             text-align: center !important;
+
             overflow: hidden;
+
+            /* يتم تحديد اللون لكل زر أدناه */
+            color: var(--sp-button-color,#344A60) !important;
+            -webkit-text-fill-color:
+                var(--sp-button-color,#344A60) !important;
         }
 
-        /*
-           مهم جدًا:
-           لا نستخدم display:inline-flex
-           أو display:block هنا.
+        /* ================================
+           ألوان النصوص والأيقونات
 
-           حتى يبقى display:none
-           الذي يضعه الشات على
-           أزرار الزائر محفوظًا.
-        */
+           كل زر له لون مستقل
+           ================================ */
 
-        /* حماية إضافية للأزرار المخفية */
+        /* خاص وتنبيه - كحلي */
 
-        .sh-pearl-profile
+        .th-upro-pro.sh-pearl-profile
+        > center > a.upm,
+        .th-upro-pro.sh-pearl-profile
+        > center > a.unot {
+            --sp-button-color: #24547B;
+        }
+
+        /* اللايك - وردي توتي */
+
+        .th-upro-pro.sh-pearl-profile
+        > center > a.ulike {
+            --sp-button-color: #BB346A;
+        }
+
+        /* الهدية - بنفسجي */
+
+        .th-upro-pro.sh-pearl-profile
+        > center > a.ugift {
+            --sp-button-color: #7446B2;
+        }
+
+        /* كشف النكات - أردوازي */
+
+        .th-upro-pro.sh-pearl-profile
+        > center > a.uh {
+            --sp-button-color: #455A70;
+        }
+
+        /* الصورة والبنر - فوشي غامق */
+
+        .th-upro-pro.sh-pearl-profile
+        > center > a.udelpic,
+        .th-upro-pro.sh-pearl-profile
+        > center > a.ubnr {
+            --sp-button-color: #AD2968;
+        }
+
+        /* ترقية مراقب - أخضر */
+
+        .th-upro-pro.sh-pearl-profile
+        > center > a.thRoomMod {
+            --sp-button-color: #087B52;
+        }
+
+        /* طرد وباند - أحمر */
+
+        .th-upro-pro.sh-pearl-profile
+        > center > a.urkick,
+        .th-upro-pro.sh-pearl-profile
+        > center > a.ukick,
+        .th-upro-pro.sh-pearl-profile
+        > center > a.uban,
+        .th-upro-pro.sh-pearl-profile
+        > center > a.ban20 {
+            --sp-button-color: #B52E42;
+        }
+
+        /* إسكات - برتقالي داكن */
+
+        .th-upro-pro.sh-pearl-profile
+        > center > a.meiut,
+        .th-upro-pro.sh-pearl-profile
+        > center > a.meiutbc {
+            --sp-button-color: #A85C21;
+        }
+
+        /* الإطار والغلاف - أزرق ملكي */
+
+        .th-upro-pro.sh-pearl-profile
+        > center > a.DELAFT,
+        .th-upro-pro.sh-pearl-profile
+        > center > a.DELMFT,
+        .th-upro-pro.sh-pearl-profile
+        > center > a.Mcover {
+            --sp-button-color: #305DA0;
+        }
+
+        /* تجاهل - أحمر هادئ */
+
+        .th-upro-pro.sh-pearl-profile
+        > center > a.umute {
+            --sp-button-color: #C03A35;
+        }
+
+        /* إلغاء التجاهل - أخضر */
+
+        .th-upro-pro.sh-pearl-profile
+        > center > a.uunmute {
+            --sp-button-color: #087B52;
+        }
+
+        /* فرض اللون على النص وأيقونة FontAwesome */
+
+        .th-upro-pro.sh-pearl-profile
+        > center > a.th-upro-action,
+        .th-upro-pro.sh-pearl-profile
+        > center > a.th-upro-action-no-margin,
+        .th-upro-pro.sh-pearl-profile
+        > center > a.th-upro-action::before,
+        .th-upro-pro.sh-pearl-profile
+        > center > a.th-upro-action-no-margin::before,
+        .th-upro-pro.sh-pearl-profile
+        > center > a.th-upro-action i,
+        .th-upro-pro.sh-pearl-profile
+        > center > a.th-upro-action-no-margin i {
+            color: var(--sp-button-color,#344A60) !important;
+
+            -webkit-text-fill-color:
+                var(--sp-button-color,#344A60) !important;
+        }
+
+        /* احترام أزرار النظام المخفية */
+
+        .th-upro-pro.sh-pearl-profile
         a[style*="display: none"],
-        .sh-pearl-profile
+        .th-upro-pro.sh-pearl-profile
         a[style*="display:none"] {
             display: none !important;
         }
 
-        /* =====================================
-           10 - تلوين الكلمات والأيقونات
-
-           الخلفيات كلها كريستالية
-           ===================================== */
-
-        /* المحادثة الخاصة والتنبيه */
-
-        .sh-pearl-profile a.upm,
-        .sh-pearl-profile a.unot {
-            color: #294D70 !important;
-        }
-
-        /* الإعجابات */
-
-        .sh-pearl-profile a.ulike {
-            color: #B23D66 !important;
-        }
-
-        /* الهدايا */
-
-        .sh-pearl-profile a.ugift {
-            color: #7255B2 !important;
-        }
-
-        /* كشف النكات */
-
-        .sh-pearl-profile a.uh {
-            color: #344A60 !important;
-        }
-
-        /* الصورة والبنر */
-
-        .sh-pearl-profile a.udelpic,
-        .sh-pearl-profile a.ubnr {
-            color: #B02B67 !important;
-        }
-
-        /* ترقية مراقب */
-
-        .sh-pearl-profile a.thRoomMod {
-            color: #18805B !important;
-        }
-
-        /* الطرد والباند */
-
-        .sh-pearl-profile a.urkick,
-        .sh-pearl-profile a.ukick,
-        .sh-pearl-profile a.uban,
-        .sh-pearl-profile a.ban20 {
-            color: #B44250 !important;
-        }
-
-        /* الإسكات */
-
-        .sh-pearl-profile a.meiut,
-        .sh-pearl-profile a.meiutbc {
-            color: #A75D28 !important;
-        }
-
-        /* الإطار والحالة والغلاف */
-
-        .sh-pearl-profile a.DELAFT,
-        .sh-pearl-profile a.DELMFT,
-        .sh-pearl-profile a.Mcover {
-            color: #365D91 !important;
-        }
-
-        /* تجاهل */
-
-        .sh-pearl-profile a.umute {
-            color: #C14339 !important;
-        }
-
-        /* إلغاء التجاهل */
-
-        .sh-pearl-profile a.uunmute {
-            color: #18805B !important;
-        }
-
-        /* مرور المؤشر */
+        /* تأثير المرور */
 
         @media (hover: hover) {
-            .sh-pearl-profile > center >
-            a.th-upro-action:hover,
-            .sh-pearl-profile > center >
-            a.th-upro-action-no-margin:hover {
-                background: #E6EFF5 !important;
-                border-color: #AFC4D5 !important;
+            .th-upro-pro.sh-pearl-profile
+            > center > a.th-upro-action:hover,
+            .th-upro-pro.sh-pearl-profile
+            > center > a.th-upro-action-no-margin:hover {
+                background: #E7F0F6 !important;
+                border-color: #B1C5D5 !important;
             }
         }
 
-        /* =====================================
-           11 - لوحة الإدارة المتصلة
-           ===================================== */
+        /* ================================
+           لوحة إدارة واحدة متصلة
+           ================================ */
 
         .sh-pearl-scope
         .th-upro-edit-box,
@@ -532,16 +495,10 @@
         .th-upro-power-box,
         .sh-pearl-scope
         .th-upro-room-box {
-            /*
-               لا نحدد display هنا
-               حتى نحترم إخفاء النظام
-            */
-
             float: none !important;
             clear: both !important;
 
             width: calc(100% - 12px) !important;
-
             box-sizing: border-box !important;
 
             margin: 0 6px !important;
@@ -554,56 +511,27 @@
             border-bottom: 0 !important;
 
             border-radius: 0 !important;
-
             box-shadow: none !important;
         }
 
-        /* أول صندوق */
+        /* بداية اللوحة */
 
         .sh-pearl-scope
         .th-upro-edit-box.nickbox {
-            border-radius:
-                11px 11px 0 0 !important;
-
+            border-radius: 11px 11px 0 0 !important;
             margin-top: 4px !important;
         }
 
-        /* آخر صندوق */
+        /* نهاية اللوحة */
 
         .sh-pearl-scope
         .th-upro-room-box.roomzbox {
-            border-bottom:
-                1px solid #D1DCE5 !important;
-
-            border-radius:
-                0 0 11px 11px !important;
-
+            border-bottom: 1px solid #D1DCE5 !important;
+            border-radius: 0 0 11px 11px !important;
             margin-bottom: 5px !important;
         }
 
-        /*
-           الحفاظ على إخفاء الصناديق
-           إذا قام النظام بإخفائها
-        */
-
-        .sh-pearl-scope
-        .th-upro-edit-box[style*="display: none"],
-        .sh-pearl-scope
-        .th-upro-edit-box[style*="display:none"],
-        .sh-pearl-scope
-        .th-upro-power-box[style*="display: none"],
-        .sh-pearl-scope
-        .th-upro-power-box[style*="display:none"],
-        .sh-pearl-scope
-        .th-upro-room-box[style*="display: none"],
-        .sh-pearl-scope
-        .th-upro-room-box[style*="display:none"] {
-            display: none !important;
-        }
-
-        /* =====================================
-           12 - عناوين وحقول الإدارة
-           ===================================== */
+        /* عناوين الإدارة */
 
         .sh-pearl-scope
         .th-upro-edit-box label,
@@ -612,7 +540,6 @@
         .sh-pearl-scope
         .th-upro-room-box label {
             color: #455D72 !important;
-
             font-size: 11px !important;
             font-weight: 700 !important;
         }
@@ -625,9 +552,10 @@
 
             border: 1px solid #D6E0E8 !important;
             border-radius: 6px !important;
-
             padding: 4px 7px !important;
         }
+
+        /* حقول الإدارة */
 
         .sh-pearl-scope
         .th-upro-edit-box input,
@@ -649,11 +577,10 @@
 
             font-size: 11px !important;
             line-height: 1.5 !important;
-
             box-shadow: none !important;
         }
 
-        /* عند الكتابة */
+        /* التركيز */
 
         .sh-pearl-scope
         .th-upro-edit-box input:focus,
@@ -677,23 +604,19 @@
             outline-offset: 0 !important;
         }
 
-        /* =====================================
-           13 - الحفظ والتغيير والنقل
-           ===================================== */
+        /* حفظ وتغيير ونقل */
 
         .sh-pearl-scope
         .th-upro-save-small,
         .sh-pearl-scope
         .th-upro-edit-box .u-nickc {
-            background:
-                linear-gradient(
-                    145deg,
-                    #F6F9FB,
-                    #E1EBF2
-                ) !important;
+            background: linear-gradient(
+                145deg,
+                #F6F9FB,
+                #E1EBF2
+            ) !important;
 
             color: #36556F !important;
-
             border: 1px solid #C6D5E0 !important;
             border-radius: 7px !important;
 
@@ -705,9 +628,26 @@
                 !important;
         }
 
-        /* =====================================
-           14 - الجوال
-           ===================================== */
+        /* الحفاظ على الإخفاء الأصلي */
+
+        .sh-pearl-scope
+        .th-upro-edit-box[style*="display: none"],
+        .sh-pearl-scope
+        .th-upro-edit-box[style*="display:none"],
+        .sh-pearl-scope
+        .th-upro-power-box[style*="display: none"],
+        .sh-pearl-scope
+        .th-upro-power-box[style*="display:none"],
+        .sh-pearl-scope
+        .th-upro-room-box[style*="display: none"],
+        .sh-pearl-scope
+        .th-upro-room-box[style*="display:none"] {
+            display: none !important;
+        }
+
+        /* ================================
+           الجوال
+           ================================ */
 
         @media (max-width: 420px) {
 
@@ -716,10 +656,10 @@
                 font-size: 15px !important;
             }
 
-            .sh-pearl-profile > center >
-            a.th-upro-action,
-            .sh-pearl-profile > center >
-            a.th-upro-action-no-margin {
+            .th-upro-pro.sh-pearl-profile
+            > center > a.th-upro-action,
+            .th-upro-pro.sh-pearl-profile
+            > center > a.th-upro-action-no-margin {
                 font-size: 10px !important;
                 height: 35px !important;
                 min-height: 35px !important;
@@ -732,17 +672,11 @@
             .sh-pearl-scope
             .th-upro-room-box {
                 width: calc(100% - 10px) !important;
-
                 margin-left: 5px !important;
                 margin-right: 5px !important;
-
                 padding: 7px !important;
             }
         }
-
-        /* =====================================
-           15 - تقليل الحركة
-           ===================================== */
 
         @media (prefers-reduced-motion: reduce) {
             .sh-pearl-profile
@@ -758,24 +692,20 @@
         document.head.appendChild(style);
     }
 
-    /* ==========================================
-       تحديث البروفايل
-       ========================================== */
+    /* تحديث البروفايل */
 
     function updateProfiles() {
-        const profiles = document.querySelectorAll(
-            ".th-upro-pro"
-        );
-
         const scopes = new Set();
 
-        profiles.forEach(function (profile) {
+        document.querySelectorAll(
+            ".th-upro-pro"
+        ).forEach(function (profile) {
+
             const matched = isTarget(profile);
 
             if (
-                profile.classList.contains(
-                    BODY_CLASS
-                ) !== matched
+                profile.classList.contains(BODY_CLASS)
+                !== matched
             ) {
                 profile.classList.toggle(
                     BODY_CLASS,
@@ -785,46 +715,30 @@
 
             if (matched) {
                 const scope = getScope(profile);
-
                 if (scope) scopes.add(scope);
             }
         });
-
-        /* إزالة الكلاس من النافذة السابقة */
 
         document.querySelectorAll(
             "." + SCOPE_CLASS
         ).forEach(function (element) {
             if (!scopes.has(element)) {
-                element.classList.remove(
-                    SCOPE_CLASS
-                );
+                element.classList.remove(SCOPE_CLASS);
             }
         });
 
-        /* ربطه بنافذة SH */
-
         scopes.forEach(function (scope) {
-            if (
-                !scope.classList.contains(
-                    SCOPE_CLASS
-                )
-            ) {
-                scope.classList.add(
-                    SCOPE_CLASS
-                );
+            if (!scope.classList.contains(SCOPE_CLASS)) {
+                scope.classList.add(SCOPE_CLASS);
             }
         });
     }
 
-    /* ==========================================
-       التشغيل
-       ========================================== */
+    /* التشغيل */
 
     function init() {
-        if (window.__shPearlV6Started) return;
-
-        window.__shPearlV6Started = true;
+        if (window.__shPearlV7Started) return;
+        window.__shPearlV7Started = true;
 
         addStyles();
         updateProfiles();
