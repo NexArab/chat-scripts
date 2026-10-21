@@ -3,16 +3,30 @@
     "use strict";
 
     /*
-       SAUDI BLACK EMERALD PROFILE V1
-       تصميم سعودي زمردي للعضوة: ⠀ˢʰ
-       مستقل تماماً عن تصاميم SH وإستبرق
+       SAUDI ROSE PROFILE V1
+       وردة السعودية
+
+       العضوة: ⠀ˢʰ
+
+       وردي غباري + أخضر سعودي
+       + لمسات شامبين ذهبية
+
+       مستقل عن تصميم SH وإستبرق
     */
 
-    const TARGET_NAME = "\u2800\u02E2\u02B0";
-    const BODY_CLASS = "saudi-emerald-profile";
-    const SCOPE_CLASS = "saudi-emerald-scope";
-    const STYLE_ID = "saudi-emerald-style";
-    const EMBLEM_CLASS = "saudi-emerald-emblem";
+    const TARGET = "\u2800\u02E2\u02B0";
+
+    const BODY_CLASS = "saudi-rose-profile";
+    const SCOPE_CLASS = "saudi-rose-scope";
+    const EMBLEM_CLASS = "saudi-rose-emblem";
+    const STYLE_ID = "saudi-rose-style";
+
+    const EMBLEM_URL =
+        "https://commons.wikimedia.org/wiki/Special:FilePath/Emblem_of_Saudi_Arabia_(2).svg";
+
+    /* ==============================
+       1 - مطابقة العضوة بدقة
+       ============================== */
 
     function isTarget(profile) {
         if (!profile) return false;
@@ -26,100 +40,74 @@
         return name.textContent.replace(
             /^[ \t\r\n]+|[ \t\r\n]+$/g,
             ""
-        ) === TARGET_NAME;
+        ) === TARGET;
     }
+
+    /* ==============================
+       2 - تحديد نافذة البروفايل
+       ============================== */
 
     function getScope(profile) {
-        const modal = profile.closest(".modal");
-        if (modal) return modal;
-
-        let el = profile.parentElement;
+        let parent = profile.parentElement;
+        let fallback = null;
 
         while (
-            el &&
-            el !== document.body &&
-            el !== document.documentElement
+            parent &&
+            parent !== document.body &&
+            parent !== document.documentElement
         ) {
             if (
-                el.querySelector(".th-upro-header") &&
-                el.querySelector(".th-upro-pro")
+                parent.querySelector(".th-upro-header") &&
+                parent.querySelector(".th-upro-pro")
             ) {
-                return el;
+                fallback = parent;
+
+                if (
+                    parent.querySelector(".th-upro-edit-box") ||
+                    parent.querySelector(".th-upro-power-box") ||
+                    parent.querySelector(".th-upro-room-box")
+                ) {
+                    return parent;
+                }
             }
 
-            el = el.parentElement;
+            parent = parent.parentElement;
         }
 
-        return profile;
+        return fallback ||
+            profile.closest(".modal-content") ||
+            profile.closest(".modal") ||
+            profile;
     }
 
-    /* شعار زخرفي مرسوم، وليس تغييراً لشعار رسمي */
+    /* ==============================
+       3 - شعار النخلة والسيفين
+       ============================== */
 
-    function emblemHTML() {
-        return `
-        <span class="${EMBLEM_CLASS}"
-              aria-hidden="true">
-          <svg viewBox="0 0 140 105"
-               xmlns="http://www.w3.org/2000/svg"
-               fill="none">
+    function createEmblem() {
+        const ornament = document.createElement("div");
 
-            <g stroke="currentColor"
-               stroke-width="3"
-               stroke-linecap="round"
-               stroke-linejoin="round">
+        ornament.className = EMBLEM_CLASS;
+        ornament.setAttribute("aria-hidden", "true");
 
-              <!-- سعف النخلة -->
+        const image = document.createElement("img");
+        image.src = EMBLEM_URL;
+        image.alt = "";
+        image.loading = "lazy";
+        image.decoding = "async";
 
-              <path d="M70 16
-                       Q46 0 14 25
-                       Q46 20 68 36"/>
+        ornament.appendChild(image);
 
-              <path d="M70 16
-                       Q94 0 126 25
-                       Q94 20 72 36"/>
-
-              <path d="M69 20
-                       Q47 -2 35 6
-                       Q55 12 69 35"/>
-
-              <path d="M71 20
-                       Q93 -2 105 6
-                       Q85 12 71 35"/>
-
-              <path d="M70 26
-                       Q53 7 47 18"/>
-
-              <path d="M70 26
-                       Q87 7 93 18"/>
-
-              <!-- جذع النخلة -->
-
-              <path d="M70 34V70"/>
-              <path d="M65 42H75
-                       M65 51H75
-                       M65 60H75"/>
-
-              <!-- السيفان المتقاطعان -->
-
-              <path d="M18 75
-                       Q57 99 117 80"/>
-
-              <path d="M122 75
-                       Q83 99 23 80"/>
-
-              <path d="M18 75L10 69
-                       M122 75L130 69"/>
-
-              <path d="M34 79L29 87
-                       M106 79L111 87"/>
-
-            </g>
-          </svg>
-        </span>`;
+        return ornament;
     }
+
+    /* ==============================
+       4 - التصميم
+       ============================== */
 
     function addStyles() {
         const old = document.getElementById(STYLE_ID);
+
         if (old) old.remove();
 
         const style = document.createElement("style");
@@ -127,214 +115,237 @@
 
         style.textContent = `
 
-        /* ==============================
-           الهوية الزمردية
-           ============================== */
+        /* =============================
+           الهوية السعودية الوردية
+           ============================= */
 
-        .saudi-emerald-scope {
-            --se-dark: #0C1F1B;
-            --se-green: #143D31;
-            --se-green-light: #245944;
-            --se-gold: #D6BD83;
-            --se-ivory: #F5EAD0;
-            --se-border: #517A61;
+        .saudi-rose-scope {
+            --sr-rose: #914F69;
+            --sr-dark: #713A52;
+            --sr-green: #17684B;
+            --sr-green-dark: #10513B;
+            --sr-gold: #D5B784;
+            --sr-soft: #F3E3E9;
+            --sr-bg: #FFF9FB;
+            --sr-border: #E5CBD6;
+            --sr-text: #61495A;
         }
 
-        /* الشريط العلوي */
+        /* =============================
+           الشريط العلوي
+           ============================= */
 
-        .saudi-emerald-scope .th-upro-header {
-            background:
-                linear-gradient(
-                    135deg,
-                    #0C1F1B,
-                    #1A4939
-                ) !important;
+        .saudi-rose-scope .th-upro-header {
+            background: linear-gradient(
+                120deg,
+                #81455D,
+                #A87088
+            ) !important;
+
+            color: #FFFFFF !important;
 
             border: 0 !important;
             border-bottom:
-                2px solid #BCA46E !important;
+                2px solid #D5B784 !important;
 
-            color: #F5EAD0 !important;
-            box-shadow: none !important;
             padding: 7px 9px !important;
+
+            box-shadow: none !important;
         }
 
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-header .th-upro-title {
-            color: #F5EAD0 !important;
+            color: #FFFFFF !important;
             font-size: 12px !important;
             font-weight: 800 !important;
+            line-height: 1.5 !important;
         }
 
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-title img {
-            vertical-align: middle !important;
             border-radius: 5px !important;
+            vertical-align: middle !important;
             margin-left: 4px !important;
         }
 
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-header .clickable.badge {
-            background: #23513E !important;
-            color: #F5EAD0 !important;
+            background: rgba(255,255,255,.16) !important;
+            color: #FFFFFF !important;
 
-            border: 1px solid #BCA46E !important;
+            border: 1px solid rgba(
+                255,255,255,.5
+            ) !important;
+
             border-radius: 6px !important;
             box-shadow: none !important;
         }
 
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-header .fa-times {
-            color: #F5EAD0 !important;
+            color: #FFFFFF !important;
         }
 
-        /* جسم البروفايل */
+        /* =============================
+           جسم البروفايل
+           ============================= */
 
-        .th-upro-pro.saudi-emerald-profile {
-            background: #102B23 !important;
-            color: #F5EAD0 !important;
+        .th-upro-pro.saudi-rose-profile {
+            background: #FFF9FB !important;
+            color: #61495A !important;
 
-            border: 1px solid #6F865B !important;
+            border: 1px solid #E5CBD6 !important;
             border-radius: 12px !important;
 
             box-shadow:
-                0 4px 16px rgba(4,25,17,.20)
+                0 4px 16px rgba(108,58,82,.10)
                 !important;
         }
 
-        .saudi-emerald-profile
+        .saudi-rose-profile
         .th-upro-profile-container {
-            background: #102B23 !important;
+            background: #FFF9FB !important;
             border-radius: 10px !important;
         }
 
-        /* الغلاف وصورة العضوة الأصلية */
+        /* =============================
+           الغلاف والصورة
+           ============================= */
 
-        .saudi-emerald-profile .th-upro-cover {
+        .saudi-rose-profile .th-upro-cover {
             border-bottom:
-                3px solid #D6BD83 !important;
+                3px solid #D5B784 !important;
         }
 
-        .saudi-emerald-profile .th-upro-picture {
-            border: 3px solid #D6BD83 !important;
+        .saudi-rose-profile .th-upro-picture {
+            border: 3px solid #D8B8C6 !important;
             border-radius: 50% !important;
 
             box-shadow:
-                0 0 0 3px rgba(255,255,255,.88),
-                0 4px 12px rgba(0,0,0,.22)
+                0 0 0 3px #FFFFFF,
+                0 3px 12px rgba(108,58,82,.16)
                 !important;
         }
 
-        /* الاسم */
+        /* =============================
+           الاسم والتوثيق
+           ============================= */
 
-        .saudi-emerald-profile
+        .saudi-rose-profile
         .th-upro-profile-content {
-            background: #14382D !important;
+            background: #FCF0F5 !important;
+
             border-bottom:
-                1px solid #54765C !important;
-            padding-bottom: 7px !important;
+                1px solid #E8D2DC !important;
+
+            padding-bottom: 6px !important;
         }
 
-        .saudi-emerald-profile
+        .saudi-rose-profile
         .th-upro-profile-name {
-            color: #F6E5BC !important;
+            color: #914F69 !important;
+
             font-size: 18px !important;
             font-weight: 800 !important;
             line-height: 1.65 !important;
 
             text-shadow:
-                0 1px 3px rgba(0,0,0,.25)
-                !important;
+                0 1px 0 #FFFFFF !important;
         }
 
-        .saudi-emerald-profile
+        .saudi-rose-profile
         .th-upro-name-wrap::before,
-        .saudi-emerald-profile
+        .saudi-rose-profile
         .th-upro-name-wrap::after {
             content: "✦";
-            color: #D6BD83;
-            font-size: 13px;
+            color: #C39C6A;
+            font-size: 12px;
             margin: 0 6px;
         }
 
-        /* ==============================
-           النخلة والسيفان داخل البروفايل
-           ============================== */
+        /* =============================
+           الشعار السعودي الأنيق
+           ============================= */
 
-        .saudi-emerald-profile
-        .saudi-emerald-emblem {
-            display: block;
-            width: 114px;
-            height: 91px;
+        .saudi-rose-profile
+        .saudi-rose-emblem {
+            width: 58px;
+            height: 65px;
 
-            margin: 5px auto 8px;
-            padding: 5px;
-
-            color: #E1CA91;
-
-            background:
-                radial-gradient(
-                    circle,
-                    #245944 0%,
-                    #123226 75%
-                );
-
-            border: 1px solid #BCA46E;
-            border-radius: 45%;
-
-            box-shadow:
-                inset 0 1px 5px rgba(255,255,255,.10),
-                0 2px 8px rgba(0,0,0,.18);
+            margin: 6px auto 7px;
+            padding: 8px;
 
             box-sizing: border-box;
+
+            background: linear-gradient(
+                145deg,
+                rgba(255,255,255,.96),
+                rgba(235,246,239,.9)
+            );
+
+            border: 1px solid #D6BEA1;
+            border-radius: 15px;
+
+            box-shadow:
+                inset 0 1px 0 #FFFFFF,
+                0 2px 7px rgba(107,68,82,.09);
+
             pointer-events: none;
         }
 
-        .saudi-emerald-profile
-        .saudi-emerald-emblem svg {
+        .saudi-rose-profile
+        .saudi-rose-emblem img {
             display: block;
             width: 100%;
             height: 100%;
+
+            object-fit: contain;
         }
 
-        /* المشاهدات والنقاط */
+        /* =============================
+           المشاهدات والنقاط
+           ============================= */
 
-        .saudi-emerald-profile .thProfileStat {
-            background: #194334 !important;
+        .saudi-rose-profile .thProfileStat {
+            background: #FFFFFF !important;
 
-            border: 1px solid #557F62 !important;
+            border: 1px solid #E7D2DC !important;
             border-radius: 9px !important;
 
-            box-shadow: none !important;
+            box-shadow:
+                0 1px 4px rgba(108,58,82,.05)
+                !important;
         }
 
-        .saudi-emerald-profile .thProfileStatShine,
-        .saudi-emerald-profile .NUMBER_TH,
-        .saudi-emerald-profile .thProfilePointsNum {
-            color: #F5EAD0 !important;
+        .saudi-rose-profile .thProfileStatShine,
+        .saudi-rose-profile .NUMBER_TH,
+        .saudi-rose-profile .thProfilePointsNum {
+            color: #914F69 !important;
             font-weight: 700 !important;
         }
 
-        .saudi-emerald-profile .thProfileEye {
-            color: #A5D4B4 !important;
+        .saudi-rose-profile .thProfileEye {
+            color: #A77A8C !important;
         }
 
-        .saudi-emerald-profile .thProfilePointsIcon {
-            color: #D6BD83 !important;
+        .saudi-rose-profile .thProfilePointsIcon {
+            color: #BA9865 !important;
         }
 
-        /* الدولة والعلم */
+        /* =============================
+           الدولة والعلم
+           ============================= */
 
-        .saudi-emerald-profile
+        .saudi-rose-profile
         .th-upro-meta-label {
-            background: #102B23 !important;
+            background: #FFF9FB !important;
         }
 
-        .saudi-emerald-profile .th-upro-co {
-            background: #1C4637 !important;
-            color: #F5EAD0 !important;
+        .saudi-rose-profile .th-upro-co {
+            background: #F4EDF0 !important;
+            color: #17684B !important;
 
-            border: 1px solid #6B8C69 !important;
+            border: 1px solid #D9C6CF !important;
             border-radius: 8px !important;
 
             padding: 3px 6px !important;
@@ -343,33 +354,36 @@
             font-weight: 700 !important;
         }
 
-        .saudi-emerald-profile .th-upro-co img {
+        .saudi-rose-profile .th-upro-co img {
             max-width: 27px !important;
+
             width: auto !important;
             height: auto !important;
 
-            background: #FFFFFF !important;
             padding: 2px !important;
             margin: 0 3px !important;
 
-            border: 1px solid #D6BD83 !important;
+            background: #FFFFFF !important;
+
+            border: 1px solid #C7D9CB !important;
             border-radius: 5px !important;
         }
 
-        /* زر الغرفة */
+        /* =============================
+           الغرفة الحالية
+           ============================= */
 
-        .saudi-emerald-profile
+        .saudi-rose-profile
         .th-upro-meta-label .roomh {
-            background:
-                linear-gradient(
-                    145deg,
-                    #1D4A39,
-                    #103126
-                ) !important;
+            background: linear-gradient(
+                145deg,
+                #FFFFFF,
+                #EAF3ED
+            ) !important;
 
-            color: #F5EAD0 !important;
+            color: #17684B !important;
 
-            border: 1px solid #BCA46E !important;
+            border: 1px solid #B8D2C2 !important;
             border-radius: 8px !important;
 
             padding: 3px 6px !important;
@@ -377,11 +391,11 @@
             font-size: 10px !important;
             font-weight: 700 !important;
 
-            text-shadow: none !important;
             box-shadow: none !important;
+            text-shadow: none !important;
         }
 
-        .saudi-emerald-profile
+        .saudi-rose-profile
         .th-upro-meta-label .roomh img {
             max-width: 24px !important;
             max-height: 24px !important;
@@ -391,47 +405,56 @@
 
             margin-left: 4px !important;
             vertical-align: middle !important;
+
             border-radius: 5px !important;
         }
 
-        /* النبذة */
+        /* =============================
+           النبذة الشخصية
+           ============================= */
 
-        .saudi-emerald-profile .th-upro-bio {
-            background: #1B4335 !important;
-            color: #E7EBD7 !important;
+        .saudi-rose-profile .th-upro-bio {
+            background: #FFFFFF !important;
+            color: #73586A !important;
 
-            border: 1px solid #557C60 !important;
+            border: 1px solid #E6D0DB !important;
             border-right:
-                3px solid #D6BD83 !important;
+                3px solid #17684B !important;
 
             border-radius: 8px !important;
+
             padding: 8px !important;
             line-height: 1.65 !important;
 
             box-shadow: none !important;
         }
 
-        /* الألعاب */
+        /* =============================
+           ألعاب XO واللودو
+           ============================= */
 
-        .saudi-emerald-profile .th-upro-game-xo,
-        .saudi-emerald-profile .th-upro-game-ludo {
-            background: #24513F !important;
-            color: #F5EAD0 !important;
+        .saudi-rose-profile .th-upro-game-xo,
+        .saudi-rose-profile .th-upro-game-ludo {
+            background: #E8F2EB !important;
+            color: #17684B !important;
 
-            border: 1px solid #749375 !important;
+            border: 1px solid #BBD4C4 !important;
             border-radius: 8px !important;
 
             font-weight: 700 !important;
             box-shadow: none !important;
         }
 
-        /* ==============================
-           أزرار البروفايل 3 بكل صف
-           ============================== */
+        /* =============================
+           شبكة أزرار البروفايل
 
-        .th-upro-pro.saudi-emerald-profile
+           ثلاثة أزرار بكل صف
+           بدون تغيير display
+           ============================= */
+
+        .th-upro-pro.saudi-rose-profile
         > center > a.th-upro-action,
-        .th-upro-pro.saudi-emerald-profile
+        .th-upro-pro.saudi-rose-profile
         > center > a.th-upro-action-no-margin {
             float: left !important;
 
@@ -443,26 +466,26 @@
             height: 36px !important;
             min-height: 36px !important;
 
-            box-sizing: border-box !important;
-
             margin: 2px 3px !important;
             padding: 5px 2px !important;
 
-            background:
-                linear-gradient(
-                    145deg,
-                    #1D493A,
-                    #15352A
-                ) !important;
+            box-sizing: border-box !important;
 
-            border: 1px solid #5C816A !important;
-            border-radius: 6px !important;
+            background: linear-gradient(
+                145deg,
+                #FFFFFF,
+                #F7EDF2
+            ) !important;
+
+            border: 1px solid #E4CCD7 !important;
+            border-radius: 7px !important;
 
             box-shadow:
-                inset 0 1px 0 rgba(255,255,255,.07)
+                inset 0 1px 0 #FFFFFF
                 !important;
 
             text-shadow: none !important;
+
             font-size: 11px !important;
             font-weight: 700 !important;
             line-height: 1.25 !important;
@@ -471,178 +494,211 @@
             overflow: hidden;
 
             color: var(
-                --se-btn-color,
-                #F5EAD0
+                --sr-btn-color,
+                #914F69
             ) !important;
 
             -webkit-text-fill-color: var(
-                --se-btn-color,
-                #F5EAD0
+                --sr-btn-color,
+                #914F69
             ) !important;
         }
 
-        /* ألوان النصوص والأيقونات */
+        /* =============================
+           ألوان النصوص والأيقونات
+           ============================= */
 
-        .saudi-emerald-profile a.upm,
-        .saudi-emerald-profile a.unot {
-            --se-btn-color: #EDE4CC;
+        /* المحادثة الخاصة */
+
+        .saudi-rose-profile a.upm {
+            --sr-btn-color: #17684B;
         }
 
-        .saudi-emerald-profile a.ulike {
-            --se-btn-color: #F3A5BD;
+        /* التنبيه */
+
+        .saudi-rose-profile a.unot {
+            --sr-btn-color: #78587B;
         }
 
-        .saudi-emerald-profile a.ugift {
-            --se-btn-color: #E6CD8D;
+        /* الإعجابات */
+
+        .saudi-rose-profile a.ulike {
+            --sr-btn-color: #BB4470;
         }
 
-        .saudi-emerald-profile a.uh {
-            --se-btn-color: #C6D9C5;
+        /* الهدية */
+
+        .saudi-rose-profile a.ugift {
+            --sr-btn-color: #9B7438;
         }
 
-        .saudi-emerald-profile a.udelpic,
-        .saudi-emerald-profile a.ubnr {
-            --se-btn-color: #DCB3D6;
+        /* كشف النكات */
+
+        .saudi-rose-profile a.uh {
+            --sr-btn-color: #526D5F;
         }
 
-        .saudi-emerald-profile a.thRoomMod,
-        .saudi-emerald-profile a.uunmute {
-            --se-btn-color: #9DDEB7;
+        /* الصورة والبنر */
+
+        .saudi-rose-profile a.udelpic,
+        .saudi-rose-profile a.ubnr {
+            --sr-btn-color: #9D5279;
         }
 
-        .saudi-emerald-profile a.urkick,
-        .saudi-emerald-profile a.ukick,
-        .saudi-emerald-profile a.uban,
-        .saudi-emerald-profile a.ban20 {
-            --se-btn-color: #F0ACAF;
+        /* ترقية مراقب */
+
+        .saudi-rose-profile a.thRoomMod,
+        .saudi-rose-profile a.uunmute {
+            --sr-btn-color: #087E57;
         }
 
-        .saudi-emerald-profile a.meiut,
-        .saudi-emerald-profile a.meiutbc {
-            --se-btn-color: #F0C18E;
+        /* الطرد والباند */
+
+        .saudi-rose-profile a.urkick,
+        .saudi-rose-profile a.ukick,
+        .saudi-rose-profile a.uban,
+        .saudi-rose-profile a.ban20 {
+            --sr-btn-color: #B2475B;
         }
 
-        .saudi-emerald-profile a.DELAFT,
-        .saudi-emerald-profile a.DELMFT,
-        .saudi-emerald-profile a.Mcover {
-            --se-btn-color: #B5D9D3;
+        /* الإسكات */
+
+        .saudi-rose-profile a.meiut,
+        .saudi-rose-profile a.meiutbc {
+            --sr-btn-color: #A56843;
         }
 
-        .saudi-emerald-profile a.umute {
-            --se-btn-color: #E8A3A0;
+        /* الإطار وبنر الحالة والغلاف */
+
+        .saudi-rose-profile a.DELAFT,
+        .saudi-rose-profile a.DELMFT,
+        .saudi-rose-profile a.Mcover {
+            --sr-btn-color: #527360;
         }
 
-        /* تلوين أيقونات Font Awesome */
+        /* تجاهل */
 
-        .th-upro-pro.saudi-emerald-profile
+        .saudi-rose-profile a.umute {
+            --sr-btn-color: #B44758;
+        }
+
+        /* تطبيق لون الأيقونة والنص */
+
+        .th-upro-pro.saudi-rose-profile
         > center > a.th-upro-action,
-        .th-upro-pro.saudi-emerald-profile
+        .th-upro-pro.saudi-rose-profile
         > center > a.th-upro-action-no-margin,
-        .th-upro-pro.saudi-emerald-profile
+        .th-upro-pro.saudi-rose-profile
         > center > a.th-upro-action::before,
-        .th-upro-pro.saudi-emerald-profile
+        .th-upro-pro.saudi-rose-profile
         > center > a.th-upro-action-no-margin::before,
-        .th-upro-pro.saudi-emerald-profile
+        .th-upro-pro.saudi-rose-profile
         > center > a.th-upro-action i,
-        .th-upro-pro.saudi-emerald-profile
+        .th-upro-pro.saudi-rose-profile
         > center > a.th-upro-action-no-margin i {
             color: var(
-                --se-btn-color,
-                #F5EAD0
+                --sr-btn-color,
+                #914F69
             ) !important;
 
             -webkit-text-fill-color: var(
-                --se-btn-color,
-                #F5EAD0
+                --sr-btn-color,
+                #914F69
             ) !important;
         }
 
-        /* احترام أزرار الزائر المخفية */
+        /* الأزرار المخفية تبقى مخفية */
 
-        .saudi-emerald-profile
+        .saudi-rose-profile
         a[style*="display:none"],
-        .saudi-emerald-profile
+        .saudi-rose-profile
         a[style*="display: none"] {
             display: none !important;
         }
 
-        @media (hover:hover) {
-            .saudi-emerald-profile
+        @media (hover: hover) {
+            .saudi-rose-profile
             > center > a.th-upro-action:hover,
-            .saudi-emerald-profile
+            .saudi-rose-profile
             > center > a.th-upro-action-no-margin:hover {
-                background: #275D47 !important;
-                border-color: #C9B27E !important;
+                background: #F1E0E8 !important;
+                border-color: #D8AFBF !important;
             }
         }
 
-        /* ==============================
-           صناديق الأدمن متصلة
-           ============================== */
+        /* =============================
+           حقول إدارة متصلة بصريًا
+           ============================= */
 
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-edit-box,
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-power-box,
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-room-box {
             float: none !important;
             clear: both !important;
 
             width: calc(100% - 12px) !important;
-            box-sizing: border-box !important;
 
             margin: 0 6px !important;
             padding: 8px 10px !important;
 
-            background: #15382B !important;
-            color: #F5EAD0 !important;
+            box-sizing: border-box !important;
 
-            border: 1px solid #5B8067 !important;
+            background: #FFFBFD !important;
+            color: #61495A !important;
+
+            border: 1px solid #E5CBD6 !important;
             border-bottom: 0 !important;
-            border-radius: 0 !important;
 
+            border-radius: 0 !important;
             box-shadow: none !important;
         }
 
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-edit-box.nickbox {
-            border-radius: 11px 11px 0 0 !important;
+            border-radius:
+                11px 11px 0 0 !important;
+
             margin-top: 4px !important;
         }
 
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-room-box.roomzbox {
             border-bottom:
-                1px solid #5B8067 !important;
+                1px solid #E5CBD6 !important;
 
-            border-radius: 0 0 11px 11px !important;
+            border-radius:
+                0 0 11px 11px !important;
+
             margin-bottom: 5px !important;
         }
 
-        /* عناوين صناديق الإدارة */
+        /* عناوين الإدارة */
 
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-edit-box label,
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-power-box label,
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-room-box label {
-            color: #E9DBB7 !important;
+            color: #914F69 !important;
+
             font-size: 11px !important;
             font-weight: 700 !important;
         }
 
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-edit-label,
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-like-label,
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-eva-label {
-            background: #24513F !important;
-            color: #F5EAD0 !important;
+            background: #F3E3E9 !important;
+            color: #914F69 !important;
 
-            border: 1px solid #789471 !important;
+            border: 1px solid #DDC3CF !important;
             border-radius: 6px !important;
 
             padding: 4px 7px !important;
@@ -650,22 +706,22 @@
 
         /* الحقول والقوائم */
 
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-edit-box input,
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-edit-box textarea,
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-power-box input,
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-room-box input,
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-power-box select,
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-room-box select {
-            background: #F7FAF7 !important;
-            color: #183B2D !important;
+            background: #FFFFFF !important;
+            color: #61495A !important;
 
-            border: 1px solid #AFC4B2 !important;
+            border: 1px solid #E0CCD5 !important;
             border-radius: 6px !important;
 
             font-size: 11px !important;
@@ -674,22 +730,44 @@
             box-shadow: none !important;
         }
 
+        /* التركيز */
+
+        .saudi-rose-scope
+        .th-upro-edit-box input:focus,
+        .saudi-rose-scope
+        .th-upro-edit-box textarea:focus,
+        .saudi-rose-scope
+        .th-upro-power-box input:focus,
+        .saudi-rose-scope
+        .th-upro-room-box input:focus,
+        .saudi-rose-scope
+        .th-upro-power-box select:focus,
+        .saudi-rose-scope
+        .th-upro-room-box select:focus {
+            border-color: #B98BA1 !important;
+
+            outline:
+                2px solid rgba(185,139,161,.15)
+                !important;
+
+            outline-offset: 0 !important;
+        }
+
         /* أزرار الحفظ */
 
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-save-small,
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-edit-box .u-nickc {
-            background:
-                linear-gradient(
-                    145deg,
-                    #27634B,
-                    #194432
-                ) !important;
+            background: linear-gradient(
+                145deg,
+                #FFFFFF,
+                #EEDCE5
+            ) !important;
 
-            color: #F5EAD0 !important;
+            color: #914F69 !important;
 
-            border: 1px solid #C4AC86 !important;
+            border: 1px solid #D9BCCA !important;
             border-radius: 7px !important;
 
             font-size: 11px !important;
@@ -698,66 +776,70 @@
             box-shadow: none !important;
         }
 
-        /* عدم تجاوز إخفاء النظام */
+        /* عدم إظهار الحقول المخفية */
 
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-edit-box[style*="display:none"],
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-edit-box[style*="display: none"],
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-power-box[style*="display:none"],
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-power-box[style*="display: none"],
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-room-box[style*="display:none"],
-        .saudi-emerald-scope
+        .saudi-rose-scope
         .th-upro-room-box[style*="display: none"] {
             display: none !important;
         }
 
         /* الجوال */
 
-        @media(max-width:420px) {
-            .saudi-emerald-profile
+        @media (max-width: 420px) {
+            .saudi-rose-profile
             .th-upro-profile-name {
                 font-size: 15px !important;
             }
 
-            .th-upro-pro.saudi-emerald-profile
+            .th-upro-pro.saudi-rose-profile
             > center > a.th-upro-action,
-            .th-upro-pro.saudi-emerald-profile
+            .th-upro-pro.saudi-rose-profile
             > center > a.th-upro-action-no-margin {
-                font-size: 10px !important;
                 height: 35px !important;
                 min-height: 35px !important;
+                font-size: 10px !important;
             }
 
-            .saudi-emerald-scope
+            .saudi-rose-scope
             .th-upro-edit-box,
-            .saudi-emerald-scope
+            .saudi-rose-scope
             .th-upro-power-box,
-            .saudi-emerald-scope
+            .saudi-rose-scope
             .th-upro-room-box {
                 width: calc(100% - 10px) !important;
+
                 margin-left: 5px !important;
                 margin-right: 5px !important;
+
                 padding: 7px !important;
             }
         }
 
-        @media(prefers-reduced-motion:reduce) {
-            .saudi-emerald-profile
-            a.th-upro-action,
-            .saudi-emerald-profile
+        @media (prefers-reduced-motion: reduce) {
+            .saudi-rose-profile a.th-upro-action,
+            .saudi-rose-profile
             a.th-upro-action-no-margin {
                 transition: none !important;
             }
         }
-
         `;
 
         document.head.appendChild(style);
     }
+
+    /* ==============================
+       5 - تحديث البروفايل
+       ============================== */
 
     function updateProfiles() {
         const scopes = new Set();
@@ -765,40 +847,46 @@
         document.querySelectorAll(
             ".th-upro-pro"
         ).forEach(function (profile) {
+
             const matched = isTarget(profile);
 
-            if (
-                profile.classList.contains(BODY_CLASS)
-                !== matched
-            ) {
-                profile.classList.toggle(
-                    BODY_CLASS,
-                    matched
-                );
-            }
+            profile.classList.toggle(
+                BODY_CLASS,
+                matched
+            );
+
+            /* إزالة الزخرفة السابقة */
 
             const oldEmblem = profile.querySelector(
+                ".saudi-emerald-emblem"
+            );
+
+            if (oldEmblem && matched) {
+                oldEmblem.remove();
+            }
+
+            const newEmblem = profile.querySelector(
                 "." + EMBLEM_CLASS
             );
 
             if (matched) {
                 const scope = getScope(profile);
+
                 if (scope) scopes.add(scope);
 
-                if (!oldEmblem) {
+                if (!newEmblem) {
                     const content = profile.querySelector(
                         ".th-upro-profile-content"
                     );
 
                     if (content) {
-                        content.insertAdjacentHTML(
-                            "beforeend",
-                            emblemHTML()
+                        content.appendChild(
+                            createEmblem()
                         );
                     }
                 }
-            } else if (oldEmblem) {
-                oldEmblem.remove();
+            } else if (newEmblem) {
+                newEmblem.remove();
             }
         });
 
@@ -813,30 +901,38 @@
         });
 
         scopes.forEach(function (scope) {
-            if (!scope.classList.contains(SCOPE_CLASS)) {
-                scope.classList.add(SCOPE_CLASS);
+            if (!scope.classList.contains(
+                SCOPE_CLASS
+            )) {
+                scope.classList.add(
+                    SCOPE_CLASS
+                );
             }
         });
     }
 
-    function init() {
-        if (window.__saudiEmeraldProfileStarted) return;
+    /* ==============================
+       6 - التشغيل
+       ============================== */
 
-        window.__saudiEmeraldProfileStarted = true;
+    function init() {
+        if (window.__saudiRoseProfileStarted) return;
+
+        window.__saudiRoseProfileStarted = true;
 
         addStyles();
         updateProfiles();
 
-        let scheduled = false;
+        let pending = false;
 
         const observer = new MutationObserver(
             function () {
-                if (scheduled) return;
+                if (pending) return;
 
-                scheduled = true;
+                pending = true;
 
                 requestAnimationFrame(function () {
-                    scheduled = false;
+                    pending = false;
                     updateProfiles();
                 });
             }
@@ -858,5 +954,4 @@
     } else {
         init();
     }
-
 })();
