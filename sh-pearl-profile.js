@@ -225,7 +225,7 @@
             border: 1px solid #D7E0E8 !important;
             border-radius: 8px !important;
             padding: 3px 6px !important;
-            font-size: 10px !important;
+            font-size: 11px !important;
             font-weight: 700 !important;
         }
 
@@ -254,7 +254,7 @@
             border: 1px solid #CCD8E2 !important;
             border-radius: 8px !important;
             padding: 3px 6px !important;
-            font-size: 10px !important;
+            font-size: 11px !important;
             font-weight: 700 !important;
             text-shadow: none !important;
             box-shadow: none !important;
@@ -332,7 +332,7 @@
                 !important;
 
             text-shadow: none !important;
-            font-size: 11px !important;
+            font-size: 12px !important;
             font-weight: 700 !important;
             line-height: 1.25 !important;
             text-align: center !important;
@@ -540,7 +540,7 @@
         .sh-pearl-scope
         .th-upro-room-box label {
             color: #455D72 !important;
-            font-size: 11px !important;
+            font-size: 12px !important;
             font-weight: 700 !important;
         }
 
@@ -575,7 +575,7 @@
             border: 1px solid #D0DCE5 !important;
             border-radius: 6px !important;
 
-            font-size: 11px !important;
+            font-size: 12px !important;
             line-height: 1.5 !important;
             box-shadow: none !important;
         }
@@ -620,7 +620,7 @@
             border: 1px solid #C6D5E0 !important;
             border-radius: 7px !important;
 
-            font-size: 11px !important;
+            font-size: 12px !important;
             font-weight: 700 !important;
 
             box-shadow:
@@ -660,7 +660,7 @@
             > center > a.th-upro-action,
             .th-upro-pro.sh-pearl-profile
             > center > a.th-upro-action-no-margin {
-                font-size: 10px !important;
+                font-size: 11px !important;
                 height: 35px !important;
                 min-height: 35px !important;
             }
