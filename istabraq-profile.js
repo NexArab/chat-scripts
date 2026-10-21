@@ -304,7 +304,7 @@
 
             padding: 3px 6px !important;
 
-            font-size: 10px !important;
+            font-size: 11px !important;
             font-weight: 700 !important;
 
             box-shadow: none !important;
@@ -343,7 +343,7 @@
 
             padding: 3px 6px !important;
 
-            font-size: 10px !important;
+            font-size: 11px !important;
             font-weight: 700 !important;
 
             text-shadow: none !important;
@@ -438,7 +438,7 @@
 
             text-shadow: none !important;
 
-            font-size: 11px !important;
+            font-size: 12px !important;
             font-weight: 700 !important;
             line-height: 1.25 !important;
             text-align: center !important;
@@ -687,7 +687,7 @@
         .th-upro-room-box label {
             color: #80546D !important;
 
-            font-size: 11px !important;
+            font-size: 12px !important;
             font-weight: 700 !important;
         }
 
@@ -728,7 +728,7 @@
             border: 1px solid #DDC6D4 !important;
             border-radius: 6px !important;
 
-            font-size: 11px !important;
+            font-size: 12px !important;
             line-height: 1.5 !important;
 
             box-shadow: none !important;
@@ -777,7 +777,7 @@
             border: 1px solid #D7BACB !important;
             border-radius: 7px !important;
 
-            font-size: 11px !important;
+            font-size: 12px !important;
             font-weight: 700 !important;
 
             box-shadow:
@@ -799,7 +799,7 @@
             > center > a.th-upro-action,
             .th-upro-pro.istabraq-royal
             > center > a.th-upro-action-no-margin {
-                font-size: 10px !important;
+                font-size: 11px !important;
                 height: 35px !important;
                 min-height: 35px !important;
             }
