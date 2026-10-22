@@ -183,10 +183,10 @@
         /* النمر الجانبي */
 
         .${PROFILE} .${EMBLEM} {
-            width: 126px;
-            height: 126px;
+            width: 114px;
+            height: 114px;
             margin: 9px auto 5px;
-            padding: 6px;
+            padding: 0;
             box-sizing: border-box;
             border: 1px solid #716126;
             border-radius: 12px;
@@ -436,8 +436,8 @@
             }
 
             .${PROFILE} .${EMBLEM} {
-                width: 112px;
-                height: 112px;
+                width: 100px;
+                height: 100px;
             }
         }
         `;
