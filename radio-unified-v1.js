@@ -25,26 +25,26 @@
   var stations = [
     {
       label: 'قرآن كريم',
-      icon: '📖',
+      icon: 'book',
       urls: ['https://edge.mixlr.com/channel/rwumx']
     },
     {
       label: 'أغاني عربية',
-      icon: '♫',
+      icon: 'music',
       urls: [
         'https://mazajfm.ice.infomaniak.ch/mazajfm-192.mp3'
       ]
     },
     {
       label: 'أغاني أجنبية',
-      icon: '🎧',
+      icon: 'headphones',
       urls: [
         'https://channels.fluxfm.de/90s/externalembedflxhp/stream.mp3'
       ]
     },
     {
       label: 'سوالف مباشرة',
-      icon: '🎙',
+      icon: 'mic',
       urls: ['https://hala-alrayamedia.radioca.st/;']
     }
   ];
@@ -107,14 +107,14 @@
   }
 
   function installStyle() {
-    if (
-      document.getElementById('chat-radio-unified-style')
-    ) {
-      return;
-    }
+    var style = document.getElementById(
+      'chat-radio-unified-style'
+    );
 
-    var style = document.createElement('style');
-    style.id = 'chat-radio-unified-style';
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'chat-radio-unified-style';
+    }
 
     style.textContent = `
       #settings #shfaq-radio-panel,
@@ -277,9 +277,96 @@
       #settings #shfaq-radio-panel audio {
         display: none !important;
       }
+
+      #settings #shfaq-radio-panel button {
+        visibility: visible !important;
+        opacity: 1;
+        overflow: visible !important;
+        text-indent: 0 !important;
+        font: 700 12px/1.7 Tahoma, "Segoe UI", sans-serif !important;
+      }
+
+      #settings #shfaq-radio-panel button::before,
+      #settings #shfaq-radio-panel button::after {
+        content: none !important;
+        display: none !important;
+      }
+
+      #settings #shfaq-radio-panel .kr-r-icon {
+        display: inline-block !important;
+        position: static !important;
+        float: none !important;
+        flex: 0 0 20px !important;
+        width: 20px !important;
+        height: 20px !important;
+        min-width: 20px !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        color: inherit !important;
+        fill: none !important;
+        stroke: currentColor !important;
+        stroke-width: 1.8 !important;
+        overflow: visible !important;
+        pointer-events: none;
+      }
+
+      #settings #shfaq-radio-panel button:disabled {
+        opacity: .65;
+      }
+
+      #settings #shfaq-radio-panel input[type="range"] {
+        appearance: auto !important;
+        position: static !important;
+        float: none !important;
+        width: 100% !important;
+        max-width: none !important;
+        height: 24px !important;
+        min-width: 0 !important;
+        padding: 0 !important;
+        margin: 8px 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+      }
     `;
 
     document.head.appendChild(style);
+  }
+
+  function icon(name) {
+    var paths = {
+      book:
+        '<path d="M12 5c-3-2-6-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1Z"/>' +
+        '<path d="M12 5v15"/>',
+
+      music:
+        '<path d="M9 18V5l11-2v13M9 9l11-2"/>' +
+        '<ellipse cx="6" cy="18" rx="3" ry="2"/>' +
+        '<ellipse cx="17" cy="16" rx="3" ry="2"/>',
+
+      headphones:
+        '<path d="M4 14v-3a8 8 0 0 1 16 0v3"/>' +
+        '<rect x="3" y="12" width="4" height="9" rx="2"/>' +
+        '<rect x="17" y="12" width="4" height="9" rx="2"/>',
+
+      mic:
+        '<rect x="9" y="2" width="6" height="13" rx="3"/>' +
+        '<path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/>',
+
+      play:
+        '<path d="m8 4 12 8-12 8Z"/>',
+
+      stop:
+        '<rect x="5" y="5" width="14" height="14" rx="1"/>'
+    };
+
+    return (
+      '<svg class="kr-r-icon" viewBox="0 0 24 24" ' +
+      'aria-hidden="true" focusable="false" ' +
+      'stroke-linecap="round" stroke-linejoin="round">' +
+      paths[name] +
+      '</svg>'
+    );
   }
 
   function el(selector) {
@@ -357,7 +444,8 @@
     panel.querySelectorAll('[data-kr-station]').forEach(
       function (button) {
         var active =
-          Number(button.getAttribute('data-kr-station')) === selected;
+          Number(button.getAttribute('data-kr-station')) ===
+          selected;
 
         button.setAttribute('aria-pressed', String(active));
       }
@@ -487,7 +575,10 @@
           result.catch(function (error) {
             if (!current()) return;
 
-            if (error && error.name === 'NotAllowedError') {
+            if (
+              error &&
+              error.name === 'NotAllowedError'
+            ) {
               failed(
                 'اضغط تشغيل للسماح بالصوت في المتصفح.',
                 false
@@ -534,10 +625,11 @@
         childList: true,
         subtree: true
       });
+
       return;
     }
 
-    // بعد التركيب نراقب الحاويات دون محتويات رسائل الشات.
+    // مراقبة الحاويات دون مراقبة محتويات رسائل الشات.
     var node = watchedParent;
 
     while (node && node.nodeType === 1) {
@@ -577,7 +669,9 @@
       panel = null;
     }
 
-    var oldPanel = document.getElementById('shfaq-radio-panel');
+    var oldPanel = document.getElementById(
+      'shfaq-radio-panel'
+    );
 
     if (oldPanel) oldPanel.remove();
 
@@ -591,6 +685,7 @@
     var radioName = detectName();
 
     panel.setAttribute('aria-label', radioName);
+
     panel.style.setProperty(
       '--chat-radio-accent',
       detectAccent()
@@ -614,8 +709,8 @@
               data-kr-station="${index}"
               aria-pressed="${index === selected}"
             >
-              <span aria-hidden="true">${station.icon}</span>
-              <span>${station.label}</span>
+              ${icon(station.icon)}
+              ${station.label}
             </button>
           `;
         }).join('')}
@@ -632,12 +727,12 @@
 
       <div class="kr-r-controls">
         <button type="button" data-kr-play>
-          <span aria-hidden="true">▶</span>
+          ${icon('play')}
           تشغيل
         </button>
 
         <button type="button" data-kr-stop>
-          <span aria-hidden="true">■</span>
+          ${icon('stop')}
           إيقاف
         </button>
       </div>
@@ -665,10 +760,15 @@
 
     panel.querySelector(
       '[data-chat-radio-heading]'
-    ).textContent = '📻 ' + radioName;
+    ).textContent = radioName;
 
-    var gamesButton = settings.querySelector('#thGamesOpenBtn');
-    var moreButton = settings.querySelector('.th-settings-more-btn');
+    var gamesButton = settings.querySelector(
+      '#thGamesOpenBtn'
+    );
+
+    var moreButton = settings.querySelector(
+      '.th-settings-more-btn'
+    );
 
     if (gamesButton) {
       gamesButton.insertAdjacentElement('afterend', panel);
@@ -681,14 +781,27 @@
     panel.addEventListener('click', function (event) {
       var target = event.target;
 
-      if (!target || typeof target.closest !== 'function') return;
+      if (
+        !target ||
+        typeof target.closest !== 'function'
+      ) {
+        return;
+      }
 
       var button = target.closest('button');
 
-      if (!button || !panel || !panel.contains(button)) return;
+      if (
+        !button ||
+        !panel ||
+        !panel.contains(button)
+      ) {
+        return;
+      }
 
       if (button.hasAttribute('data-kr-station')) {
-        choose(Number(button.getAttribute('data-kr-station')));
+        choose(
+          Number(button.getAttribute('data-kr-station'))
+        );
       } else if (button.hasAttribute('data-kr-play')) {
         play();
       } else if (button.hasAttribute('data-kr-stop')) {
@@ -716,7 +829,8 @@
         }
       }
 
-      output.textContent = Math.round(volume * 100) + '٪';
+      output.textContent =
+        Math.round(volume * 100) + '٪';
     });
 
     choose(selected);
@@ -776,8 +890,17 @@
 
     release();
 
-    document.removeEventListener('DOMContentLoaded', init);
-    document.removeEventListener('click', onLogout, true);
+    document.removeEventListener(
+      'DOMContentLoaded',
+      init
+    );
+
+    document.removeEventListener(
+      'click',
+      onLogout,
+      true
+    );
+
     window.removeEventListener('pagehide', stop);
 
     if (panel) {
@@ -796,9 +919,11 @@
   window.addEventListener('pagehide', stop);
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, {
-      once: true
-    });
+    document.addEventListener(
+      'DOMContentLoaded',
+      init,
+      { once: true }
+    );
   } else {
     init();
   }
