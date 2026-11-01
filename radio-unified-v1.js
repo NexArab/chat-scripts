@@ -12,6 +12,9 @@
 
   var options = window.CHAT_RADIO_CONFIG || {};
   var panel = null;
+  var root = null;
+  var ui = null;
+  var playProxy = null;
   var media = null;
   var selected = 0;
   var volume = 0.5;
@@ -25,26 +28,26 @@
   var stations = [
     {
       label: 'قرآن كريم',
-      icon: 'book',
+      icon: '📖',
       urls: ['https://edge.mixlr.com/channel/rwumx']
     },
     {
       label: 'أغاني عربية',
-      icon: 'music',
+      icon: '♫',
       urls: [
         'https://mazajfm.ice.infomaniak.ch/mazajfm-192.mp3'
       ]
     },
     {
       label: 'أغاني أجنبية',
-      icon: 'headphones',
+      icon: '🎧',
       urls: [
         'https://channels.fluxfm.de/90s/externalembedflxhp/stream.mp3'
       ]
     },
     {
       label: 'سوالف مباشرة',
-      icon: 'mic',
+      icon: '🎙',
       urls: ['https://hala-alrayamedia.radioca.st/;']
     }
   ];
@@ -107,40 +110,29 @@
   }
 
   function installStyle() {
-    var style = document.getElementById(
-      'chat-radio-unified-style'
-    );
-
-    if (!style) {
-      style = document.createElement('style');
-      style.id = 'chat-radio-unified-style';
-    }
+    var style = document.createElement('style');
 
     style.textContent = `
-      #settings #shfaq-radio-panel,
-      #settings #shfaq-radio-panel * {
+      #shfaq-radio-panel,
+      #shfaq-radio-panel * {
         box-sizing: border-box;
       }
 
-      #settings #shfaq-radio-panel {
-        clear: both !important;
-        float: none !important;
-        display: block !important;
-        width: calc(100% - 8px) !important;
-        margin: 10px 4px !important;
-        padding: 14px !important;
+      #shfaq-radio-panel {
+        display: block;
+        width: calc(100% - 8px);
+        margin: 10px 4px;
+        padding: 14px;
         direction: rtl;
-        background: #fff !important;
-        color: #333 !important;
-        border: 1px solid #d9d9d9 !important;
-        border-radius: 12px !important;
-        text-align: right !important;
-        font-family: Tahoma, "Segoe UI", sans-serif !important;
-        font-size: 13px !important;
-        line-height: 1.7 !important;
+        text-align: right;
+        background: #fff;
+        color: #333;
+        border: 1px solid #d9d9d9;
+        border-radius: 12px;
+        font: 13px/1.7 Tahoma, "Segoe UI", sans-serif;
       }
 
-      #shfaq-radio-panel .kr-r-heading {
+      .kr-r-heading {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -148,229 +140,162 @@
         margin-bottom: 12px;
       }
 
-      #shfaq-radio-panel .kr-r-heading strong {
-        color: #555;
+      .kr-r-heading strong {
+        color: var(--chat-radio-accent, #67436f);
         font-size: 15px;
+        font-weight: 700;
       }
 
-      #shfaq-radio-panel .kr-r-heading > span {
+      .kr-r-heading > span {
         color: #666;
         font-size: 11px;
+        white-space: nowrap;
       }
 
-      #shfaq-radio-panel .kr-r-grid {
+      .kr-r-grid,
+      .kr-r-controls {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 7px;
       }
 
-      #settings #shfaq-radio-panel button {
-        position: static !important;
-        float: none !important;
-        display: flex !important;
+      .kr-r-controls {
+        gap: 8px;
+      }
+
+      button {
+        position: static;
+        float: none;
+        display: flex;
         align-items: center;
         justify-content: center;
         gap: 6px;
-        width: auto !important;
-        min-width: 0 !important;
-        min-height: 42px !important;
-        height: auto !important;
-        margin: 0 !important;
-        padding: 9px 6px !important;
-        border: 1px solid #d0d0d0 !important;
-        border-radius: 8px !important;
-        background: #f6f6f6 !important;
-        color: #333 !important;
-        font-family: inherit !important;
-        font-size: 12px !important;
-        font-weight: 700 !important;
-        line-height: 1.7 !important;
-        white-space: normal !important;
-        text-shadow: none !important;
-        box-shadow: none !important;
+        width: 100%;
+        min-width: 0;
+        min-height: 42px;
+        height: auto;
+        margin: 0;
+        padding: 9px 6px;
+        border: 1px solid #d0d0d0;
+        border-radius: 8px;
+        background: #f6f6f6;
+        color: #333;
+        font: 700 12px/1.7 Tahoma, "Segoe UI", sans-serif;
+        white-space: normal;
+        text-align: center;
+        text-indent: 0;
+        text-shadow: none;
+        box-shadow: none;
         cursor: pointer;
       }
 
-      #settings #shfaq-radio-panel button[aria-pressed="true"],
-      #settings #shfaq-radio-panel [data-kr-play] {
-        background: var(--chat-radio-accent, #67436f) !important;
-        border-color: var(--chat-radio-accent, #67436f) !important;
-        color: #fff !important;
+      button[aria-pressed="true"],
+      button[data-kr-play] {
+        background: var(--chat-radio-accent, #67436f);
+        border-color: var(--chat-radio-accent, #67436f);
+        color: #fff;
       }
 
-      #settings #shfaq-radio-panel button:disabled {
+      button:disabled {
         opacity: .65;
         cursor: default;
       }
 
-      #settings #shfaq-radio-panel button:focus-visible,
-      #settings #shfaq-radio-panel input:focus-visible {
-        outline: 2px solid var(--chat-radio-accent, #67436f) !important;
+      button:focus-visible,
+      input:focus-visible {
+        outline: 2px solid var(--chat-radio-accent, #67436f);
         outline-offset: 2px;
       }
 
-      #settings #shfaq-radio-panel .kr-r-info {
-        padding: 6px 0 !important;
-        margin-bottom: 8px !important;
+      .kr-r-icon {
+        display: inline-block;
+        flex: 0 0 auto;
+        font-size: 16px;
+        line-height: 1;
+      }
+
+      .kr-r-label {
+        display: inline;
+        min-width: 0;
+        color: inherit;
+        font: inherit;
+        overflow-wrap: anywhere;
+      }
+
+      .kr-r-info {
+        padding: 6px 0;
+        margin-bottom: 8px;
         border-bottom: 1px solid #e3e3e3;
         overflow-wrap: anywhere;
       }
 
-      #settings #shfaq-radio-panel .kr-r-status {
-        min-height: 22px !important;
-        margin: 0 !important;
+      .kr-r-status {
+        min-height: 22px;
+        margin: 0;
         color: #555;
-        font-size: 12px !important;
+        font-size: 12px;
       }
 
-      #shfaq-radio-panel .kr-r-status[data-state="error"] {
+      .kr-r-status[data-state="error"] {
         color: #a32828;
       }
 
-      #shfaq-radio-panel .kr-r-controls {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 8px;
-      }
-
-      #shfaq-radio-panel .kr-r-volume {
+      .kr-r-volume {
         display: block;
         width: 100%;
         margin: 12px 0 0;
         font-weight: 400;
       }
 
-      #shfaq-radio-panel .kr-r-volume > span {
+      .kr-r-volume > span {
         display: flex;
         justify-content: space-between;
         color: #555;
         font-size: 12px;
       }
 
-      #shfaq-radio-panel output {
+      output {
         display: inline;
         padding: 0;
         color: #555;
-        font-size: 12px;
+        font: inherit;
       }
 
-      #settings #shfaq-radio-panel input[type="range"] {
+      input[type="range"] {
+        appearance: auto;
+        position: static;
         display: block;
         float: none;
         width: 100%;
-        min-height: 24px;
+        height: 24px;
+        min-width: 0;
         margin: 8px 0;
         padding: 0;
         border: 0;
         background: transparent;
+        box-shadow: none;
         direction: ltr;
         accent-color: var(--chat-radio-accent, #67436f);
       }
 
-      #shfaq-radio-panel .kr-r-bottom {
+      .kr-r-bottom {
         margin: 8px 0 0;
         color: #666;
         font-size: 11px;
         text-align: center;
       }
 
-      #settings #shfaq-radio-panel audio {
+      audio,
+      [hidden] {
         display: none !important;
-      }
-
-      #settings #shfaq-radio-panel button {
-        visibility: visible !important;
-        opacity: 1;
-        overflow: visible !important;
-        text-indent: 0 !important;
-        font: 700 12px/1.7 Tahoma, "Segoe UI", sans-serif !important;
-      }
-
-      #settings #shfaq-radio-panel button::before,
-      #settings #shfaq-radio-panel button::after {
-        content: none !important;
-        display: none !important;
-      }
-
-      #settings #shfaq-radio-panel .kr-r-icon {
-        display: inline-block !important;
-        position: static !important;
-        float: none !important;
-        flex: 0 0 20px !important;
-        width: 20px !important;
-        height: 20px !important;
-        min-width: 20px !important;
-        max-width: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        color: inherit !important;
-        fill: none !important;
-        stroke: currentColor !important;
-        stroke-width: 1.8 !important;
-        overflow: visible !important;
-        pointer-events: none;
-      }
-
-      #settings #shfaq-radio-panel button:disabled {
-        opacity: .65;
-      }
-
-      #settings #shfaq-radio-panel input[type="range"] {
-        appearance: auto !important;
-        position: static !important;
-        float: none !important;
-        width: 100% !important;
-        max-width: none !important;
-        height: 24px !important;
-        min-width: 0 !important;
-        padding: 0 !important;
-        margin: 8px 0 !important;
-        box-shadow: none !important;
-        background: transparent !important;
       }
     `;
 
-    document.head.appendChild(style);
-  }
-
-  function icon(name) {
-    var paths = {
-      book:
-        '<path d="M12 5c-3-2-6-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1Z"/>' +
-        '<path d="M12 5v15"/>',
-
-      music:
-        '<path d="M9 18V5l11-2v13M9 9l11-2"/>' +
-        '<ellipse cx="6" cy="18" rx="3" ry="2"/>' +
-        '<ellipse cx="17" cy="16" rx="3" ry="2"/>',
-
-      headphones:
-        '<path d="M4 14v-3a8 8 0 0 1 16 0v3"/>' +
-        '<rect x="3" y="12" width="4" height="9" rx="2"/>' +
-        '<rect x="17" y="12" width="4" height="9" rx="2"/>',
-
-      mic:
-        '<rect x="9" y="2" width="6" height="13" rx="3"/>' +
-        '<path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/>',
-
-      play:
-        '<path d="m8 4 12 8-12 8Z"/>',
-
-      stop:
-        '<rect x="5" y="5" width="14" height="14" rx="1"/>'
-    };
-
-    return (
-      '<svg class="kr-r-icon" viewBox="0 0 24 24" ' +
-      'aria-hidden="true" focusable="false" ' +
-      'stroke-linecap="round" stroke-linejoin="round">' +
-      paths[name] +
-      '</svg>'
-    );
+    root.appendChild(style);
   }
 
   function el(selector) {
-    return panel ? panel.querySelector(selector) : null;
+    return ui ? ui.querySelector(selector) : null;
   }
 
   function clearDeadline() {
@@ -430,7 +355,7 @@
 
   function choose(index) {
     if (
-      !panel ||
+      !ui ||
       !Number.isInteger(index) ||
       index < 0 ||
       index >= stations.length
@@ -441,7 +366,7 @@
     stop();
     selected = index;
 
-    panel.querySelectorAll('[data-kr-station]').forEach(
+    ui.querySelectorAll('[data-kr-station]').forEach(
       function (button) {
         var active =
           Number(button.getAttribute('data-kr-station')) ===
@@ -475,7 +400,7 @@
         // بعض الأجهزة تدير الصوت من أزرار الجهاز.
       }
 
-      panel.appendChild(audio);
+      ui.appendChild(audio);
 
       setStatus(
         sourceIndex
@@ -629,7 +554,7 @@
       return;
     }
 
-    // مراقبة الحاويات دون مراقبة محتويات رسائل الشات.
+    // مراقبة الحاويات دون محتويات رسائل الشات.
     var node = watchedParent;
 
     while (node && node.nodeType === 1) {
@@ -641,12 +566,31 @@
     }
   }
 
+  function createCompatibilityButton(attribute, handler) {
+    var button = document.createElement('button');
+
+    button.type = 'button';
+    button.hidden = true;
+    button.tabIndex = -1;
+    button.setAttribute(attribute, '');
+    button.setAttribute('aria-hidden', 'true');
+    button.style.setProperty('display', 'none', 'important');
+    button.addEventListener('click', handler);
+
+    panel.appendChild(button);
+
+    return button;
+  }
+
   function mount() {
     if (destroyed) return;
 
     if (panel && !panel.isConnected) {
       release();
       panel = null;
+      ui = null;
+      root = null;
+      playProxy = null;
     }
 
     var settings = document.getElementById('settings');
@@ -675,23 +619,36 @@
 
     if (oldPanel) oldPanel.remove();
 
-    installStyle();
-
     panel = document.createElement('section');
     panel.id = 'shfaq-radio-panel';
     panel.dir = 'rtl';
     panel.lang = 'ar';
 
     var radioName = detectName();
+    var accent = detectAccent();
 
     panel.setAttribute('aria-label', radioName);
 
-    panel.style.setProperty(
-      '--chat-radio-accent',
-      detectAccent()
-    );
+    // عزل الحاوية عن قواعد الإعدادات العامة.
+    panel.style.setProperty('all', 'initial', 'important');
+    panel.style.setProperty('display', 'block', 'important');
+    panel.style.setProperty('clear', 'both', 'important');
+    panel.style.setProperty('float', 'none', 'important');
+    panel.style.setProperty('width', '100%', 'important');
 
-    panel.innerHTML = `
+    // CSS الموقع لا يصل إلى العناصر داخل هذه الواجهة.
+    root = panel.attachShadow({ mode: 'open' });
+
+    ui = document.createElement('div');
+    ui.id = 'shfaq-radio-panel';
+    ui.dir = 'rtl';
+    ui.lang = 'ar';
+    ui.style.setProperty('--chat-radio-accent', accent);
+
+    root.appendChild(ui);
+    installStyle();
+
+    ui.innerHTML = `
       <div class="kr-r-heading">
         <strong data-chat-radio-heading></strong>
         <span>استماع شخصي</span>
@@ -709,8 +666,13 @@
               data-kr-station="${index}"
               aria-pressed="${index === selected}"
             >
-              ${icon(station.icon)}
-              ${station.label}
+              <span class="kr-r-icon" aria-hidden="true">
+                ${station.icon}
+              </span>
+
+              <span class="kr-r-label">
+                ${station.label}
+              </span>
             </button>
           `;
         }).join('')}
@@ -727,13 +689,13 @@
 
       <div class="kr-r-controls">
         <button type="button" data-kr-play>
-          ${icon('play')}
-          تشغيل
+          <span class="kr-r-icon" aria-hidden="true">▶</span>
+          <span class="kr-r-label">تشغيل</span>
         </button>
 
         <button type="button" data-kr-stop>
-          ${icon('stop')}
-          إيقاف
+          <span class="kr-r-icon" aria-hidden="true">■</span>
+          <span class="kr-r-label">إيقاف</span>
         </button>
       </div>
 
@@ -758,9 +720,19 @@
       </p>
     `;
 
-    panel.querySelector(
-      '[data-chat-radio-heading]'
-    ).textContent = radioName;
+    el('[data-chat-radio-heading]').textContent =
+      '📻 ' + radioName;
+
+    // يحافظان على التوافق مع سكربت التلفاز الموجود.
+    playProxy = createCompatibilityButton(
+      'data-kr-play',
+      play
+    );
+
+    createCompatibilityButton(
+      'data-kr-stop',
+      stop
+    );
 
     var gamesButton = settings.querySelector(
       '#thGamesOpenBtn'
@@ -778,7 +750,7 @@
       settings.appendChild(panel);
     }
 
-    panel.addEventListener('click', function (event) {
+    ui.addEventListener('click', function (event) {
       var target = event.target;
 
       if (
@@ -792,8 +764,8 @@
 
       if (
         !button ||
-        !panel ||
-        !panel.contains(button)
+        !ui ||
+        !ui.contains(button)
       ) {
         return;
       }
@@ -803,7 +775,8 @@
           Number(button.getAttribute('data-kr-station'))
         );
       } else if (button.hasAttribute('data-kr-play')) {
-        play();
+        // يمر الحدث عبر الصفحة ليلتقطه سكربت التلفاز.
+        if (playProxy) playProxy.click();
       } else if (button.hasAttribute('data-kr-stop')) {
         stop();
       }
@@ -825,7 +798,7 @@
         try {
           media.volume = volume;
         } catch (error) {
-          // يبقى التحكم متاحًا من أزرار الجهاز.
+          // بعض الأجهزة تتحكم بالصوت من أزرار الجهاز.
         }
       }
 
@@ -903,11 +876,12 @@
 
     window.removeEventListener('pagehide', stop);
 
-    if (panel) {
-      panel.remove();
-      panel = null;
-    }
+    if (panel) panel.remove();
 
+    panel = null;
+    ui = null;
+    root = null;
+    playProxy = null;
     watchedParent = null;
   }
 
