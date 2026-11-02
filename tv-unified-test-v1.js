@@ -357,13 +357,6 @@
       embed: 'https://snrt.player.easybroadcast.io/events/73_arryadia_k2tgcj0'
     },
     {
-      id: 'bein-news',
-      name: 'beIN SPORTS الإخبارية',
-      group: 'رياضة',
-      embed: 'https://www.youtube.com/embed/2lJZPT6OljI?playsinline=1&autoplay=0',
-      kind: 'بث مباشر'
-    },
-    {
       id: 'live-7',
       name: 'الكويت الرياضية',
       group: 'رياضة',
@@ -382,18 +375,6 @@
       stream: 'https://5c7b683162943.streamlock.net/live/ngrp:sportsone_all/playlist.m3u8'
     },
     {
-      id: 'live-13',
-      name: 'البحرين الرياضية 2',
-      group: 'رياضة',
-      stream: 'https://5c7b683162943.streamlock.net/live/ngrp:bahrainsportstwo_all/playlist.m3u8'
-    },
-    {
-      id: 'dubai-sport1',
-      name: 'دبي الرياضية 1',
-      group: 'رياضة',
-      embed: 'https://admin.mangomolo.com/analytics/index.php/customers/embed/index?id=NzE=&channelid=MjM=&countries=Q0M=&w=100%&h=100%&filter=DENY&signature=b8eadb483fc9abaf1f4625f3041e23d2&jwplayer=6'
-    },
-    {
       id: 'aj',
       name: 'الجزيرة',
       group: 'أخبار',
@@ -406,20 +387,6 @@
       embed: 'https://www.youtube.com/embed/ppgTP8xQQsM?playsinline=1&autoplay=0'
     },
     {
-      id: 'france24',
-      name: 'فرانس 24 عربي',
-      group: 'أخبار',
-      embed: 'https://www.youtube.com/embed/3ursYA8HMeo?playsinline=1&autoplay=0',
-      kind: 'بث مباشر'
-    },
-    {
-      id: 'hadath',
-      name: 'الحدث',
-      group: 'أخبار',
-      embed: 'https://www.youtube.com/embed/2_edgF4cIpQ?playsinline=1&autoplay=0',
-      kind: 'بث مباشر'
-    },
-    {
       id: 'live-6',
       name: 'الكويت الإخبارية',
       group: 'أخبار',
@@ -430,24 +397,6 @@
       name: 'الشرق للأخبار',
       group: 'أخبار',
       stream: 'https://live-news-v2.asharq.com/asharq.m3u8'
-    },
-    {
-      id: 'ajm',
-      name: 'الجزيرة مباشر',
-      group: 'أخبار',
-      embed: 'https://www.youtube.com/embed/Lwbp9WfLslc?playsinline=1&autoplay=0'
-    },
-    {
-      id: 'saudi-news',
-      name: 'الإخبارية السعودية',
-      group: 'أخبار',
-      embed: 'https://www.youtube.com/embed/jDChXanY4oQ?playsinline=1&autoplay=0'
-    },
-    {
-      id: 'dw-en',
-      name: 'DW News — إنجليزي',
-      group: 'أخبار',
-      embed: 'https://www.youtube.com/embed/Lh5GXucy2EU?playsinline=1&autoplay=0'
     },
     {
       id: 'doc',
@@ -498,22 +447,10 @@
       stream: 'https://kwtktvaqta.cdn.mangomolo.com/ktvaq/smil:tktvaq.stream.smil/chunklist.m3u8'
     },
     {
-      id: 'live-14',
-      name: 'تلفزيون البحرين',
-      group: 'برامج',
-      stream: 'https://5c7b683162943.streamlock.net/live/ngrp:bahraintvmain_all/playlist.m3u8'
-    },
-    {
       id: 'live-15',
       name: 'الريان القديم',
       group: 'برامج',
       stream: 'https://alrayyancdn.vidgyor.com/pub-nooldraybinbdh/liveabr/playlist_dvr.m3u8'
-    },
-    {
-      id: 'live-16',
-      name: 'الريان',
-      group: 'برامج',
-      stream: 'https://alrayyancdn.vidgyor.com/pub-noalrayy3pwz0l/liveabr/playlist_dvr.m3u8'
     },
     {
       id: 'oman-general',
@@ -538,12 +475,6 @@
       name: 'عُمان الثقافية',
       group: 'ثقافة',
       embed: 'https://player.mangomolo.com/v1/live?id=MTY4&channelid=MTYw&countries=Q0M=&w=100%25&h=100%25&filter=DENY&signature=515ec2eb016a3e614059a5261f4b8280&language=ar&app_id=&fullscreen=yes&player_profile=&base_url=aHR0cHM6Ly9heW4ub20vbGl2ZS8xNjA=&autoplay=false&vast=true'
-    },
-    {
-      id: 'lofi',
-      name: 'Lofi Girl — موسيقى هادئة',
-      group: 'أغاني',
-      embed: 'https://www.youtube.com/embed/jfKfPfyJRdk?playsinline=1&autoplay=0'
     },
     {
       id: 'fnjan-backstage',
@@ -571,48 +502,6 @@
       group: 'دين',
       stream: 'https://5c7b683162943.streamlock.net/live/ngrp:bahrainquran_all/playlist.m3u8'
     },
-
-    // القنوات الجديدة
-    {
-      id: 'test-aflam-sa',
-      name: 'أفلام',
-      group: 'أفلام',
-      stream: 'https://shd-amg-fast.edgenextcdn.net/tx001/playlist.m3u8',
-      sourceId: 'Aflam.sa@SD',
-      kind: 'بث تجريبي'
-    },
-    {
-      id: 'test-aliraqiasport-iq',
-      name: 'العراقية الرياضية',
-      group: 'رياضة',
-      stream: 'https://imn-live.esite-lab.com/hls/iraqia-sports-1.m3u8',
-      sourceId: 'AlIraqiaSport.iq@SD',
-      kind: 'بث تجريبي'
-    },
-    {
-      id: 'test-babalhara-sa',
-      name: 'باب الحارة',
-      group: 'مسلسلات',
-      stream: 'https://shd-amg-fast.edgenextcdn.net/tx010/playlist.m3u8',
-      sourceId: 'BabAlHara.sa@SD',
-      kind: 'بث تجريبي'
-    },
-    {
-      id: 'test-elheddaftv-dz',
-      name: 'الهداف',
-      group: 'رياضة',
-      stream: 'https://live.elheddaftv.com:8081/elheddaftv/index.m3u8',
-      sourceId: 'ElHeddafTV.dz@SD',
-      kind: 'بث تجريبي'
-    },
-    {
-      id: 'test-fujairahtv-ae',
-      name: 'الفجيرة',
-      group: 'ترفيه',
-      stream: 'https://live.kwikmotion.com/fujairahlive/fujairah.smil/playlist.m3u8',
-      sourceId: 'FujairahTV.ae@SD',
-      kind: 'بث تجريبي'
-    },
     {
       id: 'test-hyatv-eg',
       name: 'هي TV',
@@ -630,92 +519,12 @@
       kind: 'بث تجريبي'
     },
     {
-      id: 'test-jordancomedy-jo',
-      name: 'الأردن كوميديا',
-      group: 'كوميديا',
-      stream: 'https://playlist.fasttvcdn.com/pl/cc0blorawy1ibohhrupraa/Comedy/playlist.m3u8',
-      sourceId: 'JordanComedy.jo@SD',
-      kind: 'بث تجريبي'
-    },
-    {
-      id: 'test-jordandrama-jo',
-      name: 'الأردن دراما',
-      group: 'مسلسلات',
-      stream: 'https://playlist.fasttvcdn.com/pl/cc0blorawy1ibohhrupraa/Drama/playlist.m3u8',
-      sourceId: 'JordanDrama.jo@SD',
-      kind: 'بث تجريبي'
-    },
-    {
       id: 'test-jordansport-jo',
       name: 'الأردن الرياضية',
       group: 'رياضة',
       stream: 'https://jrtv-live.ercdn.net/jordansporthd/jordansporthd.m3u8',
       sourceId: 'JordanSport.jo@SD',
       kind: 'بث تجريبي · قد يكون محجوبًا ببلدك'
-    },
-    {
-      id: 'test-kurdsat-iq',
-      name: 'كردسات',
-      group: 'ترفيه',
-      stream: 'https://hlspackager.akamaized.net/live/DB/KURDSAT_HD/HLS/KURDSAT_HD.m3u8',
-      sourceId: 'Kurdsat.iq@SD',
-      kind: 'بث تجريبي'
-    },
-    {
-      id: 'test-maraya-sa',
-      name: 'مرايا',
-      group: 'مسلسلات',
-      stream: 'https://shd-amg-fast.edgenextcdn.net/tx008/playlist.m3u8',
-      sourceId: 'Maraya.sa@HD',
-      kind: 'بث تجريبي'
-    },
-    {
-      id: 'test-mbc4-ae',
-      name: 'MBC 4',
-      group: 'ترفيه',
-      stream: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-4/24f134f1cd63db9346439e96b86ca6ed/index.m3u8',
-      sourceId: 'MBC4.ae@SD',
-      kind: 'بث تجريبي'
-    },
-    {
-      id: 'test-mbcbollywood-ae',
-      name: 'MBC Bollywood',
-      group: 'أفلام',
-      stream: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-bollywood/546eb40d7dcf9a209255dd2496903764/index.m3u8',
-      sourceId: 'MBCBollywood.ae@SD',
-      kind: 'بث تجريبي · قد يكون محجوبًا ببلدك'
-    },
-    {
-      id: 'test-mbcdrama-ae',
-      name: 'MBC Drama — الإمارات',
-      group: 'مسلسلات',
-      stream: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-drama/2c28a458e2f3253e678b07ac7d13fe71/index.m3u8',
-      sourceId: 'MBCDrama.ae@SD',
-      kind: 'بث تجريبي'
-    },
-    {
-      id: 'test-mbcdramausa-us',
-      name: 'MBC Drama — أمريكا',
-      group: 'مسلسلات',
-      stream: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-drama-usa/ea2f5db904aff224b7066e59c7f585a2/index.m3u8',
-      sourceId: 'MBCDramaUSA.us@SD',
-      kind: 'بث تجريبي'
-    },
-    {
-      id: 'test-mbcmasrdrama-sa',
-      name: 'MBC مصر دراما',
-      group: 'مسلسلات',
-      stream: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-drama/567b703c19ede6598222de81b0e4508b/index.m3u8',
-      sourceId: 'MBCMasrDrama.sa@SD',
-      kind: 'بث تجريبي'
-    },
-    {
-      id: 'test-mbcplusdrama-sa',
-      name: 'MBC+ Drama',
-      group: 'مسلسلات',
-      stream: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-plus-drama/e37251ec2aac8f6c98f75cd0fa37cd28/index.m3u8',
-      sourceId: 'MBCPlusDrama.sa@SD',
-      kind: 'بث تجريبي'
     },
     {
       id: 'test-mixhollywood-eg',
@@ -726,85 +535,208 @@
       kind: 'بث تجريبي'
     },
     {
-      id: 'test-moviesaction-sa',
-      name: 'Movies Action',
-      group: 'أفلام',
-      stream: 'https://shd-amg-fast.edgenextcdn.net/tx011/playlist.m3u8',
-      sourceId: 'MoviesAction.sa@SD',
-      kind: 'بث تجريبي'
-    },
-    {
-      id: 'test-moviesthriller-sa',
-      name: 'Movies Thriller',
-      group: 'أفلام',
-      stream: 'https://shd-amg-fast.edgenextcdn.net/tx012/playlist.m3u8',
-      sourceId: 'MoviesThriller.sa@SD',
-      kind: 'بث تجريبي'
-    },
-    {
-      id: 'test-niledrama-eg',
-      name: 'نايل دراما',
-      group: 'مسلسلات',
-      unavailableReason: 'غير متاحة: المصدر الحالي HTTP ويحتاج رابط HTTPS',
-      sourceUrl: 'http://185.9.2.18/chid_352/index.m3u8',
-      sourceId: 'NileDrama.eg@SD',
-      kind: 'بث تجريبي'
-    },
-    {
       id: 'test-prime-sy',
       name: 'Prime السورية',
-      group: 'رياضة',
+      group: 'برامج',
       stream: 'https://cdn.bestream.io/prime/prime.m3u8',
       sourceId: 'Prime.sy@HD',
       kind: 'بث تجريبي · عامة ورياضة'
     },
     {
-      id: 'test-ritmutv-kw',
-      name: 'Ritmu TV',
-      group: 'ترفيه',
-      stream: 'https://659605a54e9a6.streamlock.net:8443/live/livestream/playlist.m3u8',
-      sourceId: 'RitmuTV.kw@SD',
+      id: 'extra-mbc1',
+      name: 'MBC 1',
+      group: 'برامج',
+      stream: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-1/15cf99af5de54063fdabfefe66adc075/index.m3u8',
       kind: 'بث تجريبي'
     },
     {
-      id: 'test-rotanacinemaegypt-eg',
-      name: 'روتانا سينما مصر',
+      id: 'extra-mbc-iraq',
+      name: 'MBC العراق',
+      group: 'برامج',
+      stream: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-iraq/e38c44b1b43474e1c39cb5b90203691e/index.m3u8',
+      kind: 'بث تجريبي'
+    },
+    {
+      id: 'extra-mbc-masr',
+      name: 'MBC مصر',
+      group: 'برامج',
+      stream: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr/956eac069c78a35d47245db6cdbb1575/index.m3u8',
+      kind: 'بث تجريبي'
+    },
+    {
+      id: 'extra-sbc',
+      name: 'SBC السعودية',
+      group: 'برامج',
+      stream: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-sbc/90e09c0c28db26435799b4a14892a167/index.m3u8',
+      kind: 'بث تجريبي'
+    },
+    {
+      id: 'extra-utv-iraq',
+      name: 'UTV العراقية',
+      group: 'برامج',
+      stream: 'https://utviraqi-live.lg.mncdn.com/utviraqi-live/64c80359/index.m3u8',
+      kind: 'بث تجريبي'
+    },
+    {
+      id: 'extra-roya',
+      name: 'رؤيا الأردنية',
+      group: 'برامج',
+      stream: 'https://live.kwikmotion.com/royatvpublic/royatv.smil/playlist.m3u8',
+      kind: 'بث تجريبي'
+    },
+    {
+      id: 'extra-rotana-khalijia',
+      name: 'روتانا خليجية',
+      group: 'برامج',
+      stream: 'https://rotana.hibridcdn.net/rotananet/khaleejiya_net-7Y83PP5adWixDF93/playlist.m3u8',
+      kind: 'بث تجريبي · قد يتعذر حسب البلد أو الموقع'
+    },
+    {
+      id: 'extra-rotana-classic',
+      name: 'روتانا كلاسيك',
       group: 'أفلام',
-      stream: 'https://rotana.hibridcdn.net/rotananet/cinemamasr_net-7Y83PP5adWixDF93/playlist.m3u8',
-      sourceId: 'RotanaCinemaEgypt.eg@SD',
+      stream: 'https://rotana.hibridcdn.net/rotananet/classical_net-7Y83PP5adWixDF93/playlist.m3u8',
+      kind: 'بث تجريبي · قد يتعذر حسب البلد أو الموقع'
+    },
+    {
+      id: 'extra-spacetoon',
+      name: 'سبيستون',
+      group: 'أطفال',
+      stream: 'https://live-uae-next.spacetoongo.com/ST_MENA_NEXT/hls/r9p2hjipmw2kl.m3u8',
+      kind: 'بث تجريبي · قد يمنع المصدر التشغيل داخل الشات'
+    },
+    {
+      id: 'extra-mbc3-usa',
+      name: 'MBC 3 — نسخة أمريكا',
+      group: 'أطفال',
+      stream: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-3-usa/5d58265a862a476dc7f97694addb5ded/index.m3u8',
       kind: 'بث تجريبي · قد يكون محجوبًا ببلدك'
     },
     {
-      id: 'test-rotanacinemaksa-sa',
-      name: 'روتانا سينما السعودية',
-      group: 'أفلام',
-      stream: 'https://rotana.hibridcdn.net/rotananet/cinema_net-7Y83PP5adWixDF93/playlist.m3u8',
-      sourceId: 'RotanaCinemaKSA.sa@SD',
-      kind: 'بث تجريبي · قد يكون محجوبًا ببلدك'
+      id: 'extra-aghani-aghani',
+      name: 'أغاني أغاني',
+      group: 'أغاني',
+      stream: 'https://cdn.streamlane.tv/hls/aghanitv/index.m3u8',
+      kind: 'بث تجريبي'
     },
     {
-      id: 'test-rotanacomedy-sa',
-      name: 'روتانا كوميدي',
-      group: 'كوميديا',
-      stream: 'https://rotana.hibridcdn.net/rotananet/comedy_net-7Y83PP5adWixDF93/playlist.m3u8',
-      sourceId: 'RotanaComedy.sa@SD',
-      kind: 'بث تجريبي · قد يكون محجوبًا ببلدك'
+      id: 'extra-rotana-music',
+      name: 'روتانا موسيقى',
+      group: 'أغاني',
+      stream: 'https://rotana.hibridcdn.net/rotananet/music_net-7Y83PP5adWixDF93/playlist.m3u8',
+      kind: 'بث تجريبي · قد يتعذر حسب البلد أو الموقع'
     },
     {
-      id: 'test-rotanadrama-sa',
-      name: 'روتانا دراما',
-      group: 'مسلسلات',
-      stream: 'https://rotana.hibridcdn.net/rotananet/drama_net-7Y83PP5adWixDF93/playlist.m3u8',
-      sourceId: 'RotanaDrama.sa@SD',
-      kind: 'بث تجريبي · قد يكون محجوبًا ببلدك'
+      id: 'extra-alarabiya',
+      name: 'العربية',
+      group: 'أخبار',
+      stream: 'https://live.alarabiya.net/alarabiapublish/alarabiya.smil/playlist.m3u8',
+      kind: 'بث تجريبي'
     },
     {
-      id: 'test-sharjahsports-ae',
+      id: 'extra-alkass-1',
+      name: 'الكأس 1',
+      group: 'رياضة',
+      stream: 'https://liveeu-gcp.alkassdigital.net/alkass1-p/main.m3u8',
+      kind: 'بث تجريبي'
+    },
+    {
+      id: 'extra-alkass-2',
+      name: 'الكأس 2',
+      group: 'رياضة',
+      stream: 'https://liveeu-gcp.alkassdigital.net/alkass2-p/main.m3u8',
+      kind: 'بث تجريبي'
+    },
+    {
+      id: 'extra-alkass-3',
+      name: 'الكأس 3',
+      group: 'رياضة',
+      stream: 'https://liveeu-gcp.alkassdigital.net/alkass3-p/main.m3u8',
+      kind: 'بث تجريبي'
+    },
+    {
+      id: 'extra-alkass-4',
+      name: 'الكأس 4',
+      group: 'رياضة',
+      stream: 'https://liveeu-gcp.alkassdigital.net/alkass4-p/main.m3u8',
+      kind: 'بث تجريبي'
+    },
+    {
+      id: 'extra-abudhabi-sports-1',
+      name: 'أبوظبي الرياضية 1',
+      group: 'رياضة',
+      stream: 'https://vo-live.cdb.cdn.orange.com/Content/Channel/AbuDhabiSportsChannel1/HLS/index.m3u8',
+      kind: 'بث تجريبي'
+    },
+    {
+      id: 'extra-abudhabi-sports-2',
+      name: 'أبوظبي الرياضية 2',
+      group: 'رياضة',
+      stream: 'https://vo-live.cdb.cdn.orange.com/Content/Channel/AbuDhabiSportsChannel2/HLS/index.m3u8',
+      kind: 'بث تجريبي'
+    },
+    {
+      id: 'extra-dubai-sports-1',
+      name: 'دبي الرياضية 1',
+      group: 'رياضة',
+      stream: 'https://dmitnthfr.cdn.mgmlcdn.com/dubaisports/smil:dubaisports.stream.smil/chunklist.m3u8',
+      kind: 'بث تجريبي'
+    },
+    {
+      id: 'extra-dubai-sports-2',
+      name: 'دبي الرياضية 2',
+      group: 'رياضة',
+      stream: 'https://dmitwlvvll.cdn.mangomolo.com/dubaisportshd/smil:dubaisportshd.smil/index.m3u8',
+      kind: 'بث تجريبي'
+    },
+    {
+      id: 'extra-dubai-sports-3',
+      name: 'دبي الرياضية 3',
+      group: 'رياضة',
+      stream: 'https://dmitwlvvll.cdn.mangomolo.com/dubaisportshd5/smil:dubaisportshd5.smil/index.m3u8',
+      kind: 'بث تجريبي'
+    },
+    {
+      id: 'extra-dubai-racing-1',
+      name: 'دبي ريسنغ 1',
+      group: 'رياضة',
+      stream: 'https://dmisvthvll.cdn.mgmlcdn.com/events/smil:events.stream.smil/playlist.m3u8',
+      kind: 'بث تجريبي · سباقات'
+    },
+    {
+      id: 'extra-dubai-racing-2',
+      name: 'دبي ريسنغ 2',
+      group: 'رياضة',
+      stream: 'https://dmithrvll.cdn.mangomolo.com/dubairacing/smil:dubairacing.smil/playlist.m3u8',
+      kind: 'بث تجريبي · سباقات'
+    },
+    {
+      id: 'extra-dubai-racing-3',
+      name: 'دبي ريسنغ 3',
+      group: 'رياضة',
+      stream: 'https://dmithrvll.cdn.mangomolo.com/dubaimubasher/smil:dubaimubasher.smil/playlist.m3u8',
+      kind: 'بث تجريبي · سباقات'
+    },
+    {
+      id: 'extra-sharjah-sports',
       name: 'الشارقة الرياضية',
       group: 'رياضة',
-      stream: 'https://svs.itworkscdn.net/smc4sportslive/smc4tv.smil/playlist.m3u8',
-      sourceId: 'SharjahSports.ae@SD',
-      kind: 'بث تجريبي · قد يكون محجوبًا ببلدك'
+      stream: 'https://svs.itworkscdn.net/smc4sportslive/smc4.smil/playlist.m3u8',
+      kind: 'بث تجريبي · رابط بديل'
+    },
+    {
+      id: 'extra-national-geographic-abudhabi',
+      name: 'ناشيونال جيوغرافيك أبوظبي',
+      group: 'وثائقي',
+      stream: 'https://admdn2.cdn.mangomolo.com/nagtv/smil:nagtv.stream.smil/playlist.m3u8',
+      kind: 'بث تجريبي'
+    },
+    {
+      id: 'extra-cartoon-network-arabic',
+      name: 'كرتون نتورك بالعربية',
+      group: 'أطفال',
+      stream: 'https://shls-cartoon-net-prod-dub.shahid.net/out/v1/dc4aa87372374325a66be458f29eab0f/index.m3u8',
+      kind: 'بث تجريبي'
     }
   ];
 
