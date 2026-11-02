@@ -360,7 +360,7 @@
       id: 'bein-news',
       name: 'beIN SPORTS الإخبارية',
       group: 'رياضة',
-      embed: 'https://www.youtube.com/watch?v=2lJZPT6OljI',
+      embed: 'https://www.youtube.com/embed/2lJZPT6OljI?playsinline=1&autoplay=0',
       kind: 'بث مباشر'
     },
     {
