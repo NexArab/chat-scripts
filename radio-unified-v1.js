@@ -29,13 +29,50 @@
     {
       label: 'قرآن كريم',
       icon: '📖',
-      urls: ['https://edge.mixlr.com/channel/rwumx']
+      urls: [
+        'https://edge.mixlr.com/channel/rwumx'
+      ]
+    },
+    {
+      label: 'الخليجية',
+      icon: '♫',
+      urls: [
+        'https://stream.radiojar.com/5wpf9e4erxquv'
+      ]
+    },
+    {
+      label: 'مكس السعودية',
+      icon: '♫',
+      urls: [
+        'https://s1.voscast.com:11377/live.mp3'
+      ]
+    },
+    {
+      label: 'العربية 99',
+      icon: '♫',
+      urls: [
+        'https://stream.radiojar.com/s1mygd1frxquv'
+      ]
     },
     {
       label: 'أغاني عربية',
       icon: '♫',
       urls: [
         'https://mazajfm.ice.infomaniak.ch/mazajfm-192.mp3'
+      ]
+    },
+    {
+      label: 'سومر العراقية',
+      icon: '♫',
+      urls: [
+        'https://l3.itworkscdn.net/itwaudio/9012/stream'
+      ]
+    },
+    {
+      label: 'الرشيد العراقية',
+      icon: '📻',
+      urls: [
+        'https://streaming.shoutcast.com/alrasheed-fm'
       ]
     },
     {
@@ -48,7 +85,30 @@
     {
       label: 'سوالف مباشرة',
       icon: '🎙',
-      urls: ['https://hala-alrayamedia.radioca.st/;']
+      urls: [
+        'https://hala-alrayamedia.radioca.st/;'
+      ]
+    },
+    {
+      label: 'الوصال',
+      icon: '🎙',
+      urls: [
+        'https://uk7.internet-radio.com/proxy/alwisal?mp=/stream'
+      ]
+    },
+    {
+      label: 'ألف ألف',
+      icon: '🎙',
+      urls: [
+        'https://alifalifjobs.com/radio/8000/AlifAlifLive.mp3'
+      ]
+    },
+    {
+      label: 'مونت كارلو',
+      icon: '🎙',
+      urls: [
+        'https://montecarlodoualiya128k.ice.infomaniak.ch/mc-doualiya.mp3'
+      ]
     }
   ];
 
@@ -288,6 +348,74 @@
       audio,
       [hidden] {
         display: none !important;
+      }
+
+      /* تصغير واجهة الراديو */
+      #shfaq-radio-panel {
+        padding: 9px;
+      }
+
+      .kr-r-heading {
+        gap: 6px;
+        margin-bottom: 9px;
+      }
+
+      .kr-r-heading strong {
+        min-width: 0;
+        font-size: 13px;
+        overflow-wrap: anywhere;
+      }
+
+      .kr-r-heading > span {
+        font-size: 10px;
+      }
+
+      /* أربع محطات في كل صف */
+      .kr-r-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 5px;
+        align-items: stretch;
+      }
+
+      .kr-r-grid > button {
+        flex-direction: column;
+        gap: 3px;
+        min-height: 48px;
+        padding: 5px 2px;
+        border-radius: 6px;
+        font-size: 10px;
+        line-height: 1.4;
+      }
+
+      .kr-r-grid .kr-r-icon {
+        font-size: 14px;
+        line-height: 1;
+      }
+
+      .kr-r-grid .kr-r-label {
+        display: block;
+        width: 100%;
+        overflow-wrap: anywhere;
+      }
+
+      /* التشغيل والإيقاف */
+      .kr-r-controls {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .kr-r-controls > button {
+        min-height: 42px;
+        padding: 6px;
+      }
+
+      .kr-r-volume {
+        margin-top: 8px;
+      }
+
+      .kr-r-bottom {
+        margin-top: 5px;
+        font-size: 10px;
       }
     `;
 
