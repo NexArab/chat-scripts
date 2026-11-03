@@ -723,7 +723,7 @@
       }
     </style>
 
-    <strong data-title>أفلام ومسلسلات</strong>
+    <strong data-title>نتفلكس</strong>
 
     <div class="screen">
       <div class="float-head">
