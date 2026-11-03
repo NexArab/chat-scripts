@@ -1,11 +1,13 @@
-/* cinema-unified-v1.js
-   نسخة تجريبية مستقلة ومتوافقة مع التلفاز واليوتيوب.
-   البحث حاليًا ضمن القائمة التجريبية فقط.
+/* cinema-unified-v2.js
+   أفلام ومسلسلات — فهرس TMDB والبحث المباشر
 */
 (function () {
   'use strict';
 
+  var TMDB_API_KEY = 'bd9c30274c4ca5405274bdf60ad42636';
+
   var KEY = '__CHAT_CINEMA_V1__';
+  var ORIGIN = 'https://cinesrc.st';
 
   if (window[KEY]) window[KEY].destroy();
 
@@ -13,6 +15,19 @@
   var playerHost = null;
   var playerRoot = null;
   var playerObserver = null;
+
+  var cinemaStructureTimer;
+  var searchTimer;
+  var searchController;
+  var detailController;
+
+  var searchVersion = 0;
+  var detailVersion = 0;
+  var page = 1;
+  var totalPages = 1;
+  var catalogueStarted = false;
+  var catalogue = [];
+  var filter = 'all';
 
   var playerJob = 0;
   var paintJob = 0;
@@ -36,24 +51,7 @@
   var frame = null;
   var selected = null;
   var loadTimer = null;
-  var ORIGIN = 'https://cinesrc.st';
 
-  var catalogue = [
-    {
-      id: 1084242,
-      type: 'movie',
-      title: 'Zootopia 2',
-      arabic: 'زوتوبيا 2'
-    },
-    {
-      id: 1396,
-      type: 'tv',
-      title: 'Breaking Bad',
-      arabic: 'بريكنغ باد'
-    }
-  ];
-
-  var observer = new MutationObserver(schedule);
   var stateObserver = new MutationObserver(schedule);
 
   function q(selector) {
@@ -63,6 +61,11 @@
 
   function say(text) {
     var node = q('[data-status]');
+    if (node) node.textContent = text;
+  }
+
+  function catalogStatus(text) {
+    var node = q('[data-catalog-status]');
     if (node) node.textContent = text;
   }
 
@@ -79,7 +82,6 @@
     }
   }
 
-  // المشغّل مستقل عن القائمة، فلا ينقطع عند إغلاقها.
   function mountPlayer() {
     var screen = root.querySelector('.screen');
     var slot = document.createElement('div');
@@ -91,9 +93,9 @@
 
     playerHost = document.createElement('div');
     playerHost.id = 'chat-cinema-player';
-
     playerHost.style.cssText =
-      'all:initial!important;zoom:1!important;' +
+      'all:initial!important;' +
+      'zoom:1!important;' +
       'display:block!important;' +
       'position:fixed!important;' +
       'inset:0!important;' +
@@ -103,7 +105,6 @@
     playerRoot = playerHost.attachShadow({ mode: 'open' });
 
     var css = document.createElement('style');
-
     css.textContent = root.querySelector('style').textContent + `
       :host {
         background:transparent!important;
@@ -154,7 +155,6 @@
     }
 
     var slot = root.querySelector('[data-player-slot]');
-
     var visible =
       mode === 'cinema' &&
       pane.classList.contains('active') &&
@@ -183,7 +183,6 @@
     screen.style.left = r.left + 'px';
     screen.style.top = r.top + 'px';
     screen.style.width = r.width + 'px';
-
     screen.style.clipPath =
       'inset(' +
       Math.max(0, top - r.top) + 'px ' +
@@ -210,19 +209,16 @@
 
     if (box.ratio) {
       var max = Math.min(maxW, maxH * box.ratio);
-
       box.w = Math.max(
         Math.min(200, max),
         Math.min(box.w, max)
       );
-
       box.h = box.w / box.ratio;
     } else {
       box.w = Math.max(
         Math.min(200, maxW),
         Math.min(box.w, maxW)
       );
-
       box.h = Math.max(
         Math.min(112, maxH),
         Math.min(box.h, maxH)
@@ -258,15 +254,10 @@
     fitBox();
 
     var screen = q('.screen');
-
     screen.style.left = box.x + 'px';
     screen.style.top = box.y + 'px';
     screen.style.width = box.w + 'px';
-
-    screen.style.setProperty(
-      '--video-height',
-      box.h + 'px'
-    );
+    screen.style.setProperty('--video-height', box.h + 'px');
   }
 
   function schedulePaint() {
@@ -359,7 +350,6 @@
     q('.screen').style.display = 'block';
     q('.screen').style.clipPath = 'none';
     q('.screen').classList.add('floating');
-
     q('[data-float]').textContent = '↩ إرجاع للقائمة';
 
     paint();
@@ -417,10 +407,8 @@
         box.x = current.bx + dx;
         box.y = current.by + dy;
       } else {
-        // المقبض في الطرف الأيسر.
         box.w = Math.max(200, current.w - dx);
         box.x = current.bx + current.w - box.w;
-
         box.h = box.ratio
           ? box.w / box.ratio
           : current.h + dy;
@@ -460,7 +448,7 @@
         display:none!important;
       }
 
-      button,input {
+      button,input,select {
         font:inherit;
       }
 
@@ -479,7 +467,8 @@
       }
 
       button:focus-visible,
-      input:focus-visible {
+      input:focus-visible,
+      select:focus-visible {
         outline:2px solid #a00;
         outline-offset:2px;
       }
@@ -498,6 +487,10 @@
         flex:1;
       }
 
+      .tools button[aria-pressed="true"] {
+        background:#eee;
+      }
+
       input {
         width:100%;
         min-width:0;
@@ -506,6 +499,14 @@
         padding:9px;
         background:#fff;
         color:#111;
+      }
+
+      select {
+        width:100%;
+        max-width:100%;
+        min-width:0;
+        padding:8px;
+        box-sizing:border-box;
       }
 
       .screen {
@@ -540,8 +541,10 @@
         right:auto;
         bottom:auto;
         margin:0;
-        box-shadow:0 6px 24px #0005;
-        border-radius:8px;
+        border:1px solid #666;
+        border-radius:10px;
+        box-shadow:0 8px 30px #0006;
+        background:#111;
       }
 
       .floating .video-wrap {
@@ -549,13 +552,18 @@
         aspect-ratio:auto;
       }
 
+      .float-head,
+      .resize-edge {
+        display:none;
+      }
+
       .floating .float-head {
         display:flex;
-        height:40px;
+        height:39px;
         align-items:center;
         gap:4px;
-        padding:4px 6px;
-        background:#252525;
+        padding:5px 7px;
+        background:var(--cinema-accent,#343a40);
         color:white;
         touch-action:none;
         user-select:none;
@@ -568,106 +576,6 @@
         overflow:hidden;
         text-overflow:ellipsis;
         white-space:nowrap;
-        font-size:11px;
-      }
-
-      .float-head button {
-        width:32px;
-        height:32px;
-        padding:0;
-        flex-shrink:0;
-      }
-
-      [data-resize] {
-        touch-action:none;
-        user-select:none;
-        cursor:nesw-resize;
-      }
-
-      .screen.moving iframe {
-        pointer-events:none;
-      }
-
-      .video-wrap:fullscreen {
-        width:100vw!important;
-        height:100vh!important;
-        aspect-ratio:auto;
-        border-radius:0;
-      }
-
-      @media(max-width:420px) {
-        .result img {
-          max-width:100px;
-        }
-      }
-
-      [data-empty] {
-        padding:15px;
-        text-align:center;
-      }
-
-      [data-status] {
-        font-size:12px;
-        color:#555;
-      }
-
-      [data-results] {
-        display:grid;
-        gap:8px;
-      }
-
-      .result {
-        display:flex;
-        align-items:center;
-        gap:8px;
-        width:100%;
-        text-align:right;
-      }
-
-      .result img {
-        width:120px;
-        height:68px;
-        object-fit:cover;
-        border-radius:5px;
-        flex-shrink:0;
-      }
-
-      .result span {
-        overflow-wrap:anywhere;
-      }
-
-      small {
-        display:block;
-        color:#666;
-        font-size:10px;
-        margin-top:4px;
-      }
-
-      [data-next] {
-        width:100%;
-        margin-top:10px;
-      }
-
-      .float-head,
-      .resize-edge {
-        display:none;
-      }
-
-      .screen.floating {
-        border:1px solid #666;
-        border-radius:10px;
-        box-shadow:0 8px 30px #0006;
-        background:#111;
-      }
-
-      .floating .float-head {
-        height:39px;
-        gap:4px;
-        padding:5px 7px;
-        background:var(--cinema-accent,#343a40);
-      }
-
-      .float-head strong {
         font:700 11px/1.5 Tahoma,sans-serif;
       }
 
@@ -675,6 +583,7 @@
         width:29px;
         height:29px;
         padding:0;
+        flex-shrink:0;
         border:1px solid #ffffff70;
         border-radius:5px;
         font:700 18px/25px Tahoma,sans-serif;
@@ -709,17 +618,85 @@
         outline-offset:-2px;
       }
 
-      select {
-        font:inherit;
+      .screen.moving iframe {
+        pointer-events:none;
       }
 
-      .tools button[aria-pressed="true"] {
-        background:#eee;
+      .video-wrap:fullscreen {
+        width:100vw!important;
+        height:100vh!important;
+        aspect-ratio:auto;
+        border-radius:0;
+      }
+
+      [data-empty] {
+        padding:15px;
+        text-align:center;
+      }
+
+      [data-status],
+      [data-catalog-status] {
+        font-size:12px;
+        color:#555;
+      }
+
+      [data-results] {
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:8px;
+      }
+
+      [data-results] .result {
+        display:flex;
+        flex-direction:column;
+        align-items:stretch;
+        gap:8px;
+        width:100%;
+        min-width:0;
+        margin:0;
+        padding:7px;
+        white-space:normal;
+        text-align:right;
+      }
+
+      [data-results] img {
+        width:100%;
+        max-width:100%;
+        height:auto;
+        aspect-ratio:2/3;
+        object-fit:cover;
+        border-radius:6px;
+      }
+
+      [data-results] strong {
+        font-size:13px;
+        overflow-wrap:anywhere;
+      }
+
+      small {
+        display:block;
+        color:#666;
+        font-size:11px;
+        margin-top:4px;
       }
 
       [data-episode] label {
         flex:1;
         min-width:0;
+      }
+
+      [data-more] {
+        width:100%;
+        margin:10px 0;
+      }
+
+      details {
+        margin-top:12px;
+        font-size:11px;
+      }
+
+      summary {
+        cursor:pointer;
       }
     </style>
 
@@ -750,90 +727,409 @@
     </div>
 
     <div class="tools">
-      <button data-stop>■ إيقاف</button>
-      <button data-full>⛶ ملء الشاشة</button>
-      <button data-float>▣ نافذة عائمة</button>
+      <button type="button" data-stop>■ إيقاف</button>
+      <button type="button" data-full>⛶ ملء الشاشة</button>
+      <button type="button" data-float>▣ نافذة عائمة</button>
     </div>
 
     <div class="tools">
-      <button data-shape="free">حر</button>
-      <button data-shape="wide">مستطيل</button>
-      <button data-shape="square">مربع</button>
-      <button data-scale="1.15" aria-label="تكبير">＋</button>
-      <button data-scale="0.87" aria-label="تصغير">−</button>
+      <button type="button" data-shape="free">حر</button>
+      <button type="button" data-shape="wide">مستطيل</button>
+      <button type="button" data-shape="square">مربع</button>
+      <button type="button" data-scale="1.15" aria-label="تكبير">＋</button>
+      <button type="button" data-scale="0.87" aria-label="تصغير">−</button>
     </div>
 
     <p data-status role="status">
-      تجربة بفيلم ومسلسل. الترجمة العربية تختارها داخل المشغّل إن توفرت.
+      اختر عنوانًا. توفر التشغيل والترجمة يعتمد على مصدر المشاهدة.
     </p>
 
     <label>
-      بحث ضمن القائمة التجريبية
+      ابحث عن فيلم أو مسلسل
       <input data-search type="search"
         placeholder="اسم الفيلم أو المسلسل" maxlength="150">
     </label>
 
     <div class="tools">
-      <button data-filter="all" aria-pressed="true">الكل</button>
-      <button data-filter="movie">أفلام</button>
-      <button data-filter="tv">مسلسلات</button>
+      <button type="button" data-filter="all"
+        aria-pressed="true">الكل</button>
+      <button type="button" data-filter="movie">أفلام</button>
+      <button type="button" data-filter="tv">مسلسلات</button>
     </div>
 
     <form data-episode hidden>
       <label>
         الموسم
-        <input data-season type="number"
-          min="1" max="999" value="1" required>
+        <select data-season required></select>
       </label>
 
       <label>
         الحلقة
-        <input data-ep type="number"
-          min="1" max="9999" value="1" required>
+        <select data-ep required></select>
       </label>
 
       <button type="submit">تشغيل</button>
     </form>
 
+    <p data-catalog-status role="status"></p>
     <div data-results></div>
+
+    <button data-more type="button" hidden>عرض المزيد</button>
+
+    <details>
+      <summary>مصدر معلومات الأفلام</summary>
+      <a href="https://www.themoviedb.org/"
+        target="_blank" rel="noopener noreferrer">
+        <img alt="TMDB" width="90"
+          src="https://www.themoviedb.org/assets/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg">
+      </a>
+      <p dir="ltr">
+        This website uses TMDB and the TMDB APIs but is not endorsed,
+        certified, or otherwise approved by TMDB.
+      </p>
+      <p>بيانات الفهرس لا تعني توفر جميع العناوين للمشاهدة.</p>
+    </details>
   `;
 
-  var filter = 'all';
+  async function tmdb(path, params, signal) {
+    if (!/^[a-f0-9]{32}$/i.test(TMDB_API_KEY.trim())) {
+      throw new Error('ضع مفتاح TMDB في بداية السكربت أولًا.');
+    }
 
-  function render() {
-    var results = q('[data-results]');
-    results.replaceChildren();
+    var url = new URL('https://api.themoviedb.org/3/' + path);
+    url.searchParams.set('api_key', TMDB_API_KEY.trim());
+    url.searchParams.set('language', 'ar-SA');
 
-    var text = q('[data-search]').value.trim().toLowerCase();
-
-    catalogue.filter(function (item) {
-      return (filter === 'all' || item.type === filter) &&
-        (item.title + ' ' + item.arabic).toLowerCase().includes(text);
-    }).forEach(function (item) {
-      var button = document.createElement('button');
-
-      button.type = 'button';
-      button.className = 'result';
-
-      button.textContent =
-        (item.type === 'tv' ? '📺 ' : '🎬 ') +
-        item.title + ' — ' + item.arabic;
-
-      button.onclick = function () {
-        selected = item;
-
-        q('[data-episode]').hidden = item.type !== 'tv';
-        q('[data-season]').value = '1';
-        q('[data-ep]').value = '1';
-
-        play();
-      };
-
-      results.appendChild(button);
+    Object.keys(params || {}).forEach(function (key) {
+      url.searchParams.set(key, params[key]);
     });
 
-    if (!results.children.length) {
-      results.textContent = 'لا توجد نتيجة ضمن القائمة التجريبية.';
+    var response = await fetch(url.href, {
+      signal: signal,
+      credentials: 'omit'
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        response.status === 401
+          ? 'مفتاح TMDB غير صالح.'
+          : response.status === 429
+            ? 'طلبات كثيرة، انتظر قليلًا ثم أعد المحاولة.'
+            : 'تعذر جلب البيانات. حاول مرة أخرى.'
+      );
+    }
+
+    return response.json();
+  }
+
+  function queueSearch() {
+    clearTimeout(searchTimer);
+    searchVersion++;
+
+    if (searchController) searchController.abort();
+
+    q('[data-more]').hidden = true;
+
+    var value = q('[data-search]').value.trim();
+
+    if (value.length === 1) {
+      q('[data-results]').replaceChildren();
+      catalogStatus('اكتب حرفين أو أكثر لعرض الاقتراحات.');
+      return;
+    }
+
+    catalogStatus('جارٍ البحث…');
+
+    searchTimer = setTimeout(function () {
+      render(false);
+    }, 400);
+  }
+
+  async function render(append) {
+    if (dead || !root) return;
+
+    clearTimeout(searchTimer);
+
+    var query = q('[data-search]').value.trim();
+    if (query.length === 1) return;
+
+    if (searchController) searchController.abort();
+
+    searchController = new AbortController();
+
+    var version = ++searchVersion;
+    var currentRoot = root;
+    var requestedPage = append ? page + 1 : 1;
+    var kind = filter;
+
+    var path = query
+      ? 'search/' + (kind === 'all' ? 'multi' : kind)
+      : 'trending/' + kind + '/week';
+
+    q('[data-more]').hidden = true;
+
+    if (!append) {
+      catalogue = [];
+      q('[data-results]').replaceChildren();
+    }
+
+    catalogStatus(
+      query
+        ? 'جارٍ البحث…'
+        : 'جارٍ تحميل العناوين الرائجة…'
+    );
+
+    var timeout = setTimeout(function () {
+      if (version === searchVersion) {
+        searchController.abort();
+      }
+    }, 15000);
+
+    try {
+      var data = await tmdb(path, {
+        query: query,
+        page: requestedPage,
+        include_adult: false
+      }, searchController.signal);
+
+      if (
+        dead ||
+        version !== searchVersion ||
+        currentRoot !== root
+      ) return;
+
+      page = requestedPage;
+      totalPages = Math.min(Number(data.total_pages) || 1, 500);
+
+      (data.results || []).forEach(function (entry) {
+        var type = entry.media_type || kind;
+
+        if (
+          entry.adult ||
+          !['movie', 'tv'].includes(type) ||
+          !Number.isInteger(entry.id)
+        ) return;
+
+        if (catalogue.some(function (item) {
+          return item.id === entry.id && item.type === type;
+        })) return;
+
+        var item = {
+          id: entry.id,
+          type: type,
+          title: entry.title || entry.name || '',
+          year: (
+            entry.release_date ||
+            entry.first_air_date ||
+            ''
+          ).slice(0, 4)
+        };
+
+        catalogue.push(item);
+
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'result';
+
+        if (/^\/[a-zA-Z0-9_.-]+$/.test(entry.poster_path || '')) {
+          var img = document.createElement('img');
+
+          img.src =
+            'https://image.tmdb.org/t/p/w185' +
+            entry.poster_path;
+
+          img.alt = '';
+          img.loading = 'lazy';
+          img.decoding = 'async';
+
+          img.onerror = function () {
+            img.remove();
+          };
+
+          button.appendChild(img);
+        }
+
+        var title = document.createElement('strong');
+        title.textContent = item.title;
+
+        var meta = document.createElement('small');
+        meta.textContent =
+          (type === 'tv' ? 'مسلسل' : 'فيلم') +
+          ' · ' + item.year;
+
+        button.append(title, meta);
+
+        button.onclick = function () {
+          chooseTitle(item);
+        };
+
+        q('[data-results]').appendChild(button);
+      });
+
+      catalogStatus(
+        catalogue.length
+          ? (query ? 'نتائج البحث' : 'الرائج هذا الأسبوع')
+          : 'لا توجد نتائج أفلام أو مسلسلات في هذه الصفحة.'
+      );
+
+      q('[data-more]').hidden = page >= totalPages;
+    } catch (error) {
+      if (
+        dead ||
+        version !== searchVersion ||
+        currentRoot !== root
+      ) return;
+
+      catalogStatus(
+        error.name === 'AbortError'
+          ? 'انتهت مهلة الاتصال. أعد البحث.'
+          : error.message
+      );
+
+      var retry = document.createElement('button');
+      retry.type = 'button';
+      retry.textContent = 'إعادة المحاولة';
+
+      retry.onclick = function () {
+        retry.remove();
+        render(append);
+      };
+
+      q('[data-results]').appendChild(retry);
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  function option(select, value, label) {
+    var node = document.createElement('option');
+    node.value = value;
+    node.textContent = label;
+    select.appendChild(node);
+  }
+
+  async function chooseTitle(item) {
+    selected = item;
+
+    if (detailController) detailController.abort();
+
+    var version = ++detailVersion;
+    var currentRoot = root;
+
+    q('[data-episode]').hidden = item.type !== 'tv';
+
+    if (item.type !== 'tv') {
+      play();
+      return;
+    }
+
+    q('[data-season]').replaceChildren();
+    q('[data-ep]').replaceChildren();
+    q('[data-episode] button').disabled = true;
+
+    say('جارٍ تحميل مواسم ' + item.title);
+
+    detailController = new AbortController();
+
+    try {
+      var data = await tmdb(
+        'tv/' + item.id,
+        {},
+        detailController.signal
+      );
+
+      if (
+        dead ||
+        version !== detailVersion ||
+        currentRoot !== root
+      ) return;
+
+      (data.seasons || []).filter(function (season) {
+        return season.season_number > 0 && season.episode_count > 0;
+      }).forEach(function (season) {
+        option(
+          q('[data-season]'),
+          season.season_number,
+          season.name || 'الموسم ' + season.season_number
+        );
+      });
+
+      if (!q('[data-season]').options.length) {
+        say('لا توجد مواسم متاحة في الفهرس.');
+        return;
+      }
+
+      loadEpisodes();
+    } catch (error) {
+      if (
+        !dead &&
+        version === detailVersion &&
+        currentRoot === root &&
+        error.name !== 'AbortError'
+      ) {
+        say(error.message + ' اختر المسلسل لإعادة المحاولة.');
+      }
+    }
+  }
+
+  async function loadEpisodes() {
+    if (!selected || selected.type !== 'tv') return;
+
+    if (detailController) detailController.abort();
+
+    detailController = new AbortController();
+
+    var version = ++detailVersion;
+    var currentRoot = root;
+    var id = selected.id;
+    var season = Number(q('[data-season]').value);
+
+    q('[data-ep]').replaceChildren();
+    q('[data-episode] button').disabled = true;
+
+    say('جارٍ تحميل الحلقات…');
+
+    try {
+      var data = await tmdb(
+        'tv/' + id + '/season/' + season,
+        {},
+        detailController.signal
+      );
+
+      if (
+        dead ||
+        version !== detailVersion ||
+        currentRoot !== root
+      ) return;
+
+      (data.episodes || []).filter(function (episode) {
+        return episode.episode_number > 0;
+      }).forEach(function (episode) {
+        option(
+          q('[data-ep]'),
+          episode.episode_number,
+          episode.episode_number + ' — ' +
+          (episode.name || 'حلقة')
+        );
+      });
+
+      q('[data-episode] button').disabled =
+        !q('[data-ep]').options.length;
+
+      say(
+        q('[data-ep]').options.length
+          ? 'اختر الموسم والحلقة ثم اضغط تشغيل.'
+          : 'لا توجد حلقات في الفهرس.'
+      );
+    } catch (error) {
+      if (
+        !dead &&
+        version === detailVersion &&
+        currentRoot === root &&
+        error.name !== 'AbortError'
+      ) {
+        say(error.message + ' أعد اختيار الموسم للمحاولة.');
+      }
     }
   }
 
@@ -848,7 +1144,6 @@
     if (tvStop) tvStop.click();
 
     var yt = document.getElementById('chat-youtube-panel');
-
     var ytStop =
       yt &&
       yt.shadowRoot &&
@@ -858,13 +1153,12 @@
 
     document.querySelectorAll(
       '#settings [data-kr-stop]'
-    ).forEach(function (b) {
-      b.click();
+    ).forEach(function (button) {
+      button.click();
     });
   }
 
   function activate() {
-    // مزامنة حالة التبويبات مع سكربت اليوتيوب الحالي.
     var tvTab = nav && nav.querySelector('[data-mode="tv"]');
     if (tvTab) tvTab.click();
 
@@ -873,11 +1167,17 @@
     mode = 'cinema';
     pane.classList.add('chat-cinema-mode');
 
-    nav.querySelectorAll('button').forEach(function (b) {
-      b.setAttribute('aria-pressed', 'false');
+    nav.querySelectorAll('button').forEach(function (button) {
+      button.setAttribute('aria-pressed', 'false');
     });
 
     tab.setAttribute('aria-pressed', 'true');
+
+    if (!catalogueStarted) {
+      catalogueStarted = true;
+      render(false);
+    }
+
     schedulePlayer();
   }
 
@@ -933,10 +1233,12 @@
     }
 
     frame = document.createElement('iframe');
+
     frame.setAttribute(
       'sandbox',
       'allow-scripts allow-same-origin allow-presentation'
     );
+
     frame.title = selected.title;
     frame.allow = 'autoplay; fullscreen; picture-in-picture';
     frame.allowFullscreen = true;
@@ -955,11 +1257,16 @@
     q('[data-title]').textContent = title;
     q('.float-head strong').textContent = title;
 
-    say('اضغط تشغيل داخل المشغّل. اختر العربية من قائمة الترجمة إن توفرت.');
+    say(
+      'اضغط تشغيل داخل المشغّل. اختر العربية من قائمة الترجمة إن توفرت.'
+    );
 
     loadTimer = setTimeout(function () {
       if (frame) {
-        say('إذا لم يبدأ الفيديو، جرّب خيارات المشغّل. تحميل الإطار وحده لا يعني توفر البث.');
+        say(
+          'إذا لم يبدأ الفيديو، جرّب خيارات المشغّل. ' +
+          'تحميل الإطار وحده لا يعني توفر البث.'
+        );
       }
     }, 45000);
 
@@ -1009,7 +1316,8 @@
       q('[data-ep]').value = data.episode;
 
       q('[data-title]').textContent =
-        selected.title + ' · ' + data.season + ' / ' + data.episode;
+        selected.title + ' · ' +
+        data.season + ' / ' + data.episode;
 
       q('.float-head strong').textContent =
         q('[data-title]').textContent;
@@ -1034,7 +1342,9 @@
 
   function mount() {
     var nextPane = document.getElementById('chat-tv');
-    var nextNav = document.querySelector('#dpnl .chat-youtube-tabs');
+    var nextNav = document.querySelector(
+      '#dpnl .chat-youtube-tabs'
+    );
 
     if (!nextPane || !nextNav) return;
 
@@ -1055,6 +1365,7 @@
 
     shell = document.createElement('div');
     shell.id = 'chat-cinema-panel';
+
     root = shell.attachShadow({ mode: 'open' });
     root.innerHTML = TEMPLATE;
 
@@ -1069,22 +1380,38 @@
       playerHost.style.setProperty('--cinema-accent', accent);
     }
 
-    q('[data-search]').oninput = render;
+    q('[data-search]').oninput = queueSearch;
 
-    q('[data-episode]').onsubmit = function (e) {
-      e.preventDefault();
+    q('[data-search]').onkeydown = function (event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        render(false);
+      }
+    };
+
+    q('[data-more]').onclick = function () {
+      render(true);
+    };
+
+    q('[data-season]').onchange = loadEpisodes;
+
+    q('[data-episode]').onsubmit = function (event) {
+      event.preventDefault();
       play();
     };
 
-    root.querySelectorAll('[data-filter]').forEach(function (b) {
-      b.onclick = function () {
-        filter = b.dataset.filter;
+    root.querySelectorAll('[data-filter]').forEach(function (button) {
+      button.onclick = function () {
+        filter = button.dataset.filter;
 
         root.querySelectorAll('[data-filter]').forEach(function (item) {
-          item.setAttribute('aria-pressed', String(item === b));
+          item.setAttribute(
+            'aria-pressed',
+            String(item === button)
+          );
         });
 
-        render();
+        render(false);
       };
     });
 
@@ -1115,28 +1442,27 @@
       box.w = box.w > 260 ? 240 : 340;
       box.h = box.w * 9 / 16;
       box.ratio = 0;
-
       paint();
     };
 
-    root.querySelectorAll('[data-scale]').forEach(function (b) {
-      b.onclick = function () {
+    root.querySelectorAll('[data-scale]').forEach(function (button) {
+      button.onclick = function () {
         if (!floating) toggleFloat();
 
         if (floating) {
-          scaleFloat(Number(b.dataset.scale));
+          scaleFloat(Number(button.dataset.scale));
         }
       };
     });
 
-    root.querySelectorAll('[data-shape]').forEach(function (b) {
-      b.onclick = function () {
+    root.querySelectorAll('[data-shape]').forEach(function (button) {
+      button.onclick = function () {
         if (!floating) toggleFloat();
         if (!floating) return;
 
-        box.ratio = b.dataset.shape === 'wide'
+        box.ratio = button.dataset.shape === 'wide'
           ? 16 / 9
-          : b.dataset.shape === 'square'
+          : button.dataset.shape === 'square'
             ? 1
             : 0;
 
@@ -1149,7 +1475,7 @@
     bindGesture(q('.float-head'), 'drag');
     bindGesture(q('[data-resize]'), 'resize');
 
-    q('[data-resize]').onkeydown = function (e) {
+    q('[data-resize]').onkeydown = function (event) {
       if (
         !floating ||
         ![
@@ -1157,17 +1483,17 @@
           'ArrowRight',
           'ArrowUp',
           'ArrowDown'
-        ].includes(e.key)
+        ].includes(event.key)
       ) return;
 
-      e.preventDefault();
+      event.preventDefault();
 
-      var step = e.shiftKey ? 30 : 10;
+      var step = event.shiftKey ? 30 : 10;
 
-      if (e.key === 'ArrowLeft') box.w -= step;
-      if (e.key === 'ArrowRight') box.w += step;
-      if (e.key === 'ArrowUp') box.h -= step;
-      if (e.key === 'ArrowDown') box.h += step;
+      if (event.key === 'ArrowLeft') box.w -= step;
+      if (event.key === 'ArrowRight') box.w += step;
+      if (event.key === 'ArrowUp') box.h -= step;
+      if (event.key === 'ArrowDown') box.h += step;
 
       if (box.ratio) box.h = box.w / box.ratio;
 
@@ -1185,7 +1511,7 @@
       });
     }
 
-    render();
+    catalogueStarted = false;
   }
 
   function sync() {
@@ -1294,7 +1620,7 @@
 
     document.head.appendChild(style);
 
-    var cinemaStructureTimer = setInterval(function () {
+    cinemaStructureTimer = setInterval(function () {
       if (dead) {
         clearInterval(cinemaStructureTimer);
         return;
@@ -1318,10 +1644,18 @@
     window.addEventListener('resize', schedulePlayer);
 
     if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', schedulePaint);
-      window.visualViewport.addEventListener('scroll', schedulePaint);
-      window.visualViewport.addEventListener('resize', schedulePlayer);
-      window.visualViewport.addEventListener('scroll', schedulePlayer);
+      window.visualViewport.addEventListener(
+        'resize', schedulePaint
+      );
+      window.visualViewport.addEventListener(
+        'scroll', schedulePaint
+      );
+      window.visualViewport.addEventListener(
+        'resize', schedulePlayer
+      );
+      window.visualViewport.addEventListener(
+        'scroll', schedulePlayer
+      );
     }
 
     schedule();
@@ -1330,7 +1664,12 @@
   function destroy() {
     dead = true;
 
-    observer.disconnect();
+    clearInterval(cinemaStructureTimer);
+    clearTimeout(searchTimer);
+
+    if (searchController) searchController.abort();
+    if (detailController) detailController.abort();
+
     cleanup();
 
     document.removeEventListener('DOMContentLoaded', init);
@@ -1343,10 +1682,18 @@
     window.removeEventListener('resize', schedulePlayer);
 
     if (window.visualViewport) {
-      window.visualViewport.removeEventListener('resize', schedulePaint);
-      window.visualViewport.removeEventListener('scroll', schedulePaint);
-      window.visualViewport.removeEventListener('resize', schedulePlayer);
-      window.visualViewport.removeEventListener('scroll', schedulePlayer);
+      window.visualViewport.removeEventListener(
+        'resize', schedulePaint
+      );
+      window.visualViewport.removeEventListener(
+        'scroll', schedulePaint
+      );
+      window.visualViewport.removeEventListener(
+        'resize', schedulePlayer
+      );
+      window.visualViewport.removeEventListener(
+        'scroll', schedulePlayer
+      );
     }
 
     [job, playerJob, paintJob].forEach(cancelAnimationFrame);
@@ -1359,7 +1706,7 @@
   window[KEY] = {
     destroy: destroy,
     stop: stop,
-    version: '1.0.0-pilot'
+    version: '2.1.0'
   };
 
   if (document.readyState === 'loading') {
