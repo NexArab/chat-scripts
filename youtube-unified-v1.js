@@ -2,17 +2,21 @@
   'use strict';
 
   var KEY = '__CHAT_YOUTUBE_V1__';
+
+  // ضع مفتاح YouTube Data API هنا.
   var API_KEY = 'AIzaSyCqfwOe_v9eBsqJWwjPZjSDL3mlQlqOhO8';
 
   if (window[KEY]) window[KEY].destroy();
 
   var pane, host, header, nav, label, root, shell, style;
+
   var playerHost = null;
   var playerRoot = null;
   var playerJob = 0;
   var playerObserver = null;
 
-  var corner = 'tr';
+  var corner = '';
+  var floatSized = false;
   var floating = false;
   var gesture = null;
   var paintJob = 0;
@@ -20,9 +24,9 @@
   var box = {
     x: 12,
     y: 70,
-    w: 360,
-    h: 202.5,
-    ratio: 16 / 9
+    w: 240,
+    h: 135,
+    ratio: 0
   };
 
   var mode = 'tv';
@@ -83,8 +87,7 @@
     }
   }
 
-  // المشغل مستقل عن القائمة منذ إنشائه.
-  // لا ننقل iframe بين العناصر عند التعويم أو الإرجاع.
+  // المشغّل مستقل عن القائمة، فلا ينقطع عند إغلاقها.
   function mountPlayer() {
     var screen = root.querySelector('.screen');
     var slot = document.createElement('div');
@@ -211,25 +214,25 @@
   function fitBox() {
     var v = viewport();
     var maxW = Math.max(1, v.w - 16);
-    var maxH = Math.max(1, v.h - 136);
+    var maxH = Math.max(1, v.h - 57);
 
     if (box.ratio) {
       var max = Math.min(maxW, maxH * box.ratio);
 
       box.w = Math.max(
-        Math.min(240, max),
+        Math.min(200, max),
         Math.min(box.w, max)
       );
 
       box.h = box.w / box.ratio;
     } else {
       box.w = Math.max(
-        Math.min(240, maxW),
+        Math.min(200, maxW),
         Math.min(box.w, maxW)
       );
 
       box.h = Math.max(
-        Math.min(135, maxH),
+        Math.min(112, maxH),
         Math.min(box.h, maxH)
       );
     }
@@ -241,7 +244,7 @@
 
     box.y = Math.max(
       v.y + 8,
-      Math.min(box.y, v.y + v.h - box.h - 128)
+      Math.min(box.y, v.y + v.h - box.h - 49)
     );
 
     if (corner) {
@@ -250,7 +253,7 @@
         : v.x + 8;
 
       box.y = corner[0] === 'b'
-        ? Math.max(v.y + 8, v.y + v.h - box.h - 128)
+        ? Math.max(v.y + 8, v.y + v.h - box.h - 49)
         : v.y + 8;
     }
   }
@@ -267,7 +270,11 @@
     screen.style.left = box.x + 'px';
     screen.style.top = box.y + 'px';
     screen.style.width = box.w + 'px';
-    screen.style.setProperty('--video-height', box.h + 'px');
+
+    screen.style.setProperty(
+      '--video-height',
+      box.h + 'px'
+    );
   }
 
   function schedulePaint() {
@@ -347,8 +354,14 @@
 
     var v = viewport();
 
-    box.x = v.x + v.w - box.w - 12;
-    box.y = v.y + 60;
+    if (!floatSized) {
+      box.w = v.w <= 600 ? 240 : 340;
+      box.h = box.w * 9 / 16;
+      floatSized = true;
+    }
+
+    box.x = v.x + 16;
+    box.y = v.y + 80;
     floating = true;
 
     q('.screen').style.display = 'block';
@@ -379,10 +392,6 @@
       ) return;
 
       corner = '';
-
-      if (q('[data-corner]')) {
-        q('[data-corner]').value = '';
-      }
 
       gesture = {
         node: node,
@@ -416,7 +425,10 @@
         box.x = current.bx + dx;
         box.y = current.by + dy;
       } else {
-        box.w = current.w - dx;
+        // المقبض في الطرف الأيسر.
+        box.w = Math.max(200, current.w - dx);
+        box.x = current.bx + current.w - box.w;
+
         box.h = box.ratio
           ? box.w / box.ratio
           : current.h + dy;
@@ -545,6 +557,7 @@
       var img = document.createElement('img');
       img.src =
         'https://i.ytimg.com/vi/' + item.id + '/mqdefault.jpg';
+
       img.alt = '';
       img.loading = 'lazy';
       img.width = 120;
@@ -633,6 +646,7 @@
 
     var ticket = sequence;
     var controller = new AbortController();
+
     request = controller;
 
     timeout = setTimeout(function () {
@@ -699,7 +713,6 @@
     } finally {
       if (ticket === sequence) {
         clearTimeout(timeout);
-
         request = null;
         busy = false;
 
@@ -719,9 +732,18 @@
     stop();
     stateObserver.disconnect();
 
-    if (pane) pane.classList.remove('chat-youtube-mode');
-    if (host) host.classList.remove('chat-youtube-visible');
-    if (label) label.classList.remove('chat-youtube-label');
+    if (pane) {
+      pane.classList.remove('chat-youtube-mode');
+    }
+
+    if (host) {
+      host.classList.remove('chat-youtube-visible');
+    }
+
+    if (label) {
+      label.classList.remove('chat-youtube-label');
+    }
+
     if (nav) nav.remove();
     if (shell) shell.remove();
 
@@ -791,9 +813,17 @@
           font:13px/1.6 Tahoma,sans-serif;
         }
 
-        * { box-sizing:border-box; }
-        [hidden] { display:none!important; }
-        button,input { font:inherit; }
+        * {
+          box-sizing:border-box;
+        }
+
+        [hidden] {
+          display:none!important;
+        }
+
+        button,input {
+          font:inherit;
+        }
 
         button {
           cursor:pointer;
@@ -821,8 +851,13 @@
           margin:10px 0;
         }
 
-        .tools { flex-wrap:wrap; }
-        .tools button { flex:1; }
+        .tools {
+          flex-wrap:wrap;
+        }
+
+        .tools button {
+          flex:1;
+        }
 
         input {
           width:100%;
@@ -858,12 +893,6 @@
           height:100%;
           border:0;
           display:block;
-        }
-
-        .float-head,
-        .float-tools,
-        .float-position {
-          display:none;
         }
 
         .screen.floating {
@@ -910,48 +939,6 @@
           flex-shrink:0;
         }
 
-        .floating .float-tools {
-          display:flex;
-          height:44px;
-          align-items:center;
-          justify-content:space-between;
-          gap:3px;
-          padding:4px;
-          background:#fff;
-        }
-
-        .float-tools button {
-          padding:3px 6px;
-          min-height:32px;
-          font-size:11px;
-        }
-
-        .float-tools button[aria-pressed="true"] {
-          background:#eee;
-          border-color:#333;
-        }
-
-        .floating .float-position {
-          display:flex;
-          height:36px;
-          align-items:center;
-          padding:3px 6px;
-          background:#fff;
-          gap:6px;
-          font-size:11px;
-        }
-
-        .float-position select {
-          flex:1;
-          min-width:0;
-          height:28px;
-          border:1px solid #bbb;
-          border-radius:5px;
-          background:#fff;
-          color:#111;
-          font:inherit;
-        }
-
         [data-resize] {
           touch-action:none;
           user-select:none;
@@ -967,6 +954,12 @@
           height:100vh!important;
           aspect-ratio:auto;
           border-radius:0;
+        }
+
+        @media(max-width:420px) {
+          .result img {
+            max-width:100px;
+          }
         }
 
         [data-empty] {
@@ -1016,8 +1009,65 @@
           margin-top:10px;
         }
 
-        @media(max-width:420px) {
-          .result img { max-width:100px; }
+        .float-head,
+        .resize-edge {
+          display:none;
+        }
+
+        .screen.floating {
+          border:1px solid #666;
+          border-radius:10px;
+          box-shadow:0 8px 30px #0006;
+          background:#111;
+        }
+
+        .floating .float-head {
+          height:39px;
+          gap:4px;
+          padding:5px 7px;
+          background:var(--youtube-accent,#343a40);
+        }
+
+        .float-head strong {
+          font:700 11px/1.5 Tahoma,sans-serif;
+        }
+
+        .float-head button {
+          width:29px;
+          height:29px;
+          padding:0;
+          border:1px solid #ffffff70;
+          border-radius:5px;
+          font:700 18px/25px Tahoma,sans-serif;
+        }
+
+        .floating .resize-edge {
+          display:block;
+          position:relative;
+          height:8px;
+          background:#343a40;
+        }
+
+        [data-resize] {
+          position:absolute;
+          left:0;
+          bottom:0;
+          width:30px;
+          height:18px;
+          text-align:center;
+          line-height:18px;
+          font-size:15px;
+          background:#343a40;
+          color:#fff;
+          cursor:nesw-resize;
+          touch-action:none;
+          user-select:none;
+          border-radius:0 5px 0 0;
+        }
+
+        [data-resize]:focus-visible {
+          outline:2px solid #fff;
+          outline-offset:-2px;
         }
       </style>
 
@@ -1027,51 +1077,27 @@
         <div class="float-head">
           <strong>يوتيوب · اسحب هنا</strong>
 
+          <button type="button" data-size
+            title="حجم صغير / كبير"
+            aria-label="تغيير حجم النافذة">⤢</button>
+
           <button type="button" data-dock
-            aria-label="إرجاع للقائمة"
-            title="إرجاع للقائمة">↩</button>
+            title="إرجاع للقائمة"
+            aria-label="إرجاع للقائمة">↩</button>
 
           <button type="button" data-float-close
-            aria-label="إغلاق وإيقاف"
-            title="إغلاق وإيقاف">×</button>
+            title="إغلاق وإيقاف"
+            aria-label="إغلاق وإيقاف">×</button>
         </div>
 
         <div class="video-wrap">
           <span data-empty>اختر فيديو أو ابحث بالأسفل</span>
         </div>
 
-        <div class="float-tools">
-          <button type="button" data-smaller
-            aria-label="تصغير النافذة">−</button>
-
-          <button type="button" data-larger
-            aria-label="تكبير النافذة">+</button>
-
-          <button type="button" data-ratio="1"
-            aria-pressed="false">مربع</button>
-
-          <button type="button" data-ratio="wide"
-            aria-pressed="true">مستطيل</button>
-
-          <button type="button" data-ratio="free"
-            aria-pressed="false">حر</button>
-
-          <button type="button" data-resize
-            aria-label="اسحب لتغيير الحجم أو استخدم الأسهم"
-            title="اسحب لتغيير الحجم أو استخدم الأسهم">⤡</button>
-        </div>
-
-        <div class="float-position">
-          <label for="yt-corner">المكان</label>
-
-          <select id="yt-corner" data-corner
-            aria-label="مكان النافذة">
-            <option value="">حر — اسحب العنوان</option>
-            <option value="tr" selected>أعلى اليمين</option>
-            <option value="tl">أعلى اليسار</option>
-            <option value="br">أسفل اليمين</option>
-            <option value="bl">أسفل اليسار</option>
-          </select>
+        <div class="resize-edge">
+          <span data-resize role="button" tabindex="0"
+            aria-label="اسحب لتغيير العرض والارتفاع أو استخدم الأسهم"
+            title="تغيير الحجم بحرية">⤡</span>
         </div>
       </div>
 
@@ -1082,9 +1108,12 @@
       </div>
 
       <form>
-        <input type="search" maxlength="150" required
+        <input type="search"
+          maxlength="150"
+          required
           aria-label="البحث في YouTube"
           placeholder="ابحث في YouTube">
+
         <button type="submit">بحث</button>
       </form>
 
@@ -1102,6 +1131,16 @@
     pane.appendChild(shell);
     mountPlayer();
 
+    var accent = getComputedStyle(pane)
+      .getPropertyValue('--tv-accent')
+      .trim();
+
+    if (accent) {
+      q('.screen').style.setProperty('--youtube-accent', accent);
+      playerHost.style.setProperty('--youtube-accent', accent);
+    }
+
+    // فيديوهات البداية.
     render([
       {
         id: 'sqv44Msl6rg',
@@ -1150,38 +1189,11 @@
       });
     };
 
-    q('[data-smaller]').onclick = function () {
-      scaleFloat(0.85);
-    };
+    q('[data-size]').onclick = function () {
+      box.w = box.w > 260 ? 240 : 340;
+      box.h = box.w * 9 / 16;
+      box.ratio = 0;
 
-    q('[data-larger]').onclick = function () {
-      scaleFloat(1.15);
-    };
-
-    playerRoot.querySelectorAll('[data-ratio]').forEach(function (button) {
-      button.onclick = function () {
-        box.ratio =
-          button.dataset.ratio === 'free'
-            ? 0
-            : button.dataset.ratio === '1'
-              ? 1
-              : 16 / 9;
-
-        if (box.ratio) box.h = box.w / box.ratio;
-
-        playerRoot.querySelectorAll('[data-ratio]').forEach(function (item) {
-          item.setAttribute(
-            'aria-pressed',
-            String(item === button)
-          );
-        });
-
-        paint();
-      };
-    });
-
-    q('[data-corner]').onchange = function () {
-      corner = this.value;
       paint();
     };
 
@@ -1216,7 +1228,11 @@
       paint();
     });
 
-    for (var node = pane; node; node = node.parentElement) {
+    for (
+      var node = pane;
+      node;
+      node = node.parentElement
+    ) {
       stateObserver.observe(node, {
         attributes: true,
         attributeFilter: ['class', 'style', 'hidden']
@@ -1252,7 +1268,6 @@
     if (!active) {
       if (request) cancel();
 
-      // اختفاء القائمة لا يوقف الفيديو.
       if (!floating && frame && mode === 'yt') {
         toggleFloat();
       }
