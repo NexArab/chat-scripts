@@ -3,10 +3,7 @@
 
   var KEY = '__CHAT_TV_V1__';
 
-  if (
-    window[KEY] &&
-    typeof window[KEY].destroy === 'function'
-  ) {
+  if (window[KEY] && typeof window[KEY].destroy === 'function') {
     window[KEY].destroy();
   }
 
@@ -21,25 +18,21 @@
         padding-left: var(--tv-pad-left) !important;
         padding-right: var(--tv-pad-right) !important;
       }
-
       #d0.chat-tv-bar.chat-tv-tight > button.ae {
         box-sizing: border-box !important;
         min-width: 0 !important;
         width: var(--tv-nav-width) !important;
       }
-
       #d0 #chat-tv-open svg {
         position: relative;
         top: -4px;
       }
-
       #chat-tv,
       #chat-tv *,
       #chat-tv-floating,
       #chat-tv-floating * {
         box-sizing: border-box;
       }
-
       #chat-tv {
         direction: rtl;
         text-align: right;
@@ -47,7 +40,6 @@
         padding: 10px !important;
         font: 13px/1.7 Tahoma, "Segoe UI", sans-serif;
       }
-
       #chat-tv .chat-tv-top {
         display: flex;
         justify-content: space-between;
@@ -55,12 +47,10 @@
         gap: 5px;
         margin-bottom: 9px;
       }
-
       #chat-tv .chat-tv-tag {
         font-size: 10px;
         opacity: .65;
       }
-
       #chat-tv .chat-tv-screen {
         position: relative;
         width: 100%;
@@ -75,18 +65,15 @@
         justify-content: center;
         text-align: center;
       }
-
       #chat-tv [data-tv-placeholder] {
         padding: 20px;
         color: #eee;
         font-size: 13px;
       }
-
       #chat-tv [hidden],
       #chat-tv-floating [hidden] {
         display: none !important;
       }
-
       #chat-tv iframe {
         position: absolute;
         inset: 0;
@@ -95,14 +82,12 @@
         border: 0;
         display: block;
       }
-
       #chat-tv .chat-tv-tools {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 6px;
         margin-top: 9px;
       }
-
       #chat-tv button {
         float: none !important;
         position: static !important;
@@ -116,7 +101,6 @@
         min-height: 37px;
         padding: 7px !important;
       }
-
       #chat-tv button,
       #chat-tv button:hover,
       #chat-tv button:focus,
@@ -125,25 +109,17 @@
         background: #fff !important;
         text-shadow: none !important;
       }
-
       #chat-tv .chat-tv-choice {
         border-color: currentColor;
-        border-color: color-mix(
-          in srgb,
-          currentColor 22%,
-          transparent
-        );
+        border-color: color-mix(in srgb, currentColor 22%, transparent);
       }
-
       #chat-tv button[aria-pressed="true"],
       #chat-tv [data-tv-start] {
         border: 2px solid var(--tv-accent, currentColor) !important;
-        box-shadow:
-          inset 0 -3px 0 var(--tv-accent, currentColor) !important;
+        box-shadow: inset 0 -3px 0 var(--tv-accent, currentColor) !important;
         background: #f1f3f5 !important;
         color: #000 !important;
       }
-
       #chat-tv button:disabled {
         opacity: 1;
         cursor: default;
@@ -151,14 +127,12 @@
         background: #f4f4f4 !important;
         box-shadow: none !important;
       }
-
       #chat-tv [data-tv-status] {
         font-size: 11px;
         margin: 8px 0;
         opacity: .85;
         overflow-wrap: anywhere;
       }
-
       #chat-tv .chat-tv-categories {
         display: flex;
         gap: 5px;
@@ -166,23 +140,19 @@
         border-top: 1px solid #8884;
         flex-wrap: wrap;
       }
-
       #chat-tv .chat-tv-categories button {
         flex: 1 1 auto;
       }
-
       #chat-tv .chat-tv-channels {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 7px;
       }
-
       #chat-tv .chat-tv-channels button {
         width: 100% !important;
         text-align: right !important;
         min-height: 58px;
       }
-
       #chat-tv small {
         display: block;
         font-size: 9px;
@@ -190,25 +160,21 @@
         opacity: .75;
         margin-top: 3px;
       }
-
       #chat-tv button small {
         color: #333 !important;
         opacity: 1;
       }
-
       #chat-tv .chat-tv-help {
         font-size: 10px;
         opacity: .7;
         margin: 12px 0 3px;
       }
-
       #chat-tv button:focus-visible,
       #chat-tv a:focus-visible,
       #chat-tv-open:focus-visible {
         outline: 2px solid currentColor;
         outline-offset: 2px;
       }
-
       #chat-tv .chat-tv-dock-marker {
         padding: 20px 12px;
         border: 1px dashed #999;
@@ -216,11 +182,9 @@
         text-align: center;
         font-size: 12px;
       }
-
       #chat-tv [data-tv-float] {
         grid-column: 1 / -1;
       }
-
       #dpnl.chat-tv-expanded {
         position: fixed !important;
         inset: 10px 10px 50px !important;
@@ -232,11 +196,9 @@
         flex-direction: column !important;
         overflow: hidden !important;
       }
-
       #dpnl.chat-tv-expanded > .th-dpnl-head {
         flex: 0 0 auto !important;
       }
-
       #dpnl.chat-tv-expanded > #chat-tv.active {
         flex: 1 1 0 !important;
         width: 100% !important;
@@ -248,13 +210,11 @@
         overflow-x: hidden !important;
         background: #fff !important;
       }
-
       #dpnl.chat-tv-expanded #chat-tv .chat-tv-screen {
         width: min(100%, 1100px);
         margin-inline: auto;
         max-height: calc(100dvh - 240px);
       }
-
       #chat-tv-floating {
         position: fixed !important;
         z-index: 10020 !important;
@@ -269,11 +229,9 @@
         direction: rtl;
         font: 12px/1.5 Tahoma, sans-serif;
       }
-
       #chat-tv-floating.tv-float-small {
         width: 240px;
       }
-
       #chat-tv-floating .tv-float-head {
         display: flex;
         justify-content: space-between;
@@ -286,20 +244,17 @@
         user-select: none;
         color: #fff;
       }
-
       #chat-tv-floating .tv-float-head strong {
         font: 700 11px/1.5 Tahoma, sans-serif;
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
       }
-
       #chat-tv-floating .tv-float-head > div {
         display: flex;
         gap: 4px;
         flex-shrink: 0;
       }
-
       #chat-tv-floating button {
         position: static !important;
         float: none !important;
@@ -316,7 +271,6 @@
         font: 700 18px/25px Tahoma, sans-serif !important;
         cursor: pointer;
       }
-
       #chat-tv-floating .chat-tv-screen {
         position: relative !important;
         width: 100% !important;
@@ -330,7 +284,6 @@
         border-radius: 0 !important;
         overflow: hidden !important;
       }
-
       #chat-tv-floating iframe {
         position: absolute !important;
         inset: 0 !important;
@@ -339,18 +292,15 @@
         height: 100% !important;
         border: 0 !important;
       }
-
       #chat-tv-floating .chat-tv-screen iframe {
         min-height: 0 !important;
         margin: 0 !important;
       }
-
       #chat-tv-floating [data-tv-placeholder] {
         color: #fff;
         text-align: center;
         padding: 20px;
       }
-
       #chat-tv .chat-tv-screen video,
       #chat-tv-floating .chat-tv-screen video {
         position: absolute !important;
@@ -365,12 +315,10 @@
         object-fit: contain !important;
         background: #000 !important;
       }
-
       #chat-tv-floating.tv-float-dragging video,
       #chat-tv-floating.tv-float-dragging iframe {
         pointer-events: none !important;
       }
-
       #chat-tv .chat-tv-screen:fullscreen,
       #chat-tv-floating .chat-tv-screen:fullscreen {
         width: 100vw !important;
@@ -382,12 +330,10 @@
         border-radius: 0 !important;
         aspect-ratio: auto !important;
       }
-
       @media (max-width: 420px) {
         #chat-tv {
           padding: 7px !important;
         }
-
         #dpnl.chat-tv-expanded {
           inset: 0 0 48px !important;
         }
@@ -411,13 +357,6 @@
       embed: 'https://snrt.player.easybroadcast.io/events/73_arryadia_k2tgcj0'
     },
     {
-      id: 'bein-news',
-      name: 'beIN SPORTS الإخبارية',
-      group: 'رياضة',
-      embed: 'https://www.youtube.com/embed/O_02mf1vpQo?playsinline=1&autoplay=0',
-      kind: 'بث مباشر'
-    },
-    {
       id: 'live-7',
       name: 'الكويت الرياضية',
       group: 'رياضة',
@@ -436,18 +375,6 @@
       stream: 'https://5c7b683162943.streamlock.net/live/ngrp:sportsone_all/playlist.m3u8'
     },
     {
-      id: 'live-13',
-      name: 'البحرين الرياضية 2',
-      group: 'رياضة',
-      stream: 'https://5c7b683162943.streamlock.net/live/ngrp:bahrainsportstwo_all/playlist.m3u8'
-    },
-    {
-      id: 'dubai-sport1',
-      name: 'دبي الرياضية 1',
-      group: 'رياضة',
-      embed: 'https://admin.mangomolo.com/analytics/index.php/customers/embed/index?id=NzE=&channelid=MjM=&countries=Q0M=&w=100%&h=100%&filter=DENY&signature=b8eadb483fc9abaf1f4625f3041e23d2&jwplayer=6'
-    },
-    {
       id: 'aj',
       name: 'الجزيرة',
       group: 'أخبار',
@@ -460,20 +387,6 @@
       embed: 'https://www.youtube.com/embed/ppgTP8xQQsM?playsinline=1&autoplay=0'
     },
     {
-      id: 'france24',
-      name: 'فرانس 24 عربي',
-      group: 'أخبار',
-      embed: 'https://www.youtube.com/embed/3ursYA8HMeo?playsinline=1&autoplay=0',
-      kind: 'بث مباشر'
-    },
-    {
-      id: 'hadath',
-      name: 'الحدث',
-      group: 'أخبار',
-      embed: 'https://www.youtube.com/embed/2_edgF4cIpQ?playsinline=1&autoplay=0',
-      kind: 'بث مباشر'
-    },
-    {
       id: 'live-6',
       name: 'الكويت الإخبارية',
       group: 'أخبار',
@@ -484,24 +397,6 @@
       name: 'الشرق للأخبار',
       group: 'أخبار',
       stream: 'https://live-news-v2.asharq.com/asharq.m3u8'
-    },
-    {
-      id: 'ajm',
-      name: 'الجزيرة مباشر',
-      group: 'أخبار',
-      embed: 'https://www.youtube.com/embed/Lwbp9WfLslc?playsinline=1&autoplay=0'
-    },
-    {
-      id: 'saudi-news',
-      name: 'الإخبارية السعودية',
-      group: 'أخبار',
-      embed: 'https://www.youtube.com/embed/jDChXanY4oQ?playsinline=1&autoplay=0'
-    },
-    {
-      id: 'dw-en',
-      name: 'DW News — إنجليزي',
-      group: 'أخبار',
-      embed: 'https://www.youtube.com/embed/Lh5GXucy2EU?playsinline=1&autoplay=0'
     },
     {
       id: 'doc',
@@ -552,22 +447,10 @@
       stream: 'https://kwtktvaqta.cdn.mangomolo.com/ktvaq/smil:tktvaq.stream.smil/chunklist.m3u8'
     },
     {
-      id: 'live-14',
-      name: 'تلفزيون البحرين',
-      group: 'برامج',
-      stream: 'https://5c7b683162943.streamlock.net/live/ngrp:bahraintvmain_all/playlist.m3u8'
-    },
-    {
       id: 'live-15',
       name: 'الريان القديم',
       group: 'برامج',
       stream: 'https://alrayyancdn.vidgyor.com/pub-nooldraybinbdh/liveabr/playlist_dvr.m3u8'
-    },
-    {
-      id: 'live-16',
-      name: 'الريان',
-      group: 'برامج',
-      stream: 'https://alrayyancdn.vidgyor.com/pub-noalrayy3pwz0l/liveabr/playlist_dvr.m3u8'
     },
     {
       id: 'oman-general',
@@ -594,12 +477,6 @@
       embed: 'https://player.mangomolo.com/v1/live?id=MTY4&channelid=MTYw&countries=Q0M=&w=100%25&h=100%25&filter=DENY&signature=515ec2eb016a3e614059a5261f4b8280&language=ar&app_id=&fullscreen=yes&player_profile=&base_url=aHR0cHM6Ly9heW4ub20vbGl2ZS8xNjA=&autoplay=false&vast=true'
     },
     {
-      id: 'lofi',
-      name: 'Lofi Girl — موسيقى هادئة',
-      group: 'أغاني',
-      embed: 'https://www.youtube.com/embed/jfKfPfyJRdk?playsinline=1&autoplay=0'
-    },
-    {
       id: 'fnjan-backstage',
       name: 'فنجان — كواليس برامج ثمانية',
       group: 'بودكاست',
@@ -624,6 +501,221 @@
       name: 'البحرين قرآن كريم',
       group: 'دين',
       stream: 'https://5c7b683162943.streamlock.net/live/ngrp:bahrainquran_all/playlist.m3u8'
+    },
+    {
+      id: 'test-hyatv-eg',
+      name: 'هي TV',
+      group: 'ترفيه',
+      stream: 'https://freem3u.xyz/api/live/play.m3u8?vid=187',
+      sourceId: 'HyaTV.eg@SD',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'test-ifilmarabic-ir',
+      name: 'آي فيلم عربي',
+      group: 'مسلسلات',
+      stream: 'https://live.presstv.co.uk/hls/ifilmar.m3u8',
+      sourceId: 'iFilmArabic.ir@SD',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'test-jordansport-jo',
+      name: 'الأردن الرياضية',
+      group: 'رياضة',
+      stream: 'https://jrtv-live.ercdn.net/jordansporthd/jordansporthd.m3u8',
+      sourceId: 'JordanSport.jo@SD',
+      kind: 'بث مباشر · قد يكون محجوبًا ببلدك'
+    },
+    {
+      id: 'test-mixhollywood-eg',
+      name: 'Mix Hollywood',
+      group: 'أفلام',
+      stream: 'https://ml-pull-hwc.myco.io/MixTV/hls/index.m3u8',
+      sourceId: 'MixHollywood.eg@SD',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'test-prime-sy',
+      name: 'Prime السورية',
+      group: 'برامج',
+      stream: 'https://cdn.bestream.io/prime/prime.m3u8',
+      sourceId: 'Prime.sy@HD',
+      kind: 'بث مباشر · عامة ورياضة'
+    },
+    {
+      id: 'extra-roya',
+      name: 'رؤيا الأردنية',
+      group: 'برامج',
+      stream: 'https://live.kwikmotion.com/royatvpublic/royatv.smil/playlist.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'extra-spacetoon',
+      name: 'سبيستون',
+      group: 'أطفال',
+      stream: 'https://live-uae-next.spacetoongo.com/ST_MENA_NEXT/hls/r9p2hjipmw2kl.m3u8',
+      kind: 'بث مباشر · قد يمنع المصدر التشغيل داخل الشات'
+    },
+    {
+      id: 'extra-aghani-aghani',
+      name: 'أغاني أغاني',
+      group: 'أغاني',
+      stream: 'https://cdn.streamlane.tv/hls/aghanitv/index.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'extra-alarabiya',
+      name: 'العربية',
+      group: 'أخبار',
+      stream: 'https://live.alarabiya.net/alarabiapublish/alarabiya.smil/playlist.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'ftv-dijlah',
+      name: 'دجلة',
+      group: 'برامج',
+      stream: 'https://ghaasiflu.online/Dijlah/index.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'ftv-inews',
+      name: 'آي نيوز',
+      group: 'أخبار',
+      stream: 'https://live.i-news.tv/hls/stream.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'ftv-iraq-future',
+      name: 'عراق المستقبل',
+      group: 'برامج',
+      stream: 'https://viewmedia7219.bozztv.com/wmedia/viewmedia100/web_040/Stream/playlist.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'ftv-zagros',
+      name: 'زاغروس',
+      group: 'برامج',
+      stream: 'https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'ftv-watan',
+      name: 'وطن',
+      group: 'برامج',
+      stream: 'https://rp.tactivemedia.com/watantv_source/live/playlist.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'ftv-manar',
+      name: 'المنار',
+      group: 'أخبار',
+      stream: 'https://edge.fastpublish.me/live/index.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'ftv-mayadeen',
+      name: 'الميادين',
+      group: 'أخبار',
+      stream: 'https://mdnlv.cdn.octivid.com/almdn/smil:mpegts.stream.smil/playlist.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'ftv-voice-lebanon',
+      name: 'صوت لبنان',
+      group: 'برامج',
+      stream: 'https://svs.itworkscdn.net/vdltvlive/vdltv.smil/playlist.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'ftv-nour-sharq',
+      name: 'نور الشرق',
+      group: 'دين',
+      stream: 'https://svs.itworkscdn.net/nour8satlive/livestream/playlist.m3u8',
+      kind: 'بث مباشر · مسيحية'
+    },
+    {
+      id: 'ftv-aliman',
+      name: 'الإيمان',
+      group: 'دين',
+      stream: 'https://svs.itworkscdn.net/alimanlive/imantv.smil/playlist.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'ftv-qatar-1',
+      name: 'قطر',
+      group: 'برامج',
+      stream: 'https://qatartv.akamaized.net/hls/live/20000609/qtv1/master.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'ftv-aj-mubasher',
+      name: 'الجزيرة مباشر',
+      group: 'أخبار',
+      stream: 'https://live-hls-web-ajm.getaj.net/AJM/index.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'ftv-aj-2',
+      name: 'الجزيرة 2',
+      group: 'أخبار',
+      stream: 'https://live-hls-web-aja2-gcp.thehlive.com/AJA2/index.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'ftv-alaraby',
+      name: 'التلفزيون العربي',
+      group: 'أخبار',
+      stream: 'https://live.kwikmotion.com/alaraby1live/alaraby_abr/playlist.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'ftv-alarabiya-business',
+      name: 'العربية Business',
+      group: 'اقتصاد',
+      stream: 'https://live.alarabiya.net/alarabiapublish/aswaaq.smil/playlist.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'ftv-sharjah',
+      name: 'الشارقة',
+      group: 'برامج',
+      stream: 'https://live.kwikmotion.com/smc1live/smc1tv.smil/playlist.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'ftv-alwousta',
+      name: 'الوسطى',
+      group: 'برامج',
+      stream: 'https://svs.itworkscdn.net/alwoustalive/alwoustatv.smil/playlist.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'ftv-hadath',
+      name: 'الحدث',
+      group: 'أخبار',
+      stream: 'https://live.alarabiya.net/alarabiapublish/alhadath.smil/alarabiapublish/alhadath_1080p/chunks.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'ftv-dw-arabic',
+      name: 'DW عربية',
+      group: 'أخبار',
+      stream: 'https://dwamdstream103.akamaized.net/hls/live/2015526/dwstream103/index.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'ftv-rt-arabic',
+      name: 'RT عربية',
+      group: 'أخبار',
+      stream: 'https://rt-arb.rttv.com/dvr/rtarab/playlist.m3u8',
+      kind: 'بث مباشر'
+    },
+    {
+      id: 'ftv-sahara-24',
+      name: 'صحراء 24',
+      group: 'أخبار',
+      stream: 'https://live.saharamedias.net:3317/live/shara24live.m3u8',
+      kind: 'بث مباشر'
     }
   ];
 
@@ -669,7 +761,6 @@
 
   function message(text) {
     var node = q('[data-tv-status]');
-
     if (node && node.textContent !== text) {
       node.textContent = text;
     }
@@ -699,11 +790,9 @@
     }
 
     var frame = q('iframe');
-
     if (frame) frame.remove();
 
     var placeholder = q('[data-tv-placeholder]');
-
     if (placeholder) placeholder.hidden = false;
     if (text) message(text);
   }
@@ -725,7 +814,6 @@
 
         settled = true;
         clearTimeout(timeout);
-
         script.onload = null;
         script.onerror = null;
 
@@ -740,11 +828,9 @@
 
       script.async = true;
       script.src = HLS_SCRIPT;
-
       script.onload = function () {
         finish(true);
       };
-
       script.onerror = function () {
         finish(false);
       };
@@ -810,7 +896,6 @@
 
   function renderChannels() {
     var list = q('[data-tv-channels]');
-
     if (!list) return;
 
     var fragment = document.createDocumentFragment();
@@ -819,7 +904,6 @@
       if (group !== 'الكل' && channel.group !== group) return;
 
       var control = document.createElement('button');
-
       control.type = 'button';
       control.className =
         'btn border ' +
@@ -837,7 +921,7 @@
       var small = document.createElement('small');
 
       small.textContent = control.disabled
-        ? 'غير متاحة داخل الشات حاليًا'
+        ? (channel.unavailableReason || 'غير متاحة داخل الشات حاليًا')
         : (channel.kind || 'بث مباشر');
 
       control.appendChild(small);
@@ -852,10 +936,7 @@
     selected = channel;
 
     q('[data-tv-name]').textContent = channel.name;
-
-    q('[data-tv-start]').disabled =
-      !channel.embed && !channel.stream;
-
+    q('[data-tv-start]').disabled = !channel.embed && !channel.stream;
     q('[data-tv-placeholder]').textContent =
       'اضغط «عرض القناة» ثم تشغيل داخل المشغّل';
 
@@ -901,7 +982,6 @@
       frame.title = channel.name;
       frame.allow =
         'autoplay; fullscreen; picture-in-picture; encrypted-media';
-
       frame.allowFullscreen = true;
       frame.referrerPolicy = 'strict-origin-when-cross-origin';
       frame.src = channel.embed;
@@ -912,9 +992,7 @@
 
       screen.appendChild(frame);
 
-      message(
-        'اضغط تشغيل داخل المشغّل. الصوت والجودة من أدوات القناة.'
-      );
+      message('اضغط تشغيل داخل المشغّل. الصوت والجودة من أدوات القناة.');
     } else {
       var video = document.createElement('video');
 
@@ -985,9 +1063,7 @@
       });
 
       video.addEventListener('error', function () {
-        fail(
-          'تعذر تشغيل القناة. قد يكون البث متوقفًا أو غير متاح ببلدك.'
-        );
+        fail('تعذر تشغيل القناة. قد يكون البث متوقفًا أو غير متاح ببلدك.');
       });
 
       video.addEventListener('ended', function () {
@@ -1024,10 +1100,7 @@
             }
           });
 
-          instance.on(
-            Hls.Events.MANIFEST_PARSED,
-            playVideo
-          );
+          instance.on(Hls.Events.MANIFEST_PARSED, playVideo);
 
           instance.on(Hls.Events.ERROR, function (event, data) {
             if (!current() || !data.fatal) return;
@@ -1038,9 +1111,7 @@
             ) {
               instance.recoverMediaError();
             } else {
-              fail(
-                'تعذر تحميل البث. جرّب قناة أخرى أو أعد المحاولة.'
-              );
+              fail('تعذر تحميل البث. جرّب قناة أخرى أو أعد المحاولة.');
             }
           });
 
@@ -1065,9 +1136,7 @@
     if (dead) return;
 
     if (typeof window.TIGERHOST_DPNL_BTN !== 'function') {
-      message(
-        'دالة فتح القائمة غير متاحة. أعد المحاولة بعد دخول الشات.'
-      );
+      message('دالة فتح القائمة غير متاحة. أعد المحاولة بعد دخول الشات.');
       return;
     }
 
@@ -1077,11 +1146,7 @@
     clearTimeout(openTimer);
 
     openTimer = setTimeout(function () {
-      if (
-        !dead &&
-        pane &&
-        !pane.classList.contains('active')
-      ) {
+      if (!dead && pane && !pane.classList.contains('active')) {
         message('لم يفعّل القالب تبويب التلفاز.');
       }
     }, 120);
@@ -1192,14 +1257,11 @@
 
       var appearance = getComputedStyle(anchor);
 
-      [
-        'fontSize',
-        'lineHeight',
-        'height',
-        'borderRadius'
-      ].forEach(function (property) {
-        button.style[property] = appearance[property];
-      });
+      ['fontSize', 'lineHeight', 'height', 'borderRadius'].forEach(
+        function (property) {
+          button.style[property] = appearance[property];
+        }
+      );
     }
 
     button.classList.remove('fa', 'fa-television');
@@ -1207,21 +1269,15 @@
     button.innerHTML = `
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        width="15"
-        height="15"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-        focusable="false"
+        width="15" height="15" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"
+        aria-hidden="true" focusable="false"
         style="display:inline-block!important;vertical-align:middle;margin-inline-end:4px;width:15px;height:15px"
       >
         <rect x="3" y="7" width="18" height="13" rx="2"></rect>
         <path d="M8 3l4 4 4-4M9 23h6"></path>
-      </svg>تلفاز
+      </svg>شاهد
     `;
 
     button.addEventListener('click', open);
@@ -1263,49 +1319,33 @@
       </div>
 
       <div class="chat-tv-tools">
-        <button
-          type="button"
+        <button type="button"
           class="btn label-primary border"
-          data-tv-start
-          disabled
-        >▶ عرض القناة</button>
+          data-tv-start disabled>▶ عرض القناة</button>
 
-        <button
-          type="button"
+        <button type="button"
           class="btn border chat-tv-choice"
-          data-tv-stop
-        >■ إيقاف</button>
+          data-tv-stop>■ إيقاف</button>
 
-        <button
-          type="button"
+        <button type="button"
           class="btn border chat-tv-choice"
-          data-tv-expand
-          aria-pressed="false"
-        >⤢ تكبير</button>
+          data-tv-expand aria-pressed="false">⤢ تكبير</button>
 
-        <button
-          type="button"
+        <button type="button"
           class="btn border chat-tv-choice"
-          data-tv-full
-        >⛶ ملء الشاشة</button>
+          data-tv-full>⛶ ملء الشاشة</button>
 
-        <button
-          type="button"
+        <button type="button"
           class="btn border chat-tv-choice"
-          data-tv-float
-        >▣ نافذة عائمة</button>
+          data-tv-float>▣ نافذة عائمة</button>
       </div>
 
       <p data-tv-status role="status" aria-live="polite">
         اختر قناة ثم اضغط عرض القناة.
       </p>
 
-      <div
-        class="chat-tv-categories"
-        data-tv-categories
-        role="group"
-        aria-label="تصنيف القنوات"
-      ></div>
+      <div class="chat-tv-categories" data-tv-categories
+        role="group" aria-label="تصنيف القنوات"></div>
 
       <div data-tv-channels class="chat-tv-channels"></div>
 
@@ -1317,22 +1357,16 @@
 
     host.appendChild(pane);
 
-    var accent = anchor
-      ? getComputedStyle(anchor).backgroundColor
-      : '';
+    var accent = anchor ? getComputedStyle(anchor).backgroundColor : '';
 
     if (accent && accent !== 'rgba(0, 0, 0, 0)') {
       pane.style.setProperty('--tv-accent', accent);
     }
 
     var groups = ['الكل'].concat(
-      Array.from(
-        new Set(
-          channels.map(function (channel) {
-            return channel.group;
-          })
-        )
-      )
+      Array.from(new Set(channels.map(function (channel) {
+        return channel.group;
+      })))
     );
 
     groups.forEach(function (name) {
@@ -1341,16 +1375,11 @@
       control.type = 'button';
       control.textContent = name;
       control.dataset.tvGroup = name;
-
       control.className =
         'btn border ' +
         (name === group ? 'label-primary' : 'chat-tv-choice');
 
-      control.setAttribute(
-        'aria-pressed',
-        String(name === group)
-      );
-
+      control.setAttribute('aria-pressed', String(name === group));
       q('[data-tv-categories]').appendChild(control);
     });
 
@@ -1366,8 +1395,7 @@
 
   function onPaneClick(event) {
     var control =
-      event.target.closest &&
-      event.target.closest('button');
+      event.target.closest && event.target.closest('button');
 
     if (!control || !pane.contains(control)) return;
 
@@ -1386,8 +1414,7 @@
         var active = item.dataset.tvGroup === group;
 
         item.className =
-          'btn border ' +
-          (active ? 'label-primary' : 'chat-tv-choice');
+          'btn border ' + (active ? 'label-primary' : 'chat-tv-choice');
 
         item.setAttribute('aria-pressed', String(active));
       });
@@ -1403,7 +1430,6 @@
       floatScreen();
     } else if (control.hasAttribute('data-tv-expand')) {
       expanded = !expanded;
-
       host.classList.toggle('chat-tv-expanded', expanded);
       control.textContent = expanded ? '⤡ تصغير' : '⤢ تكبير';
       control.setAttribute('aria-pressed', String(expanded));
@@ -1424,7 +1450,7 @@
         parent.moveBefore(screen, before || null);
         return;
       } catch (error) {
-        // نستخدم النقل المعتاد إذا لم يتوفر النقل المباشر.
+        // الرجوع إلى النقل المعتاد.
       }
     }
 
@@ -1435,7 +1461,6 @@
 
     if (resume) {
       var promise = video.play();
-
       if (promise && promise.catch) {
         promise.catch(function () {});
       }
@@ -1450,7 +1475,6 @@
     if (!floatBox || dead) return;
 
     var viewport = window.visualViewport;
-
     var left = viewport ? viewport.offsetLeft : 0;
     var top = viewport ? viewport.offsetTop : 0;
 
@@ -1458,10 +1482,7 @@
       ? viewport.width
       : document.documentElement.clientWidth;
 
-    var height = viewport
-      ? viewport.height
-      : window.innerHeight;
-
+    var height = viewport ? viewport.height : window.innerHeight;
     var maxWidth = Math.max(100, width - 16) + 'px';
 
     if (floatBox.style.maxWidth !== maxWidth) {
@@ -1482,17 +1503,15 @@
     var wantedX = dragging ? dragging.left : rect.left;
     var wantedY = dragging ? dragging.top : rect.top;
 
-    floatBox.style.left =
-      Math.max(
-        left + 8,
-        Math.min(wantedX, left + width - rect.width - 8)
-      ) + 'px';
+    floatBox.style.left = Math.max(
+      left + 8,
+      Math.min(wantedX, left + width - rect.width - 8)
+    ) + 'px';
 
-    floatBox.style.top =
-      Math.max(
-        top + 8,
-        Math.min(wantedY, bottom - rect.height)
-      ) + 'px';
+    floatBox.style.top = Math.max(
+      top + 8,
+      Math.min(wantedY, bottom - rect.height)
+    ) + 'px';
   }
 
   function scheduleFloat() {
@@ -1517,22 +1536,17 @@
     var screen = floatBox.querySelector('[data-tv-screen]');
 
     if (screen) {
-      [
-        'min-height',
-        'height',
-        'aspect-ratio',
-        'padding'
-      ].forEach(function (property) {
-        screen.style.removeProperty(property);
-      });
+      ['min-height', 'height', 'aspect-ratio', 'padding'].forEach(
+        function (property) {
+          screen.style.removeProperty(property);
+        }
+      );
 
       if (pane && pane.isConnected) {
         moveScreen(
           pane,
           screen,
-          dockMarker && dockMarker.parentNode === pane
-            ? dockMarker
-            : null
+          dockMarker && dockMarker.parentNode === pane ? dockMarker : null
         );
       }
     }
@@ -1546,10 +1560,7 @@
     }
 
     var control = q('[data-tv-float]');
-
-    if (control) {
-      control.textContent = '▣ نافذة عائمة';
-    }
+    if (control) control.textContent = '▣ نافذة عائمة';
   }
 
   function floatScreen() {
@@ -1593,25 +1604,10 @@
     floatBox.innerHTML = `
       <div class="tv-float-head">
         <strong>التلفاز · اسحب هنا</strong>
-
         <div>
-          <button
-            type="button"
-            data-float-size
-            title="تغيير الحجم"
-          >⤢</button>
-
-          <button
-            type="button"
-            data-float-dock
-            title="إرجاع للقائمة"
-          >↩</button>
-
-          <button
-            type="button"
-            data-float-close
-            title="إغلاق وإيقاف"
-          >×</button>
+          <button type="button" data-float-size title="تغيير الحجم">⤢</button>
+          <button type="button" data-float-dock title="إرجاع للقائمة">↩</button>
+          <button type="button" data-float-close title="إغلاق وإيقاف">×</button>
         </div>
       </div>
     `;
@@ -1630,36 +1626,34 @@
     scheduleFloat();
     q('[data-tv-float]').textContent = '↩ إرجاع الشاشة';
 
-    floatBox.querySelector(
-      '[data-float-dock]'
-    ).addEventListener('click', function () {
-      dockScreen();
-      open();
-    });
+    floatBox.querySelector('[data-float-dock]').addEventListener(
+      'click',
+      function () {
+        dockScreen();
+        open();
+      }
+    );
 
-    floatBox.querySelector(
-      '[data-float-close]'
-    ).addEventListener('click', function () {
-      stop('تم إيقاف التلفاز');
-      dockScreen();
-    });
+    floatBox.querySelector('[data-float-close]').addEventListener(
+      'click',
+      function () {
+        stop('تم إيقاف التلفاز');
+        dockScreen();
+      }
+    );
 
-    floatBox.querySelector(
-      '[data-float-size]'
-    ).addEventListener('click', function () {
-      floatBox.classList.toggle('tv-float-small');
-      scheduleFloat();
-    });
+    floatBox.querySelector('[data-float-size]').addEventListener(
+      'click',
+      function () {
+        floatBox.classList.toggle('tv-float-small');
+        scheduleFloat();
+      }
+    );
 
     var handle = floatBox.querySelector('.tv-float-head');
 
     handle.addEventListener('pointerdown', function (event) {
-      if (
-        event.target.closest('button') ||
-        event.button !== 0
-      ) {
-        return;
-      }
+      if (event.target.closest('button') || event.button !== 0) return;
 
       var rect = floatBox.getBoundingClientRect();
 
@@ -1677,13 +1671,7 @@
     });
 
     handle.addEventListener('pointermove', function (event) {
-      if (
-        !dragging ||
-        dragging.id !== event.pointerId ||
-        !floatBox
-      ) {
-        return;
-      }
+      if (!dragging || dragging.id !== event.pointerId || !floatBox) return;
 
       dragging.left = event.clientX - dragging.x;
       dragging.top = event.clientY - dragging.y;
@@ -1711,22 +1699,13 @@
   }
 
   function fitBar() {
-    if (
-      dead ||
-      !bar ||
-      !bar.isConnected ||
-      bar.clientWidth <= 0
-    ) {
-      return;
-    }
+    if (dead || !bar || !bar.isConnected || bar.clientWidth <= 0) return;
 
     bar.classList.remove('chat-tv-tight');
 
-    var buttons = Array.from(bar.children).filter(
-      function (node) {
-        return node.tagName === 'BUTTON';
-      }
-    );
+    var buttons = Array.from(bar.children).filter(function (node) {
+      return node.tagName === 'BUTTON';
+    });
 
     buttons.forEach(function (control) {
       control.style.removeProperty('--tv-nav-width');
@@ -1766,15 +1745,8 @@
       };
     }).filter(Boolean);
 
-    if (
-      available > 0 &&
-      flexible > 0 &&
-      fixed + flexible > available
-    ) {
-      var ratio = Math.max(
-        0,
-        (available - fixed - 2) / flexible
-      );
+    if (available > 0 && flexible > 0 && fixed + flexible > available) {
+      var ratio = Math.max(0, (available - fixed - 2) / flexible);
 
       widths.forEach(function (item) {
         if (item.button.classList.contains('ae')) {
@@ -1805,12 +1777,9 @@
     if (dead) return;
 
     if (mounted()) {
-      if (
-        records &&
-        records.some(function (record) {
-          return record.target === bar;
-        })
-      ) {
+      if (records && records.some(function (record) {
+        return record.target === bar;
+      })) {
         scheduleFit();
       }
 
@@ -1839,7 +1808,6 @@
         childList: true,
         subtree: true
       });
-
       return;
     }
 
@@ -1848,13 +1816,9 @@
     [host, bar].forEach(function (node) {
       while (node && node.nodeType === 1) {
         if (!watched.has(node)) {
-          observer.observe(node, {
-            childList: true
-          });
-
+          observer.observe(node, { childList: true });
           watched.add(node);
         }
-
         node = node.parentElement;
       }
     });
@@ -1866,15 +1830,11 @@
 
   function onClick(event) {
     var target = event.target;
-
     if (!target || !target.closest) return;
 
     var logout = target.closest('#settings .SERT');
 
-    if (
-      logout ||
-      target.closest('#dpnl .th-dpnl-close')
-    ) {
+    if (logout || target.closest('#dpnl .th-dpnl-close')) {
       if (logout) {
         stop('تم إيقاف التلفاز');
         dockScreen();
@@ -1891,7 +1851,6 @@
       if (!floatBox) {
         stop('توقف البث عند مغادرة التلفاز');
       }
-
       collapse();
     }
 
@@ -1921,7 +1880,6 @@
     if (dead || !document.body) return;
 
     installTVStyle();
-
     observer = new MutationObserver(schedule);
 
     if (typeof ResizeObserver === 'function') {
@@ -1944,13 +1902,8 @@
     clearTimeout(mountTimer);
     clearTimeout(openTimer);
 
-    if (fitFrame !== null) {
-      cancelAnimationFrame(fitFrame);
-    }
-
-    if (floatFrame !== null) {
-      cancelAnimationFrame(floatFrame);
-    }
+    if (fitFrame !== null) cancelAnimationFrame(fitFrame);
+    if (floatFrame !== null) cancelAnimationFrame(floatFrame);
 
     if (observer) observer.disconnect();
     if (resizeObserver) resizeObserver.disconnect();
@@ -1973,21 +1926,12 @@
     window.removeEventListener('resize', scheduleFloat);
 
     if (window.visualViewport) {
-      window.visualViewport.removeEventListener(
-        'resize',
-        scheduleFloat
-      );
-
-      window.visualViewport.removeEventListener(
-        'scroll',
-        scheduleFloat
-      );
+      window.visualViewport.removeEventListener('resize', scheduleFloat);
+      window.visualViewport.removeEventListener('scroll', scheduleFloat);
     }
   }
 
-  window[KEY] = {
-    destroy: destroy
-  };
+  window[KEY] = { destroy: destroy };
 
   document.addEventListener('click', onClick, true);
   document.addEventListener('keydown', onKey);
@@ -1997,21 +1941,12 @@
   window.addEventListener('resize', scheduleFloat);
 
   if (window.visualViewport) {
-    window.visualViewport.addEventListener(
-      'resize',
-      scheduleFloat
-    );
-
-    window.visualViewport.addEventListener(
-      'scroll',
-      scheduleFloat
-    );
+    window.visualViewport.addEventListener('resize', scheduleFloat);
+    window.visualViewport.addEventListener('scroll', scheduleFloat);
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, {
-      once: true
-    });
+    document.addEventListener('DOMContentLoaded', init, { once: true });
   } else {
     init();
   }
