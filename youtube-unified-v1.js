@@ -8,17 +8,28 @@
 
   if (window[KEY]) window[KEY].destroy();
 
-  var pane, host, header, nav, label, root, shell, style;
+  var pane, host, nav, label, root, shell, style;
   var mode = 'tv';
   var dead = false;
   var frame = null;
   var job = 0;
 
+  var floating = false;
+  var gesture = null;
+  var paintJob = 0;
+
+  var box = {
+    x: 12,
+    y: 70,
+    w: 360,
+    h: 202.5,
+    ratio: 16 / 9
+  };
+
   var request = null;
   var timeout = null;
   var sequence = 0;
   var busy = false;
-
   var query = '';
   var next = '';
   var lastSearch = 0;
@@ -29,9 +40,7 @@
       !pane || !pane.isConnected ||
       !shell || !shell.isConnected ||
       !nav || !nav.isConnected
-    ) {
-      schedule();
-    }
+    ) schedule();
   });
 
   var stateObserver = new MutationObserver(schedule);
@@ -56,13 +65,220 @@
     if (node) node.textContent = text;
   }
 
+  function viewport() {
+    var v = window.visualViewport;
+
+    return {
+      x: v ? v.offsetLeft : 0,
+      y: v ? v.offsetTop : 0,
+      w: v ? v.width : window.innerWidth,
+      h: v ? v.height : window.innerHeight
+    };
+  }
+
+  function fitBox() {
+    var v = viewport();
+    var maxW = Math.max(1, v.w - 16);
+    var maxH = Math.max(1, v.h - 100);
+
+    if (box.ratio) {
+      var max = Math.min(maxW, maxH * box.ratio);
+
+      box.w = Math.max(
+        Math.min(240, max),
+        Math.min(box.w, max)
+      );
+
+      box.h = box.w / box.ratio;
+    } else {
+      box.w = Math.max(
+        Math.min(240, maxW),
+        Math.min(box.w, maxW)
+      );
+
+      box.h = Math.max(
+        Math.min(135, maxH),
+        Math.min(box.h, maxH)
+      );
+    }
+
+    box.x = Math.max(
+      v.x + 8,
+      Math.min(box.x, v.x + v.w - box.w - 8)
+    );
+
+    box.y = Math.max(
+      v.y + 8,
+      Math.min(box.y, v.y + v.h - box.h - 92)
+    );
+  }
+
+  function paint() {
+    paintJob = 0;
+
+    if (!floating || !q('.screen')) return;
+
+    fitBox();
+
+    var screen = q('.screen');
+    screen.style.left = box.x + 'px';
+    screen.style.top = box.y + 'px';
+    screen.style.width = box.w + 'px';
+    screen.style.setProperty('--video-height', box.h + 'px');
+  }
+
+  function schedulePaint() {
+    if (floating && !paintJob) {
+      paintJob = requestAnimationFrame(paint);
+    }
+  }
+
+  function endGesture() {
+    if (gesture) {
+      var current = gesture;
+      gesture = null;
+
+      try {
+        if (current.node.hasPointerCapture(current.id)) {
+          current.node.releasePointerCapture(current.id);
+        }
+      } catch (error) {}
+    }
+
+    if (q('.screen')) {
+      q('.screen').classList.remove('moving');
+    }
+  }
+
+  function dock() {
+    floating = false;
+    endGesture();
+
+    if (paintJob) cancelAnimationFrame(paintJob);
+    paintJob = 0;
+
+    var screen = q('.screen');
+
+    if (screen) {
+      screen.classList.remove('floating');
+      screen.removeAttribute('style');
+    }
+
+    if (q('[data-float]')) {
+      q('[data-float]').textContent = '▣ نافذة عائمة';
+    }
+  }
+
+  function toggleFloat() {
+    if (floating) {
+      dock();
+      return;
+    }
+
+    if (!frame) {
+      say('اختر فيديو أولًا.');
+      return;
+    }
+
+    if (
+      document.fullscreenElement ||
+      (root && root.fullscreenElement)
+    ) {
+      say('اخرج من ملء الشاشة أولًا.');
+      return;
+    }
+
+    var v = viewport();
+
+    box.x = v.x + v.w - box.w - 12;
+    box.y = v.y + 60;
+    floating = true;
+
+    q('.screen').classList.add('floating');
+    q('[data-float]').textContent = '↩ إرجاع للقائمة';
+
+    paint();
+  }
+
+  function scaleFloat(factor) {
+    box.w *= factor;
+    box.h *= factor;
+    paint();
+  }
+
+  function bindGesture(node, kind) {
+    node.addEventListener('pointerdown', function (event) {
+      if (
+        !floating ||
+        event.button !== 0 ||
+        gesture ||
+        (
+          kind === 'drag' &&
+          event.target.closest('button')
+        )
+      ) return;
+
+      gesture = {
+        node: node,
+        id: event.pointerId,
+        kind: kind,
+        x: event.clientX,
+        y: event.clientY,
+        bx: box.x,
+        by: box.y,
+        w: box.w,
+        h: box.h
+      };
+
+      try {
+        node.setPointerCapture(event.pointerId);
+      } catch (error) {}
+
+      q('.screen').classList.add('moving');
+      event.preventDefault();
+    });
+
+    node.addEventListener('pointermove', function (event) {
+      var current = gesture;
+
+      if (!current || current.id !== event.pointerId) return;
+
+      var dx = event.clientX - current.x;
+      var dy = event.clientY - current.y;
+
+      if (current.kind === 'drag') {
+        box.x = current.bx + dx;
+        box.y = current.by + dy;
+      } else {
+        // المقبض في الطرف الأيسر بسبب اتجاه الواجهة العربي.
+        box.w = current.w - dx;
+
+        box.h = box.ratio
+          ? box.w / box.ratio
+          : current.h + dy;
+      }
+
+      schedulePaint();
+    });
+
+    [
+      'pointerup',
+      'pointercancel',
+      'lostpointercapture'
+    ].forEach(function (name) {
+      node.addEventListener(name, function (event) {
+        if (gesture && gesture.id === event.pointerId) {
+          endGesture();
+        }
+      });
+    });
+  }
+
   function stop() {
     if (frame) frame.remove();
     frame = null;
 
-    if (q('.screen')) {
-      q('.screen').classList.remove('floating');
-    }
+    dock();
 
     if (q('[data-empty]')) {
       q('[data-empty]').hidden = false;
@@ -134,14 +350,13 @@
     });
 
     q('[data-title]').textContent = title;
+    q('.float-head strong').textContent = title;
     q('[data-empty]').hidden = true;
 
     frame = document.createElement('iframe');
     frame.title = title;
-
     frame.allow =
       'autoplay; encrypted-media; fullscreen; picture-in-picture';
-
     frame.allowFullscreen = true;
     frame.referrerPolicy = 'strict-origin-when-cross-origin';
 
@@ -150,10 +365,10 @@
       id +
       '?playsinline=1&autoplay=0';
 
-    q('.screen').appendChild(frame);
+    q('.video-wrap').appendChild(frame);
 
     say(
-      'اضغط تشغيل داخل الفيديو. إذا منع صاحب الفيديو التضمين، جرّب فيديو آخر.'
+      'اضغط تشغيل داخل الفيديو. بعض الفيديوهات لا تسمح بالتضمين.'
     );
   }
 
@@ -169,7 +384,6 @@
       var img = document.createElement('img');
       img.src =
         'https://i.ytimg.com/vi/' + item.id + '/mqdefault.jpg';
-
       img.alt = '';
       img.loading = 'lazy';
       img.width = 120;
@@ -212,7 +426,6 @@
     });
 
     render(items);
-
     next = data.nextPageToken || '';
     q('[data-next]').hidden = !next;
 
@@ -227,7 +440,6 @@
     if (busy) return;
 
     var term = token ? query : q('input').value.trim();
-
     if (!term) return;
 
     if (
@@ -259,7 +471,6 @@
 
     var ticket = sequence;
     var controller = new AbortController();
-
     request = controller;
 
     timeout = setTimeout(function () {
@@ -268,7 +479,6 @@
 
     q('[type=submit]').disabled = true;
     q('[data-next]').disabled = true;
-
     say('جاري البحث…');
 
     var params = new URLSearchParams({
@@ -326,12 +536,13 @@
     } finally {
       if (ticket === sequence) {
         clearTimeout(timeout);
-
         request = null;
         busy = false;
 
-        q('[type=submit]').disabled = false;
-        q('[data-next]').disabled = false;
+        if (q('[type=submit]')) {
+          q('[type=submit]').disabled = false;
+          q('[data-next]').disabled = false;
+        }
       }
     }
   }
@@ -341,27 +552,17 @@
     stop();
     stateObserver.disconnect();
 
-    if (pane) {
-      pane.classList.remove('chat-youtube-mode');
-    }
-
-    if (host) {
-      host.classList.remove('chat-youtube-visible');
-    }
-
-    if (label) {
-      label.classList.remove('chat-youtube-label');
-    }
-
+    if (pane) pane.classList.remove('chat-youtube-mode');
+    if (host) host.classList.remove('chat-youtube-visible');
+    if (label) label.classList.remove('chat-youtube-label');
     if (nav) nav.remove();
     if (shell) shell.remove();
 
-    pane = host = header = nav = label = root = shell = null;
+    pane = host = nav = label = root = shell = null;
 
     mode = 'tv';
     next = '';
     query = '';
-
     cache.clear();
   }
 
@@ -376,7 +577,6 @@
     label = host.querySelector('.pnhead');
     if (!label) return;
 
-    header = label.parentElement;
     label.classList.add('chat-youtube-label');
 
     nav = document.createElement('span');
@@ -402,174 +602,241 @@
 
     shell = document.createElement('div');
     shell.id = 'chat-youtube-panel';
-
     root = shell.attachShadow({ mode: 'open' });
 
     root.innerHTML = `
       <style>
         :host {
-          display: block;
-          direction: rtl;
-          color: #222;
-          background: #fff;
-          font: 13px/1.6 Tahoma, sans-serif;
+          display:block;
+          direction:rtl;
+          color:#222;
+          background:#fff;
+          font:13px/1.6 Tahoma,sans-serif;
         }
 
-        * { box-sizing: border-box; }
-        [hidden] { display: none !important; }
-
-        button, input { font: inherit; }
+        * { box-sizing:border-box; }
+        [hidden] { display:none!important; }
+        button,input { font:inherit; }
 
         button {
-          cursor: pointer;
-          border: 1px solid #bbb;
-          border-radius: 7px;
-          padding: 8px;
-          color: #111;
-          background: #fff;
+          cursor:pointer;
+          border:1px solid #bbb;
+          border-radius:7px;
+          padding:8px;
+          color:#111;
+          background:#fff;
         }
 
-        button:disabled {
-          opacity: .5;
-          cursor: default;
-        }
+        button:disabled { opacity:.5; cursor:default; }
 
         button:focus-visible,
         input:focus-visible {
-          outline: 2px solid #a00;
-          outline-offset: 2px;
+          outline:2px solid #a00;
+          outline-offset:2px;
         }
 
-        form, .tools {
-          display: flex;
-          gap: 6px;
-          margin: 10px 0;
+        form,.tools {
+          display:flex;
+          gap:6px;
+          margin:10px 0;
         }
 
-        .tools { flex-wrap: wrap; }
-        .tools button { flex: 1; }
+        .tools { flex-wrap:wrap; }
+        .tools button { flex:1; }
 
         input {
-          width: 100%;
-          min-width: 0;
-          border: 1px solid #aaa;
-          border-radius: 7px;
-          padding: 9px;
-          background: white;
-          color: #111;
+          width:100%;
+          min-width:0;
+          border:1px solid #aaa;
+          border-radius:7px;
+          padding:9px;
+          background:#fff;
+          color:#111;
         }
 
         .screen {
-          position: relative;
-          width: 100%;
-          aspect-ratio: 16/9;
-          min-height: 200px;
-          background: #090b0f;
-          border-radius: 8px;
-          overflow: hidden;
-          color: white;
-          display: grid;
-          place-items: center;
+          width:100%;
+          background:#fff;
+          border-radius:8px;
+          overflow:hidden;
+        }
+
+        .video-wrap {
+          position:relative;
+          width:100%;
+          aspect-ratio:16/9;
+          background:#090b0f;
+          color:#fff;
+          display:grid;
+          place-items:center;
         }
 
         iframe {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          border: 0;
+          position:absolute;
+          inset:0;
+          width:100%;
+          height:100%;
+          border:0;
+          display:block;
         }
+
+        .float-head,.float-tools { display:none; }
 
         .screen.floating {
-          position: fixed;
-          z-index: 10030;
-          bottom: 65px;
-          right: 12px;
-          width: min(360px, calc(100vw - 24px));
-          height: 220px;
+          position:fixed;
+          z-index:10030;
+          right:auto;
+          bottom:auto;
+          margin:0;
+          box-shadow:0 6px 24px #0005;
+          border-radius:8px;
         }
 
-        .screen:fullscreen {
-          width: 100vw;
-          height: 100vh;
-          max-width: none;
-          border-radius: 0;
+        .floating .video-wrap {
+          height:var(--video-height);
+          aspect-ratio:auto;
         }
 
-        .float-close {
-          display: none;
-          position: absolute;
-          z-index: 2;
-          top: 2px;
-          right: 2px;
-          background: #fff;
-          color: #111;
+        .floating .float-head {
+          display:flex;
+          height:40px;
+          align-items:center;
+          gap:4px;
+          padding:4px 6px;
+          background:#252525;
+          color:white;
+          touch-action:none;
+          user-select:none;
+          cursor:grab;
         }
 
-        .floating { padding-top: 32px; }
-
-        .floating iframe {
-          top: 32px;
-          height: calc(100% - 32px);
+        .float-head strong {
+          flex:1;
+          min-width:0;
+          overflow:hidden;
+          text-overflow:ellipsis;
+          white-space:nowrap;
+          font-size:11px;
         }
 
-        .floating .float-close { display: block; }
-
-        [data-empty] {
-          padding: 15px;
-          text-align: center;
+        .float-head button {
+          width:32px;
+          height:32px;
+          padding:0;
+          flex-shrink:0;
         }
 
-        [data-status] {
-          font-size: 12px;
-          color: #555;
+        .floating .float-tools {
+          display:flex;
+          height:44px;
+          align-items:center;
+          justify-content:space-between;
+          gap:3px;
+          padding:4px;
+          background:#fff;
         }
 
-        [data-results] {
-          display: grid;
-          gap: 8px;
+        .float-tools button {
+          padding:3px 6px;
+          min-height:32px;
+          font-size:11px;
         }
+
+        .float-tools button[aria-pressed="true"] {
+          background:#e8e8e8;
+          border-color:#333;
+        }
+
+        [data-resize] {
+          touch-action:none;
+          user-select:none;
+          cursor:nesw-resize;
+        }
+
+        .screen.moving iframe { pointer-events:none; }
+
+        .video-wrap:fullscreen {
+          width:100vw;
+          height:100vh;
+          aspect-ratio:auto;
+          border-radius:0;
+        }
+
+        [data-empty] { padding:15px; text-align:center; }
+        [data-status] { font-size:12px; color:#555; }
+        [data-results] { display:grid; gap:8px; }
 
         .result {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          width: 100%;
-          text-align: right;
+          display:flex;
+          align-items:center;
+          gap:8px;
+          width:100%;
+          text-align:right;
         }
 
         .result img {
-          width: 120px;
-          height: 68px;
-          object-fit: cover;
-          border-radius: 5px;
-          flex-shrink: 0;
+          width:120px;
+          height:68px;
+          object-fit:cover;
+          border-radius:5px;
+          flex-shrink:0;
         }
 
-        .result span { overflow-wrap: anywhere; }
+        .result span { overflow-wrap:anywhere; }
 
         small {
-          display: block;
-          color: #666;
-          font-size: 10px;
-          margin-top: 4px;
+          display:block;
+          color:#666;
+          font-size:10px;
+          margin-top:4px;
         }
 
-        [data-next] {
-          width: 100%;
-          margin-top: 10px;
+        [data-next] { width:100%; margin-top:10px; }
+
+        @media(max-width:420px) {
+          .result img { width:100px; height:56px; }
         }
       </style>
 
       <strong data-title>YouTube</strong>
 
       <div class="screen">
-        <span data-empty>اختر فيديو أو ابحث بالأسفل</span>
+        <div class="float-head">
+          <strong>يوتيوب · اسحب هنا</strong>
 
-        <button type="button"
-          class="float-close"
-          data-dock
-          aria-label="إرجاع الفيديو للقائمة">↩ إرجاع</button>
+          <button type="button" data-dock
+            aria-label="إرجاع للقائمة"
+            title="إرجاع للقائمة">↩</button>
+
+          <button type="button" data-float-close
+            aria-label="إغلاق وإيقاف"
+            title="إغلاق وإيقاف">×</button>
+        </div>
+
+        <div class="video-wrap">
+          <span data-empty>اختر فيديو أو ابحث بالأسفل</span>
+        </div>
+
+        <div class="float-tools">
+          <button type="button" data-smaller
+            aria-label="تصغير النافذة">−</button>
+
+          <button type="button" data-larger
+            aria-label="تكبير النافذة">+</button>
+
+          <button type="button" data-ratio="1"
+            aria-pressed="false">مربع</button>
+
+          <button type="button" data-ratio="wide"
+            aria-pressed="true">مستطيل</button>
+
+          <button type="button" data-ratio="free"
+            aria-pressed="false">حر</button>
+
+          <button type="button" data-resize
+            aria-label="اسحب لتغيير الحجم أو استخدم الأسهم"
+            title="اسحب لتغيير الحجم أو استخدم الأسهم">⤡</button>
+        </div>
       </div>
 
       <div class="tools">
@@ -579,13 +846,9 @@
       </div>
 
       <form>
-        <input
-          type="search"
-          maxlength="150"
-          required
+        <input type="search" maxlength="150" required
           aria-label="البحث في YouTube"
-          placeholder="ابحث في YouTube"
-        >
+          placeholder="ابحث في YouTube">
         <button type="submit">بحث</button>
       </form>
 
@@ -594,15 +857,11 @@
       </p>
 
       <div data-results></div>
-
-      <button type="button" data-next hidden>
-        النتائج التالية
-      </button>
+      <button type="button" data-next hidden>النتائج التالية</button>
     `;
 
     pane.appendChild(shell);
 
-    // فيديوهات البداية: تستطيع تغييرها لاحقًا.
     render([
       {
         id: 'sqv44Msl6rg',
@@ -628,39 +887,87 @@
       say('تم إيقاف الفيديو.');
     };
 
-    q('[data-float]').onclick = function () {
-      if (frame) {
-        q('.screen').classList.toggle('floating');
-      } else {
-        say('اختر فيديو أولًا.');
-      }
-    };
+    q('[data-float]').onclick = toggleFloat;
+    q('[data-dock]').onclick = dock;
 
-    q('[data-dock]').onclick = function () {
-      q('.screen').classList.remove('floating');
+    q('[data-float-close]').onclick = function () {
+      stop();
+      say('تم إيقاف الفيديو.');
     };
 
     q('[data-full]').onclick = function () {
       if (!frame) return;
 
-      var screen = q('.screen');
-      var fn = screen.requestFullscreen;
+      var video = q('.video-wrap');
 
-      if (!fn) {
-        say('استخدم ملء الشاشة من داخل مشغّل YouTube.');
+      if (!video.requestFullscreen) {
+        say('استخدم زر ملء الشاشة داخل مشغّل YouTube.');
         return;
       }
 
-      fn.call(screen).catch(function () {
-        say('استخدم ملء الشاشة من داخل مشغّل YouTube.');
+      video.requestFullscreen().catch(function () {
+        say('استخدم زر ملء الشاشة داخل مشغّل YouTube.');
       });
     };
 
-    for (
-      var node = pane;
-      node;
-      node = node.parentElement
-    ) {
+    q('[data-smaller]').onclick = function () {
+      scaleFloat(0.85);
+    };
+
+    q('[data-larger]').onclick = function () {
+      scaleFloat(1.15);
+    };
+
+    root.querySelectorAll('[data-ratio]').forEach(function (button) {
+      button.onclick = function () {
+        box.ratio =
+          button.dataset.ratio === 'free'
+            ? 0
+            : button.dataset.ratio === '1'
+              ? 1
+              : 16 / 9;
+
+        if (box.ratio) box.h = box.w / box.ratio;
+
+        root.querySelectorAll('[data-ratio]').forEach(function (item) {
+          item.setAttribute(
+            'aria-pressed',
+            String(item === button)
+          );
+        });
+
+        paint();
+      };
+    });
+
+    bindGesture(q('.float-head'), 'drag');
+    bindGesture(q('[data-resize]'), 'resize');
+
+    q('[data-resize]').addEventListener('keydown', function (event) {
+      if (![
+        'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'
+      ].includes(event.key)) return;
+
+      event.preventDefault();
+
+      var step = event.shiftKey ? 30 : 10;
+
+      if (event.key === 'ArrowLeft') box.w -= step;
+      if (event.key === 'ArrowRight') box.w += step;
+
+      if (box.ratio) {
+        if (event.key === 'ArrowUp') box.w -= step * box.ratio;
+        if (event.key === 'ArrowDown') box.w += step * box.ratio;
+        box.h = box.w / box.ratio;
+      } else {
+        if (event.key === 'ArrowUp') box.h -= step;
+        if (event.key === 'ArrowDown') box.h += step;
+      }
+
+      paint();
+    });
+
+    for (var node = pane; node; node = node.parentElement) {
       stateObserver.observe(node, {
         attributes: true,
         attributeFilter: ['class', 'style', 'hidden']
@@ -670,16 +977,13 @@
 
   function sync() {
     job = 0;
-
     if (dead) return;
 
     if (
       !pane || !pane.isConnected ||
       !shell || !shell.isConnected ||
       !nav || !nav.isConnected
-    ) {
-      mount();
-    }
+    ) mount();
 
     if (!pane || !nav) return;
 
@@ -701,9 +1005,7 @@
   }
 
   function schedule() {
-    if (!dead && !job) {
-      job = requestAnimationFrame(sync);
-    }
+    if (!dead && !job) job = requestAnimationFrame(sync);
   }
 
   function onClick(event) {
@@ -736,61 +1038,61 @@
 
     style.textContent = `
       #dpnl .chat-youtube-tabs {
-        display: none;
-        gap: 5px;
-        align-items: center;
-        float: left;
-        direction: rtl;
-        padding: 3px;
+        display:none;
+        gap:5px;
+        align-items:center;
+        float:left;
+        direction:rtl;
+        padding:3px;
       }
 
       #dpnl.chat-youtube-visible .chat-youtube-tabs {
-        display: inline-flex;
+        display:inline-flex;
       }
 
       #dpnl.chat-youtube-visible .chat-youtube-label {
-        display: none !important;
+        display:none!important;
       }
 
       #dpnl .chat-youtube-tabs button {
-        display: inline-flex !important;
-        align-items: center;
-        gap: 5px;
-        float: none !important;
-        position: static !important;
-        width: auto !important;
-        height: 32px !important;
-        margin: 0 !important;
-        padding: 4px 9px !important;
-        border: 1px solid #ffffff80 !important;
-        border-radius: 6px !important;
-        background: transparent !important;
-        color: white !important;
-        font: 700 12px Tahoma !important;
-        cursor: pointer;
+        display:inline-flex!important;
+        align-items:center;
+        gap:5px;
+        float:none!important;
+        position:static!important;
+        width:auto!important;
+        height:32px!important;
+        margin:0!important;
+        padding:4px 9px!important;
+        border:1px solid #ffffff80!important;
+        border-radius:6px!important;
+        background:transparent!important;
+        color:white!important;
+        font:700 12px Tahoma!important;
+        cursor:pointer;
       }
 
       #dpnl .chat-youtube-tabs button[aria-pressed="true"] {
-        background: #fff !important;
-        color: #222 !important;
+        background:#fff!important;
+        color:#222!important;
       }
 
       #dpnl .chat-youtube-tabs svg {
-        width: 19px;
-        height: 19px;
-        flex-shrink: 0;
+        width:19px;
+        height:19px;
+        flex-shrink:0;
       }
 
       #chat-tv > #chat-youtube-panel {
-        display: none !important;
+        display:none!important;
       }
 
       #chat-tv.chat-youtube-mode > :not(#chat-youtube-panel) {
-        display: none !important;
+        display:none!important;
       }
 
       #chat-tv.chat-youtube-mode > #chat-youtube-panel {
-        display: block !important;
+        display:block!important;
       }
     `;
 
@@ -803,13 +1105,18 @@
 
     document.addEventListener('click', onClick, true);
     window.addEventListener('pagehide', onHide);
+    window.addEventListener('resize', schedulePaint);
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', schedulePaint);
+      window.visualViewport.addEventListener('scroll', schedulePaint);
+    }
 
     schedule();
   }
 
   function destroy() {
     dead = true;
-
     observer.disconnect();
     stateObserver.disconnect();
 
@@ -818,20 +1125,21 @@
     document.removeEventListener('DOMContentLoaded', init);
     document.removeEventListener('click', onClick, true);
     window.removeEventListener('pagehide', onHide);
+    window.removeEventListener('resize', schedulePaint);
+
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener('resize', schedulePaint);
+      window.visualViewport.removeEventListener('scroll', schedulePaint);
+    }
 
     cleanup();
-
     if (style) style.remove();
   }
 
-  window[KEY] = {
-    destroy: destroy
-  };
+  window[KEY] = { destroy: destroy };
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, {
-      once: true
-    });
+    document.addEventListener('DOMContentLoaded', init, { once: true });
   } else {
     init();
   }
