@@ -723,7 +723,7 @@
       }
     </style>
 
-    <strong data-title>نتفلكس</strong>
+    <strong data-title>أفلام ومسلسلات</strong>
 
     <div class="screen">
       <div class="float-head">
@@ -1047,7 +1047,7 @@
     tab = document.createElement('button');
     tab.type = 'button';
     tab.id = 'chat-cinema-tab';
-    tab.textContent = '🎬 أفلام ومسلسلات';
+    tab.textContent = '🎬 نتفلكس';
     tab.setAttribute('aria-pressed', 'false');
     tab.onclick = activate;
 
