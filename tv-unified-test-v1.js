@@ -508,7 +508,7 @@
       group: 'ترفيه',
       stream: 'https://freem3u.xyz/api/live/play.m3u8?vid=187',
       sourceId: 'HyaTV.eg@SD',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'test-ifilmarabic-ir',
@@ -516,7 +516,7 @@
       group: 'مسلسلات',
       stream: 'https://live.presstv.co.uk/hls/ifilmar.m3u8',
       sourceId: 'iFilmArabic.ir@SD',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'test-jordansport-jo',
@@ -524,7 +524,7 @@
       group: 'رياضة',
       stream: 'https://jrtv-live.ercdn.net/jordansporthd/jordansporthd.m3u8',
       sourceId: 'JordanSport.jo@SD',
-      kind: 'بث تجريبي · قد يكون محجوبًا ببلدك'
+      kind: 'بث مباشر · قد يكون محجوبًا ببلدك'
     },
     {
       id: 'test-mixhollywood-eg',
@@ -532,7 +532,7 @@
       group: 'أفلام',
       stream: 'https://ml-pull-hwc.myco.io/MixTV/hls/index.m3u8',
       sourceId: 'MixHollywood.eg@SD',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'test-prime-sy',
@@ -540,245 +540,245 @@
       group: 'برامج',
       stream: 'https://cdn.bestream.io/prime/prime.m3u8',
       sourceId: 'Prime.sy@HD',
-      kind: 'بث تجريبي · عامة ورياضة'
+      kind: 'بث مباشر · عامة ورياضة'
     },
     {
       id: 'extra-roya',
       name: 'رؤيا الأردنية',
       group: 'برامج',
       stream: 'https://live.kwikmotion.com/royatvpublic/royatv.smil/playlist.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'extra-spacetoon',
       name: 'سبيستون',
       group: 'أطفال',
       stream: 'https://live-uae-next.spacetoongo.com/ST_MENA_NEXT/hls/r9p2hjipmw2kl.m3u8',
-      kind: 'بث تجريبي · قد يمنع المصدر التشغيل داخل الشات'
+      kind: 'بث مباشر · قد يمنع المصدر التشغيل داخل الشات'
     },
     {
       id: 'extra-aghani-aghani',
       name: 'أغاني أغاني',
       group: 'أغاني',
       stream: 'https://cdn.streamlane.tv/hls/aghanitv/index.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'extra-alarabiya',
       name: 'العربية',
       group: 'أخبار',
       stream: 'https://live.alarabiya.net/alarabiapublish/alarabiya.smil/playlist.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'ftv-dijlah',
       name: 'دجلة',
       group: 'برامج',
       stream: 'https://ghaasiflu.online/Dijlah/index.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'ftv-inews',
       name: 'آي نيوز',
       group: 'أخبار',
       stream: 'https://live.i-news.tv/hls/stream.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'ftv-iraq-future',
       name: 'عراق المستقبل',
       group: 'برامج',
       stream: 'https://viewmedia7219.bozztv.com/wmedia/viewmedia100/web_040/Stream/playlist.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'ftv-zagros',
       name: 'زاغروس',
       group: 'برامج',
       stream: 'https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'ftv-watan',
       name: 'وطن',
       group: 'برامج',
       stream: 'https://rp.tactivemedia.com/watantv_source/live/playlist.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'ftv-manar',
       name: 'المنار',
       group: 'أخبار',
       stream: 'https://edge.fastpublish.me/live/index.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'ftv-mayadeen',
       name: 'الميادين',
       group: 'أخبار',
       stream: 'https://mdnlv.cdn.octivid.com/almdn/smil:mpegts.stream.smil/playlist.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'ftv-voice-lebanon',
       name: 'صوت لبنان',
       group: 'برامج',
       stream: 'https://svs.itworkscdn.net/vdltvlive/vdltv.smil/playlist.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'ftv-nour-sharq',
       name: 'نور الشرق',
       group: 'دين',
       stream: 'https://svs.itworkscdn.net/nour8satlive/livestream/playlist.m3u8',
-      kind: 'بث تجريبي · مسيحية'
+      kind: 'بث مباشر · مسيحية'
     },
     {
       id: 'ftv-aliman',
       name: 'الإيمان',
       group: 'دين',
       stream: 'https://svs.itworkscdn.net/alimanlive/imantv.smil/playlist.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'ftv-qatar-1',
       name: 'قطر',
       group: 'برامج',
       stream: 'https://qatartv.akamaized.net/hls/live/20000609/qtv1/master.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'ftv-aj-mubasher',
       name: 'الجزيرة مباشر',
       group: 'أخبار',
       stream: 'https://live-hls-web-ajm.getaj.net/AJM/index.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'ftv-aj-2',
       name: 'الجزيرة 2',
       group: 'أخبار',
       stream: 'https://live-hls-web-aja2-gcp.thehlive.com/AJA2/index.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'ftv-alaraby',
       name: 'التلفزيون العربي',
       group: 'أخبار',
       stream: 'https://live.kwikmotion.com/alaraby1live/alaraby_abr/playlist.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'ftv-alarabiya-business',
       name: 'العربية Business',
       group: 'اقتصاد',
       stream: 'https://live.alarabiya.net/alarabiapublish/aswaaq.smil/playlist.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'ftv-sharjah',
       name: 'الشارقة',
       group: 'برامج',
       stream: 'https://live.kwikmotion.com/smc1live/smc1tv.smil/playlist.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'ftv-alwousta',
       name: 'الوسطى',
       group: 'برامج',
       stream: 'https://svs.itworkscdn.net/alwoustalive/alwoustatv.smil/playlist.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'ftv-hadath',
       name: 'الحدث',
       group: 'أخبار',
       stream: 'https://live.alarabiya.net/alarabiapublish/alhadath.smil/alarabiapublish/alhadath_1080p/chunks.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'ftv-dw-arabic',
       name: 'DW عربية',
       group: 'أخبار',
       stream: 'https://dwamdstream103.akamaized.net/hls/live/2015526/dwstream103/index.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'ftv-rt-arabic',
       name: 'RT عربية',
       group: 'أخبار',
       stream: 'https://rt-arb.rttv.com/dvr/rtarab/playlist.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'ftv-sahara-24',
       name: 'صحراء 24',
       group: 'أخبار',
       stream: 'https://live.saharamedias.net:3317/live/shara24live.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'okal-ksa-sports-1',
       name: 'السعودية الرياضية 1',
       group: 'رياضة',
       stream: 'https://live20.bozztv.com/gin-36bay3/ga-ksaports1/index.m3u8',
-      kind: 'بث تجريبي · مصدر بديل'
+      kind: 'بث مباشر · مصدر بديل'
     },
     {
       id: 'okal-national-geographic',
       name: 'ناشيونال جيوغرافيك أبوظبي',
       group: 'وثائقي',
       stream: 'https://admn-live-cdn-lb.starzplayarabia.com/out/v1/admn_tv_enc/national_geo/national_geo_hls_nd/index.m3u8',
-      kind: 'بث تجريبي · مصدر بديل'
+      kind: 'بث مباشر · مصدر بديل'
     },
     {
       id: 'okal-majid',
       name: 'ماجد',
       group: 'أطفال',
       stream: 'https://vo-live.cdb.cdn.orange.com/Content/Channel/MajidChildrenChannel/HLS/index.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'okal-mbc3-ksa',
       name: 'MBC 3 السعودية',
       group: 'أطفال',
       stream: 'https://shls-mbc3-prod-dub.shahid.net/out/v1/d5bbe570e1514d3d9a142657d33d85e6/index.m3u8',
-      kind: 'بث تجريبي · مصدر بديل'
+      kind: 'بث مباشر · مصدر بديل'
     },
     {
       id: 'okal-cbc-sofra',
       name: 'CBC سفرة',
       group: 'طبخ',
       stream: 'https://bcovlive-a.akamaihd.net/753a1f2c951b4fb3914f30e1deb147d8/us-west-2/6057955906001/playlist.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'okal-almajd-quran',
       name: 'المجد للقرآن الكريم',
       group: 'دين',
       stream: 'https://edge66.magictvbox.com/liveApple/al_majd/tracks-v1a1/mono.m3u8',
-      kind: 'بث تجريبي'
+      kind: 'بث مباشر'
     },
     {
       id: 'okal-alarabiya-programs',
       name: 'العربية برامج',
       group: 'برامج',
       stream: 'https://d1j4r34gq3qw9y.cloudfront.net/out/v1/96804f3a14864641a21c25e8ca9afb74/index.m3u8',
-      kind: 'بث تجريبي · مصدر بديل'
+      kind: 'بث مباشر · مصدر بديل'
     },
     {
       id: 'okal-almasriyah',
       name: 'المصرية',
       group: 'برامج',
       stream: 'https://fl1002.bozztv.com/ga-almasriya/index.m3u8',
-      kind: 'بث تجريبي · مصدر بديل'
+      kind: 'بث مباشر · مصدر بديل'
     },
     {
       id: 'okal-saudi-quran',
       name: 'القرآن الكريم السعودية',
       group: 'دين',
       stream: 'https://rtmp.moe.gov.sa/live/quran/playlist.m3u8',
-      kind: 'بث تجريبي · مصدر بديل'
+      kind: 'بث مباشر · مصدر بديل'
     }
   ];
 
@@ -1374,7 +1374,7 @@
     pane.innerHTML = `
       <div class="chat-tv-top">
         <strong data-tv-name>اختر قناة</strong>
-        <span class="chat-tv-tag">${channels.length} خيار مشاهدة · تجريبي</span>
+        <span class="chat-tv-tag">${channels.length} خيار مشاهدة</span>
       </div>
 
       <div data-tv-screen class="chat-tv-screen">
