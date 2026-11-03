@@ -132,7 +132,7 @@
     `;
 
     playerRoot.append(css, screen);
-    document.body.appendChild(playerHost);
+    document.documentElement.appendChild(playerHost);
 
     if (typeof ResizeObserver === 'function') {
       playerObserver = new ResizeObserver(schedulePlayer);
