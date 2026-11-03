@@ -716,6 +716,69 @@
       group: 'أخبار',
       stream: 'https://live.saharamedias.net:3317/live/shara24live.m3u8',
       kind: 'بث تجريبي'
+    },
+    {
+      id: 'okal-ksa-sports-1',
+      name: 'السعودية الرياضية 1',
+      group: 'رياضة',
+      stream: 'https://live20.bozztv.com/gin-36bay3/ga-ksaports1/index.m3u8',
+      kind: 'بث تجريبي · مصدر بديل'
+    },
+    {
+      id: 'okal-national-geographic',
+      name: 'ناشيونال جيوغرافيك أبوظبي',
+      group: 'وثائقي',
+      stream: 'https://admn-live-cdn-lb.starzplayarabia.com/out/v1/admn_tv_enc/national_geo/national_geo_hls_nd/index.m3u8',
+      kind: 'بث تجريبي · مصدر بديل'
+    },
+    {
+      id: 'okal-majid',
+      name: 'ماجد',
+      group: 'أطفال',
+      stream: 'https://vo-live.cdb.cdn.orange.com/Content/Channel/MajidChildrenChannel/HLS/index.m3u8',
+      kind: 'بث تجريبي'
+    },
+    {
+      id: 'okal-mbc3-ksa',
+      name: 'MBC 3 السعودية',
+      group: 'أطفال',
+      stream: 'https://shls-mbc3-prod-dub.shahid.net/out/v1/d5bbe570e1514d3d9a142657d33d85e6/index.m3u8',
+      kind: 'بث تجريبي · مصدر بديل'
+    },
+    {
+      id: 'okal-cbc-sofra',
+      name: 'CBC سفرة',
+      group: 'طبخ',
+      stream: 'https://bcovlive-a.akamaihd.net/753a1f2c951b4fb3914f30e1deb147d8/us-west-2/6057955906001/playlist.m3u8',
+      kind: 'بث تجريبي'
+    },
+    {
+      id: 'okal-almajd-quran',
+      name: 'المجد للقرآن الكريم',
+      group: 'دين',
+      stream: 'https://edge66.magictvbox.com/liveApple/al_majd/tracks-v1a1/mono.m3u8',
+      kind: 'بث تجريبي'
+    },
+    {
+      id: 'okal-alarabiya-programs',
+      name: 'العربية برامج',
+      group: 'برامج',
+      stream: 'https://d1j4r34gq3qw9y.cloudfront.net/out/v1/96804f3a14864641a21c25e8ca9afb74/index.m3u8',
+      kind: 'بث تجريبي · مصدر بديل'
+    },
+    {
+      id: 'okal-almasriyah',
+      name: 'المصرية',
+      group: 'برامج',
+      stream: 'https://fl1002.bozztv.com/ga-almasriya/index.m3u8',
+      kind: 'بث تجريبي · مصدر بديل'
+    },
+    {
+      id: 'okal-saudi-quran',
+      name: 'القرآن الكريم السعودية',
+      group: 'دين',
+      stream: 'https://rtmp.moe.gov.sa/live/quran/playlist.m3u8',
+      kind: 'بث تجريبي · مصدر بديل'
     }
   ];
 
