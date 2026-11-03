@@ -933,6 +933,10 @@
     }
 
     frame = document.createElement('iframe');
+    frame.setAttribute(
+      'sandbox',
+      'allow-scripts allow-same-origin allow-presentation'
+    );
     frame.title = selected.title;
     frame.allow = 'autoplay; fullscreen; picture-in-picture';
     frame.allowFullscreen = true;
@@ -1290,10 +1294,20 @@
 
     document.head.appendChild(style);
 
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
+    var cinemaStructureTimer = setInterval(function () {
+      if (dead) {
+        clearInterval(cinemaStructureTimer);
+        return;
+      }
+
+      if (
+        !shell || !shell.isConnected ||
+        !tab || !tab.isConnected ||
+        !pane || !pane.isConnected
+      ) {
+        schedule();
+      }
+    }, 1500);
 
     document.addEventListener('click', onClick, true);
     document.addEventListener('scroll', schedulePlayer, true);
