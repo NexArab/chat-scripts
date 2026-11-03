@@ -2,18 +2,17 @@
   'use strict';
 
   var KEY = '__CHAT_YOUTUBE_V1__';
-
-  // ضع مفتاحك هنا فقط.
   var API_KEY = 'AIzaSyCqfwOe_v9eBsqJWwjPZjSDL3mlQlqOhO8';
 
   if (window[KEY]) window[KEY].destroy();
 
-  var pane, host, nav, label, root, shell, style;
-  var mode = 'tv';
-  var dead = false;
-  var frame = null;
-  var job = 0;
+  var pane, host, header, nav, label, root, shell, style;
+  var playerHost = null;
+  var playerRoot = null;
+  var playerJob = 0;
+  var playerObserver = null;
 
+  var corner = 'tr';
   var floating = false;
   var gesture = null;
   var paintJob = 0;
@@ -25,6 +24,11 @@
     h: 202.5,
     ratio: 16 / 9
   };
+
+  var mode = 'tv';
+  var dead = false;
+  var frame = null;
+  var job = 0;
 
   var request = null;
   var timeout = null;
@@ -40,7 +44,9 @@
       !pane || !pane.isConnected ||
       !shell || !shell.isConnected ||
       !nav || !nav.isConnected
-    ) schedule();
+    ) {
+      schedule();
+    }
   });
 
   var stateObserver = new MutationObserver(schedule);
@@ -57,12 +63,138 @@
     '<path d="m10 8 6 4-6 4" fill="#fff"/></svg>';
 
   function q(selector) {
-    return root && root.querySelector(selector);
+    return (root && root.querySelector(selector)) ||
+      (playerRoot && playerRoot.querySelector(selector));
   }
 
   function say(text) {
     var node = q('[data-status]');
     if (node) node.textContent = text;
+  }
+
+  function stop() {
+    if (frame) frame.remove();
+    frame = null;
+
+    dock();
+
+    if (q('[data-empty]')) {
+      q('[data-empty]').hidden = false;
+    }
+  }
+
+  // المشغل مستقل عن القائمة منذ إنشائه.
+  // لا ننقل iframe بين العناصر عند التعويم أو الإرجاع.
+  function mountPlayer() {
+    var screen = root.querySelector('.screen');
+    var slot = document.createElement('div');
+
+    slot.setAttribute('data-player-slot', '');
+    slot.style.cssText = 'width:100%;aspect-ratio:16/9;';
+
+    screen.before(slot);
+
+    playerHost = document.createElement('div');
+    playerHost.id = 'chat-youtube-player';
+
+    playerHost.style.cssText =
+      'all:initial!important;' +
+      'display:block!important;' +
+      'position:fixed!important;' +
+      'inset:0!important;' +
+      'z-index:10030!important;' +
+      'pointer-events:none!important;';
+
+    playerRoot = playerHost.attachShadow({ mode: 'open' });
+
+    var css = document.createElement('style');
+
+    css.textContent = root.querySelector('style').textContent + `
+      :host {
+        background:transparent!important;
+        pointer-events:none!important;
+      }
+
+      .screen {
+        position:fixed;
+        pointer-events:auto;
+        direction:rtl;
+        font:13px/1.6 Tahoma,sans-serif;
+        color:#222;
+      }
+
+      .screen.floating {
+        clip-path:none!important;
+      }
+    `;
+
+    playerRoot.append(css, screen);
+    document.body.appendChild(playerHost);
+
+    if (typeof ResizeObserver === 'function') {
+      playerObserver = new ResizeObserver(schedulePlayer);
+      playerObserver.observe(slot);
+    }
+
+    schedulePlayer();
+  }
+
+  function schedulePlayer() {
+    if (!dead && !playerJob) {
+      playerJob = requestAnimationFrame(placePlayer);
+    }
+  }
+
+  function placePlayer() {
+    playerJob = 0;
+
+    if (!playerRoot || !pane || !pane.isConnected) return;
+
+    var screen = playerRoot.querySelector('.screen');
+
+    if (floating) {
+      screen.style.display = 'block';
+      schedulePaint();
+      return;
+    }
+
+    var slot = root.querySelector('[data-player-slot]');
+
+    var visible =
+      mode === 'yt' &&
+      pane.classList.contains('active') &&
+      slot.getClientRects().length > 0 &&
+      getComputedStyle(host).visibility !== 'hidden';
+
+    if (!visible) {
+      screen.style.display = 'none';
+      return;
+    }
+
+    var r = slot.getBoundingClientRect();
+    var p = pane.getBoundingClientRect();
+
+    var top = Math.max(r.top, p.top, 0);
+    var bottom = Math.min(r.bottom, p.bottom, window.innerHeight);
+    var left = Math.max(r.left, p.left, 0);
+    var right = Math.min(r.right, p.right, window.innerWidth);
+
+    if (bottom <= top || right <= left) {
+      screen.style.display = 'none';
+      return;
+    }
+
+    screen.style.display = 'block';
+    screen.style.left = r.left + 'px';
+    screen.style.top = r.top + 'px';
+    screen.style.width = r.width + 'px';
+
+    screen.style.clipPath =
+      'inset(' +
+      Math.max(0, top - r.top) + 'px ' +
+      Math.max(0, r.right - right) + 'px ' +
+      Math.max(0, r.bottom - bottom) + 'px ' +
+      Math.max(0, left - r.left) + 'px)';
   }
 
   function viewport() {
@@ -79,7 +211,7 @@
   function fitBox() {
     var v = viewport();
     var maxW = Math.max(1, v.w - 16);
-    var maxH = Math.max(1, v.h - 100);
+    var maxH = Math.max(1, v.h - 136);
 
     if (box.ratio) {
       var max = Math.min(maxW, maxH * box.ratio);
@@ -109,8 +241,18 @@
 
     box.y = Math.max(
       v.y + 8,
-      Math.min(box.y, v.y + v.h - box.h - 92)
+      Math.min(box.y, v.y + v.h - box.h - 128)
     );
+
+    if (corner) {
+      box.x = corner[1] === 'r'
+        ? v.x + v.w - box.w - 8
+        : v.x + 8;
+
+      box.y = corner[0] === 'b'
+        ? Math.max(v.y + 8, v.y + v.h - box.h - 128)
+        : v.y + 8;
+    }
   }
 
   function paint() {
@@ -121,6 +263,7 @@
     fitBox();
 
     var screen = q('.screen');
+
     screen.style.left = box.x + 'px';
     screen.style.top = box.y + 'px';
     screen.style.width = box.w + 'px';
@@ -167,6 +310,20 @@
     if (q('[data-float]')) {
       q('[data-float]').textContent = '▣ نافذة عائمة';
     }
+
+    if (
+      frame &&
+      pane &&
+      (
+        !pane.classList.contains('active') ||
+        !pane.getClientRects().length
+      )
+    ) {
+      var openButton = document.getElementById('chat-tv-open');
+      if (openButton) openButton.click();
+    }
+
+    schedulePlayer();
   }
 
   function toggleFloat() {
@@ -182,7 +339,7 @@
 
     if (
       document.fullscreenElement ||
-      (root && root.fullscreenElement)
+      (playerRoot && playerRoot.fullscreenElement)
     ) {
       say('اخرج من ملء الشاشة أولًا.');
       return;
@@ -194,7 +351,10 @@
     box.y = v.y + 60;
     floating = true;
 
+    q('.screen').style.display = 'block';
+    q('.screen').style.clipPath = 'none';
     q('.screen').classList.add('floating');
+
     q('[data-float]').textContent = '↩ إرجاع للقائمة';
 
     paint();
@@ -214,9 +374,15 @@
         gesture ||
         (
           kind === 'drag' &&
-          event.target.closest('button')
+          event.target.closest('button,select')
         )
       ) return;
+
+      corner = '';
+
+      if (q('[data-corner]')) {
+        q('[data-corner]').value = '';
+      }
 
       gesture = {
         node: node,
@@ -250,9 +416,7 @@
         box.x = current.bx + dx;
         box.y = current.by + dy;
       } else {
-        // المقبض في الطرف الأيسر بسبب اتجاه الواجهة العربي.
         box.w = current.w - dx;
-
         box.h = box.ratio
           ? box.w / box.ratio
           : current.h + dy;
@@ -272,17 +436,6 @@
         }
       });
     });
-  }
-
-  function stop() {
-    if (frame) frame.remove();
-    frame = null;
-
-    dock();
-
-    if (q('[data-empty]')) {
-      q('[data-empty]').hidden = false;
-    }
   }
 
   function cancel() {
@@ -332,6 +485,8 @@
       );
     });
 
+    schedulePlayer();
+
     if (mode === 'yt') {
       say('ابحث عن فيديو، أو اختر من الفيديوهات الموجودة أدناه.');
     }
@@ -339,6 +494,8 @@
 
   function play(id, title) {
     if (!/^[\w-]{11}$/.test(id)) return;
+
+    var wasFloating = floating;
 
     stopTV();
     stop();
@@ -367,8 +524,12 @@
 
     q('.video-wrap').appendChild(frame);
 
+    if (wasFloating) toggleFloat();
+
+    schedulePlayer();
+
     say(
-      'اضغط تشغيل داخل الفيديو. بعض الفيديوهات لا تسمح بالتضمين.'
+      'اضغط تشغيل داخل الفيديو. إذا منع صاحب الفيديو التضمين، جرّب فيديو آخر.'
     );
   }
 
@@ -426,6 +587,7 @@
     });
 
     render(items);
+
     next = data.nextPageToken || '';
     q('[data-next]').hidden = !next;
 
@@ -479,6 +641,7 @@
 
     q('[type=submit]').disabled = true;
     q('[data-next]').disabled = true;
+
     say('جاري البحث…');
 
     var params = new URLSearchParams({
@@ -536,11 +699,15 @@
     } finally {
       if (ticket === sequence) {
         clearTimeout(timeout);
+
         request = null;
         busy = false;
 
         if (q('[type=submit]')) {
           q('[type=submit]').disabled = false;
+        }
+
+        if (q('[data-next]')) {
           q('[data-next]').disabled = false;
         }
       }
@@ -558,7 +725,16 @@
     if (nav) nav.remove();
     if (shell) shell.remove();
 
-    pane = host = nav = label = root = shell = null;
+    if (playerObserver) playerObserver.disconnect();
+    playerObserver = null;
+
+    if (playerJob) cancelAnimationFrame(playerJob);
+    playerJob = 0;
+
+    if (playerHost) playerHost.remove();
+    playerHost = playerRoot = null;
+
+    pane = host = header = nav = label = root = shell = null;
 
     mode = 'tv';
     next = '';
@@ -577,6 +753,7 @@
     label = host.querySelector('.pnhead');
     if (!label) return;
 
+    header = label.parentElement;
     label.classList.add('chat-youtube-label');
 
     nav = document.createElement('span');
@@ -627,7 +804,10 @@
           background:#fff;
         }
 
-        button:disabled { opacity:.5; cursor:default; }
+        button:disabled {
+          opacity:.5;
+          cursor:default;
+        }
 
         button:focus-visible,
         input:focus-visible {
@@ -680,7 +860,11 @@
           display:block;
         }
 
-        .float-head,.float-tools { display:none; }
+        .float-head,
+        .float-tools,
+        .float-position {
+          display:none;
+        }
 
         .screen.floating {
           position:fixed;
@@ -743,8 +927,29 @@
         }
 
         .float-tools button[aria-pressed="true"] {
-          background:#e8e8e8;
+          background:#eee;
           border-color:#333;
+        }
+
+        .floating .float-position {
+          display:flex;
+          height:36px;
+          align-items:center;
+          padding:3px 6px;
+          background:#fff;
+          gap:6px;
+          font-size:11px;
+        }
+
+        .float-position select {
+          flex:1;
+          min-width:0;
+          height:28px;
+          border:1px solid #bbb;
+          border-radius:5px;
+          background:#fff;
+          color:#111;
+          font:inherit;
         }
 
         [data-resize] {
@@ -753,18 +958,31 @@
           cursor:nesw-resize;
         }
 
-        .screen.moving iframe { pointer-events:none; }
+        .screen.moving iframe {
+          pointer-events:none;
+        }
 
         .video-wrap:fullscreen {
-          width:100vw;
-          height:100vh;
+          width:100vw!important;
+          height:100vh!important;
           aspect-ratio:auto;
           border-radius:0;
         }
 
-        [data-empty] { padding:15px; text-align:center; }
-        [data-status] { font-size:12px; color:#555; }
-        [data-results] { display:grid; gap:8px; }
+        [data-empty] {
+          padding:15px;
+          text-align:center;
+        }
+
+        [data-status] {
+          font-size:12px;
+          color:#555;
+        }
+
+        [data-results] {
+          display:grid;
+          gap:8px;
+        }
 
         .result {
           display:flex;
@@ -782,7 +1000,9 @@
           flex-shrink:0;
         }
 
-        .result span { overflow-wrap:anywhere; }
+        .result span {
+          overflow-wrap:anywhere;
+        }
 
         small {
           display:block;
@@ -791,10 +1011,13 @@
           margin-top:4px;
         }
 
-        [data-next] { width:100%; margin-top:10px; }
+        [data-next] {
+          width:100%;
+          margin-top:10px;
+        }
 
         @media(max-width:420px) {
-          .result img { width:100px; height:56px; }
+          .result img { max-width:100px; }
         }
       </style>
 
@@ -837,6 +1060,19 @@
             aria-label="اسحب لتغيير الحجم أو استخدم الأسهم"
             title="اسحب لتغيير الحجم أو استخدم الأسهم">⤡</button>
         </div>
+
+        <div class="float-position">
+          <label for="yt-corner">المكان</label>
+
+          <select id="yt-corner" data-corner
+            aria-label="مكان النافذة">
+            <option value="">حر — اسحب العنوان</option>
+            <option value="tr" selected>أعلى اليمين</option>
+            <option value="tl">أعلى اليسار</option>
+            <option value="br">أسفل اليمين</option>
+            <option value="bl">أسفل اليسار</option>
+          </select>
+        </div>
       </div>
 
       <div class="tools">
@@ -857,10 +1093,14 @@
       </p>
 
       <div data-results></div>
-      <button type="button" data-next hidden>النتائج التالية</button>
+
+      <button type="button" data-next hidden>
+        النتائج التالية
+      </button>
     `;
 
     pane.appendChild(shell);
+    mountPlayer();
 
     render([
       {
@@ -918,7 +1158,7 @@
       scaleFloat(1.15);
     };
 
-    root.querySelectorAll('[data-ratio]').forEach(function (button) {
+    playerRoot.querySelectorAll('[data-ratio]').forEach(function (button) {
       button.onclick = function () {
         box.ratio =
           button.dataset.ratio === 'free'
@@ -929,7 +1169,7 @@
 
         if (box.ratio) box.h = box.w / box.ratio;
 
-        root.querySelectorAll('[data-ratio]').forEach(function (item) {
+        playerRoot.querySelectorAll('[data-ratio]').forEach(function (item) {
           item.setAttribute(
             'aria-pressed',
             String(item === button)
@@ -940,12 +1180,20 @@
       };
     });
 
+    q('[data-corner]').onchange = function () {
+      corner = this.value;
+      paint();
+    };
+
     bindGesture(q('.float-head'), 'drag');
     bindGesture(q('[data-resize]'), 'resize');
 
     q('[data-resize]').addEventListener('keydown', function (event) {
       if (![
-        'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'
+        'ArrowLeft',
+        'ArrowRight',
+        'ArrowUp',
+        'ArrowDown'
       ].includes(event.key)) return;
 
       event.preventDefault();
@@ -958,6 +1206,7 @@
       if (box.ratio) {
         if (event.key === 'ArrowUp') box.w -= step * box.ratio;
         if (event.key === 'ArrowDown') box.w += step * box.ratio;
+
         box.h = box.w / box.ratio;
       } else {
         if (event.key === 'ArrowUp') box.h -= step;
@@ -983,7 +1232,9 @@
       !pane || !pane.isConnected ||
       !shell || !shell.isConnected ||
       !nav || !nav.isConnected
-    ) mount();
+    ) {
+      mount();
+    }
 
     if (!pane || !nav) return;
 
@@ -998,31 +1249,50 @@
       host.classList.toggle('chat-youtube-visible', active);
     }
 
-    if (!active && (frame || request)) {
-      cancel();
-      stop();
+    if (!active) {
+      if (request) cancel();
+
+      // اختفاء القائمة لا يوقف الفيديو.
+      if (!floating && frame && mode === 'yt') {
+        toggleFloat();
+      }
     }
+
+    schedulePlayer();
   }
 
   function schedule() {
-    if (!dead && !job) job = requestAnimationFrame(sync);
+    if (!dead && !job) {
+      job = requestAnimationFrame(sync);
+    }
   }
 
   function onClick(event) {
     var target = event.target;
     if (!target.closest) return;
 
-    if (
-      target.closest(
-        '#dpnl .th-dpnl-close, #settings .SERT, #settings [data-kr-play]'
-      ) ||
+    var hardStop = target.closest(
+      '#settings .SERT, ' +
+      '#settings [data-kr-play], ' +
+      '#chat-tv [data-tv-start], ' +
+      '#chat-tv [data-tv-channel]'
+    );
+
+    var leaving =
+      target.closest('#dpnl .th-dpnl-close') ||
       (
         target.closest('#d0 [data-key]') &&
         !target.closest('#chat-tv-open')
-      )
-    ) {
+      );
+
+    if (hardStop || leaving) {
       cancel();
-      stop();
+
+      if (hardStop) {
+        stop();
+      } else if (frame && !floating && mode === 'yt') {
+        toggleFloat();
+      }
     }
 
     schedule();
@@ -1104,12 +1374,17 @@
     });
 
     document.addEventListener('click', onClick, true);
+    document.addEventListener('scroll', schedulePlayer, true);
+
     window.addEventListener('pagehide', onHide);
     window.addEventListener('resize', schedulePaint);
+    window.addEventListener('resize', schedulePlayer);
 
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', schedulePaint);
       window.visualViewport.addEventListener('scroll', schedulePaint);
+      window.visualViewport.addEventListener('resize', schedulePlayer);
+      window.visualViewport.addEventListener('scroll', schedulePlayer);
     }
 
     schedule();
@@ -1117,6 +1392,7 @@
 
   function destroy() {
     dead = true;
+
     observer.disconnect();
     stateObserver.disconnect();
 
@@ -1124,22 +1400,32 @@
 
     document.removeEventListener('DOMContentLoaded', init);
     document.removeEventListener('click', onClick, true);
+    document.removeEventListener('scroll', schedulePlayer, true);
+
     window.removeEventListener('pagehide', onHide);
     window.removeEventListener('resize', schedulePaint);
+    window.removeEventListener('resize', schedulePlayer);
 
     if (window.visualViewport) {
       window.visualViewport.removeEventListener('resize', schedulePaint);
       window.visualViewport.removeEventListener('scroll', schedulePaint);
+      window.visualViewport.removeEventListener('resize', schedulePlayer);
+      window.visualViewport.removeEventListener('scroll', schedulePlayer);
     }
 
     cleanup();
+
     if (style) style.remove();
   }
 
-  window[KEY] = { destroy: destroy };
+  window[KEY] = {
+    destroy: destroy
+  };
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, { once: true });
+    document.addEventListener('DOMContentLoaded', init, {
+      once: true
+    });
   } else {
     init();
   }
