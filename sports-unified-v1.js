@@ -7,9 +7,10 @@
   const groups = ['كرة القدم', 'كرة السلة', 'باقي الرياضات'];
 
   const sources = [20, 60, 61].map((id, i) => ({
+    id: 'thmanyah' + (i + 1) + '.sa',
     name: 'ثمانية ' + (i + 1) + ' · تجريبي',
     group: 0,
-    url: 'https://dflive.app.tc/' + id + '.m3u8'
+    urls: ['https://dflive.app.tc/' + id + '.m3u8']
   }));
 
   let catalogRequest;
@@ -22,46 +23,34 @@
   let mountTimer;
 
   function readCatalog(text) {
-    const found = [];
-    const urls = new Set(sources.map(item => item.url));
-    let name = '';
-
-    for (const raw of text.split(/\r?\n/)) {
-      const line = raw.trim();
-
+    const channels = new Map(sources.map(item => [item.id, {...item, urls: [...item.urls]}]));
+    const used = new Set(sources.flatMap(item => item.urls));
+    let meta = null;
+    for (const line of text.split(/\r?\n/).map(value => value.trim())) {
       if (line.startsWith('#EXTINF:')) {
-        name = line.slice(line.indexOf(',') + 1).trim();
-      } else if (/^#(?:EXTVLCOPT|KODIPROP|EXTHTTP)/i.test(line)) {
-        name = '';
-      } else if (line && !line.startsWith('#')) {
-        const supportedUrl =
-          /^https:\/\//i.test(line) &&
-          /\.m3u8(?:[?#]|$)/i.test(line);
-
-        const existingChannel =
-          /oman sports|arryadia|kuwait sport|ktv sport|bahrain sport|jordan sport|thmanyah [123]|ثمانية [١٢٣123]/i.test(name);
-
-        if (name && supportedUrl && !urls.has(line) && !existingChannel) {
-          let group = 2; // باقي الرياضات افتراضياً
-
-          // تخصيص شامل للبحث عن كرة السلة
-          if (/basket|nba|wnba|fiba|courtside|السلة/i.test(name)) {
-            group = 1;
-          } 
-          // تخصيص شامل للبحث عن كرة القدم والدوريات الكبرى وأبطال أوروبا وآسيا
-          else if (/football|soccer|futbol|fútbol|calcio|laliga|la liga|serie a|premier league|bundesliga|ligue 1|دوري روشن|السعودي|أبطال أوروبا|champions league|دوري أبطال|afc|أسيوي|أسيا|كرة القدم/i.test(name)) {
-            group = 0;
-          }
-
-          found.push({ name, group, url: line });
-          urls.add(line);
-        }
-
-        name = '';
+        const info = line.match(/^#EXTINF:(?:[^",]|"[^"]*")*,(.*)$/);
+        const id = (line.match(/\btvg-id="([^"]*)"/i) || [,''])[1].toLowerCase().split('@')[0];
+        meta = info && {id, name: info[1].replace(/\s*\(\d+p\)|\s*\[(?:geo-blocked|not 24\/7)\]/gi, '').trim()};
+        continue;
       }
+      if (/^#(?:EXTVLCOPT|KODIPROP|EXTHTTP)/i.test(line)) meta = null;
+      if (!line || line.startsWith('#') || !meta) continue;
+      const {id, name} = meta;
+      meta = null;
+      if (!name || !/^https:\/\//i.test(line) || !/\.m3u8(?:[?#]|$)/i.test(line) || used.has(line)) continue;
+      const label = name.normalize('NFKC').replace(/[\u064B-\u065Fـ]/g, '').replace(/[أإآ]/g, 'ا');
+      const tags = id + ' ' + label;
+      if (/omansport|oman sports?|arryadia|arriyadia|kuwait\s*sport|ktv\s*sport|bahrain\s*sport|jordan\s*sport|عمان الرياضية|الرياضية المغربية|الكويت الرياضية|البحرين الرياضية|الاردن الرياضية/i.test(tags)) continue;
+      if (!/[\u0621-\u064a]/.test(label) && !/\.(sa|qa|ae|iq|eg|kw|jo|ma|om|bh|dz|tn|ly|lb|sy|ye|ps|sd|mr)$/.test(id) &&
+          !/arabic|alkass|ssc\b|ad sports|dubai sports|sharjah|on ?time/i.test(label)) continue;
+      const key = id || label.toLowerCase().replace(/\s+/g,' ');
+      const group = /basket|nba\b|wnba|fiba|courtside|سلة/i.test(tags) ? 1 :
+        /football|soccer|calcio|f[uú]tbol|laliga|روشن|كرة القدم|thmanyah/i.test(tags) ? 0 : 2;
+      if (!channels.has(key)) channels.set(key,{id:key, name, group, urls:[]});
+      channels.get(key).urls.push(line);
+      used.add(line);
     }
-
-    return found;
+    return Array.from(channels.values());
   }
 
   async function loadCatalog() {
@@ -76,9 +65,9 @@
           if (!response.ok) throw new Error('Catalog unavailable');
 
           const extra = readCatalog(await response.text());
-          if (!extra.length) throw new Error('Empty catalog');
+          
 
-          sources.push(...extra);
+          sources.splice(0, sources.length, ...extra);
           catalogReady = true;
         })
         .finally(() => {
@@ -103,8 +92,8 @@
     const note = document.createElement('small');
     note.dataset.note = '';
     note.textContent = catalogReady
-      ? 'التوفر يختلف حسب المصدر والمنطقة.'
-      : 'جارٍ تحميل دليل الرياضة والدوريات الكبرى…';
+      ? (sources.length > 3 ? 'التوفر يختلف حسب المصدر والمنطقة.' : 'ما لقينا قنوات إضافية تطابق الفلتر.')
+      : 'جارٍ جلب القنوات الرياضية الناطقة بالعربية…';
 
     list.appendChild(note);
 
@@ -117,12 +106,15 @@
       summary.textContent = label + ' (' + items.length + ')';
       details.appendChild(summary);
 
+      const grid = document.createElement('div');
+      grid.className = 'grid';
+      details.appendChild(grid);
       items.forEach(source => {
         const button = document.createElement('button');
         button.type = 'button';
         button.textContent = source.name;
         button.onclick = () => play(source);
-        details.appendChild(button);
+        grid.appendChild(button);
       });
 
       list.appendChild(details);
@@ -136,6 +128,8 @@
     hls = null;
 
     if (video) {
+      video.onerror = null;
+      panel.shadowRoot.querySelector('[data-title]').textContent = 'القنوات الرياضية العربية';
       video.pause();
       video.removeAttribute('src');
       video.load();
@@ -168,16 +162,25 @@
     return library;
   }
 
-  async function play(source) {
+  async function play(source, index = 0) {
     stop();
 
     const ticket = attempt;
+    const url = source.urls[index];
+    panel.shadowRoot.querySelector('[data-title]').textContent = source.name;
+    function failed() {
+      if (ticket !== attempt) return;
+      if (index + 1 < source.urls.length) { play(source, index + 1); return; }
+      stop();
+      status.textContent = 'تعذّر تشغيل مصادر هذه القناة.';
+    }
+    video.onerror = failed;
     video.hidden = false;
     status.textContent = 'جارٍ الاتصال بالمصدر…';
 
     try {
       if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = source.url;
+        video.src = url;
       } else {
         const Hls = await loadLibrary();
         if (ticket !== attempt) return;
@@ -187,12 +190,11 @@
 
         hls.on(Hls.Events.ERROR, function (_, data) {
           if (ticket === attempt && data.fatal) {
-            stop();
-            status.textContent = 'تعذّر تشغيل المصدر في هذا المتصفح.';
+            failed();
           }
         });
 
-        hls.loadSource(source.url);
+        hls.loadSource(url);
         hls.attachMedia(video);
       }
 
@@ -200,9 +202,8 @@
     } catch (error) {
       if (ticket !== attempt) return;
 
-      status.textContent = error.name === 'NotAllowedError'
-        ? 'اضغط تشغيل داخل الفيديو.'
-        : 'تعذّر تحميل البث. تحقق من المصدر.';
+      if (error.name === 'NotAllowedError') status.textContent = 'اضغط تشغيل داخل الفيديو.';
+      else failed();
     }
   }
 
@@ -269,7 +270,7 @@
 
     tab = document.createElement('button');
     tab.type = 'button';
-    tab.textContent = '⚽ رياضة';
+    tab.textContent = '⚽ رياضة عربية';
     tab.setAttribute('aria-pressed', 'false');
 
     panel = document.createElement('section');
@@ -279,42 +280,22 @@
 
     root.innerHTML = `
       <style>
-        :host {
-          direction: rtl;
-          background: white;
-          color: #222;
-          font: 14px Tahoma, sans-serif;
-        }
-
-        section {
-          padding: 12px;
-        }
-
-        button {
-          padding: 8px;
-          margin: 4px;
-          cursor: pointer;
-        }
-
-        video {
-          width: 100%;
-          background: #111;
-          max-height: 60vh;
-        }
-
-        video[hidden] {
-          display: none;
-        }
+        :host{direction:rtl;background:#fff;color:#202724;font:14px/1.5 Tahoma,sans-serif}
+        *{box-sizing:border-box}section{padding:8px}
+        .screen{display:grid;place-items:center;position:relative;width:100%;aspect-ratio:16/9;background:#101714;color:white;border-radius:8px;overflow:hidden}
+        .screen span{padding:10px;text-align:center}video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+        [hidden]{display:none!important}.tools{display:flex;align-items:center;gap:8px;margin:8px 0}
+        strong{flex:1;overflow-wrap:anywhere}button{font:inherit;cursor:pointer;border:1px solid #cad1ce;background:white;color:#16251d;border-radius:6px;padding:6px 8px}
+        details{border:1px solid #dbe3df;border-radius:7px;margin:7px 0}summary{padding:8px;cursor:pointer;font-weight:bold}
+        .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(115px,100%),1fr));gap:5px;padding:6px}
+        .grid button{overflow-wrap:anywhere}small,p{font-size:12px;color:#55615b;margin:5px 0}
       </style>
-
       <section>
-        <strong>القنوات الرياضية والدوريات</strong>
-        <div data-list></div>
-        <video controls playsinline hidden></video>
+        <div class="screen"><span>اختر قناة من القائمة بالأسفل</span><video controls playsinline hidden></video></div>
+        <div class="tools"><strong data-title>القنوات الرياضية العربية</strong><button type="button" data-stop>■ إيقاف</button></div>
         <p role="status"></p>
-        <button type="button" data-stop>إيقاف البث</button>
-      </section>
-    `;
+        <div data-list></div>
+      </section>`;
 
     status = root.querySelector('[role="status"]');
     list = root.querySelector('[data-list]');
@@ -361,7 +342,7 @@
         button.setAttribute('aria-pressed', String(button === tab));
       });
 
-      status.textContent = 'اختر المصدر لتجربة البث.';
+      status.textContent = 'اختر القناة العربية لتجربة البث.';
     };
 
     tabs.appendChild(tab);
