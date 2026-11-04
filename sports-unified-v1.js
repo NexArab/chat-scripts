@@ -22,7 +22,7 @@
   let library;
   let mountTimer;
 
-  function readCatalog(text) {
+  function readCatalog(text, mixed) {
     const channels = new Map(sources.map(item => [item.id, {...item, urls: [...item.urls]}]));
     const used = new Set(sources.flatMap(item => item.urls));
     let meta = null;
@@ -33,16 +33,14 @@
         meta = info && {id, name: info[1].replace(/\s*\(\d+p\)|\s*\[(?:geo-blocked|not 24\/7)\]/gi, '').trim()};
         continue;
       }
-      if (/^#(?:EXTVLCOPT|KODIPROP|EXTHTTP)/i.test(line)) meta = null;
+
       if (!line || line.startsWith('#') || !meta) continue;
       const {id, name} = meta;
       meta = null;
-      if (!name || !/^https:\/\//i.test(line) || !/\.m3u8(?:[?#]|$)/i.test(line) || used.has(line)) continue;
+      if (!name || !/^https?:\/\//i.test(line) || used.has(line)) continue;
       const label = name.normalize('NFKC').replace(/[\u064B-\u065Fـ]/g, '').replace(/[أإآ]/g, 'ا');
       const tags = id + ' ' + label;
-      if (/omansport|oman sports?|arryadia|arriyadia|kuwait\s*sport|ktv\s*sport|bahrain\s*sport|jordan\s*sport|عمان الرياضية|الرياضية المغربية|الكويت الرياضية|البحرين الرياضية|الاردن الرياضية/i.test(tags)) continue;
-      if (!/[\u0621-\u064a]/.test(label) && !/\.(sa|qa|ae|iq|eg|kw|jo|ma|om|bh|dz|tn|ly|lb|sy|ye|ps|sd|mr)$/.test(id) &&
-          !/arabic|alkass|ssc\b|ad sports|dubai sports|sharjah|on ?time/i.test(label)) continue;
+      if (mixed && !/sport|bein|kass|ssc|nba|basket|football|soccer|espn|tennis|رياضية|رياضة|سبورت|الكاس|السلة|القدم/i.test(tags)) continue;
       const key = id || label.toLowerCase().replace(/\s+/g,' ');
       const group = /basket|nba\b|wnba|fiba|courtside|سلة/i.test(tags) ? 1 :
         /football|soccer|calcio|f[uú]tbol|laliga|روشن|كرة القدم|thmanyah/i.test(tags) ? 0 : 2;
@@ -53,23 +51,33 @@
     return Array.from(channels.values());
   }
 
+  let catalogSummary = '';
   async function loadCatalog() {
     if (catalogReady) return;
 
     if (!catalogRequest) {
-      catalogRequest = fetch(
-        'https://iptv-org.github.io/iptv/categories/sports.m3u',
-        { credentials: 'omit' }
-      )
-        .then(async response => {
-          if (!response.ok) throw new Error('Catalog unavailable');
-
-          const extra = readCatalog(await response.text());
-          
-
-          sources.splice(0, sources.length, ...extra);
-          catalogReady = true;
-        })
+      const catalogs = [
+        ['IPTV-org', 'https://iptv-org.github.io/iptv/categories/sports.m3u'],
+        ['beinsports', 'https://gist.githubusercontent.com/fuadmirzaliyev/c76eab4a0d7deeaecfa7565d50c69a25/raw/beinsports.m3u'],
+        ['beinsport', 'https://gist.githubusercontent.com/regragi-younes/a77b56c45b3c086cc166b79d5cc45e4a/raw/beinsport.m3u']
+      ];
+      catalogRequest = Promise.allSettled(catalogs.map(async ([name, url]) => {
+        const response = await fetch(url, {credentials: 'omit', signal: AbortSignal.timeout(15000)});
+        if (!response.ok) throw new Error(name);
+        const text = await response.text();
+        if (!text.includes('#EXTINF:')) throw new Error(name);
+        return text;
+      })).then(results => {
+        const missing = [];
+        results.forEach((result, i) => {
+          if (result.status === 'rejected') { missing.push(catalogs[i][0]); return; }
+          const merged = readCatalog(result.value, i === 2);
+          sources.splice(0, sources.length, ...merged);
+        });
+        catalogReady = !missing.length;
+        catalogSummary = sources.length + ' قناة للتجربة' +
+          (missing.length ? ' · تعذّر تحميل ' + missing.join('، ') + ' · أعد فتح القسم للمحاولة.' : '');
+      })
         .finally(() => {
           catalogRequest = null;
         });
@@ -91,9 +99,7 @@
 
     const note = document.createElement('small');
     note.dataset.note = '';
-    note.textContent = catalogReady
-      ? (sources.length > 3 ? 'التوفر يختلف حسب المصدر والمنطقة.' : 'ما لقينا قنوات إضافية تطابق الفلتر.')
-      : 'جارٍ جلب القنوات الرياضية الناطقة بالعربية…';
+    note.textContent = catalogSummary || 'جارٍ تحميل قوائم الرياضة…';
 
     list.appendChild(note);
 
@@ -173,6 +179,11 @@
       if (index + 1 < source.urls.length) { play(source, index + 1); return; }
       stop();
       status.textContent = 'تعذّر تشغيل مصادر هذه القناة.';
+    }
+    if (location.protocol === 'https:' && url.startsWith('http:')) {
+      if (index + 1 < source.urls.length) return play(source, index + 1);
+      status.textContent = 'هذا المصدر HTTP فقط ولا يتوفر رابط HTTPS آخر للتجربة.';
+      return;
     }
     video.onerror = failed;
     video.hidden = false;
