@@ -42,11 +42,14 @@
           /oman sports|arryadia|kuwait sport|ktv sport|bahrain sport|jordan sport|thmanyah [123]|ثمانية [١٢٣123]/i.test(name);
 
         if (name && supportedUrl && !urls.has(line) && !existingChannel) {
-          let group = 2;
+          let group = 2; // باقي الرياضات افتراضياً
 
+          // تخصيص شامل للبحث عن كرة السلة
           if (/basket|nba|wnba|fiba|courtside|السلة/i.test(name)) {
             group = 1;
-          } else if (/football|soccer|futbol|fútbol|calcio|laliga|serie a|premier league|كرة القدم/i.test(name)) {
+          } 
+          // تخصيص شامل للبحث عن كرة القدم والدوريات الكبرى وأبطال أوروبا وآسيا
+          else if (/football|soccer|futbol|fútbol|calcio|laliga|la liga|serie a|premier league|bundesliga|ligue 1|دوري روشن|السعودي|أبطال أوروبا|champions league|دوري أبطال|afc|أسيوي|أسيا|كرة القدم/i.test(name)) {
             group = 0;
           }
 
@@ -101,7 +104,7 @@
     note.dataset.note = '';
     note.textContent = catalogReady
       ? 'التوفر يختلف حسب المصدر والمنطقة.'
-      : 'جارٍ تحميل دليل الرياضة…';
+      : 'جارٍ تحميل دليل الرياضة والدوريات الكبرى…';
 
     list.appendChild(note);
 
@@ -215,7 +218,7 @@
   function navigate(event) {
     if (event.target.closest(
       '.chat-youtube-tabs [data-mode], #chat-cinema-tab, ' +
-      '#dpnl .th-dpnl-close, #settings .SERT, #d0 [data-key]'
+       '#dpnl .th-dpnl-close, #settings .SERT, #d0 [data-key]'
     )) {
       leave();
     }
@@ -305,7 +308,7 @@
       </style>
 
       <section>
-        <strong>القنوات الرياضية</strong>
+        <strong>القنوات الرياضية والدوريات</strong>
         <div data-list></div>
         <video controls playsinline hidden></video>
         <p role="status"></p>
