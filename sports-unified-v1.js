@@ -331,7 +331,7 @@
   }
   const life = new AbortController();
   let mounted;
-  const $ = sel => els.root.querySelector(sel);
+  const $ = sel => els.root.querySelector(sel) || els.portalRoot?.querySelector(sel);
   function on(target,type,fn,options={}) {
     target.addEventListener(type,fn,{...options,signal:mounted.signal});
   }
@@ -469,6 +469,19 @@
     Object.assign(els.screen.style,{left:b.x+'px',top:b.y+'px',width:b.width+'px',height:b.height+'px'});
   }
   function setFloat(on) {
+    if (state.floating === on) return;
+    if (!on && state.active && !els.slot.getBoundingClientRect().width) {
+      show('افتح شاهد ثم رياضة لإرجاع الشاشة.');
+      return;
+    }
+    const playing = !els.video.paused;
+    const parent = on ? els.portalRoot : els.slot;
+    if (parent.moveBefore && els.screen.isConnected && parent.isConnected) {
+      parent.moveBefore(els.screen, null);
+    } else {
+      parent.append(els.screen);
+      if (playing) els.video.play().catch(() => show(T.tap));
+    }
     state.floating = on; state.gesture = null;
     els.screen.classList.toggle('floating',on);
     els.slot.classList.toggle('away',on);
@@ -500,7 +513,7 @@
     on(handle,'lostpointercapture',() => { state.gesture = null; save(); });
   }
   function modes() {
-    const full = Boolean(els.root.fullscreenElement || els.root.webkitFullscreenElement || els.video.webkitDisplayingFullscreen);
+    const full = Boolean(els.portalRoot?.fullscreenElement || els.root.fullscreenElement || els.root.webkitFullscreenElement || els.video.webkitDisplayingFullscreen);
     $('[data-full]').textContent = full ? T.exitFull : T.full;
     $('[data-full]').setAttribute('aria-pressed',String(full));
     const pip = Boolean(document.pictureInPictureElement || els.root.pictureInPictureElement);
@@ -596,12 +609,21 @@
   }
   function unmount() {
     leave(); mounted?.abort();
-    els.panel?.remove(); els.tab?.remove();
+    els.portal?.remove(); els.panel?.remove(); els.tab?.remove();
     for (const k of Object.keys(els)) delete els[k];
   }
   function mount() {
     const tabs=document.querySelector('#dpnl .chat-youtube-tabs'), pane=document.getElementById('chat-tv');
     if (tabs && pane && els.tab?.parentNode===tabs && els.panel?.parentNode===pane) return;
+    if (state.active && state.floating) {
+      if (tabs && pane) {
+        els.tabs = tabs; els.pane = pane;
+        if (els.tab.parentNode !== tabs) tabs.append(els.tab);
+        if (els.panel.parentNode !== pane) pane.prepend(els.panel);
+        pane.classList.add('sd-open');
+      }
+      return;
+    }
     unmount();
     if (!tabs || !pane) return;
     mounted=new AbortController();
@@ -630,6 +652,13 @@
         <button type="button" data-last hidden></button><div class="channels" role="group" aria-label="${T.channels}"></div>
       </div>`;
     Object.assign(els,{screen:$('.screen'),slot:$('.slot'),video:$('video'),title:$('strong'),status:$('.status')});
+    els.portal = document.createElement('div');
+    els.portalRoot = els.portal.attachShadow({mode:'open'});
+    const floatStyle = document.createElement('style');
+    floatStyle.textContent = sheet + ':host {display:contents}';
+    els.portalRoot.append(floatStyle);
+    document.body.append(els.portal);
+    on(els.portalRoot,'keydown',keyboard);
     catalogUI(); volumeUI();
     const actions={full:fullscreen,float:()=>setFloat(!state.floating),stop,mute,pip,
       return:()=>setFloat(false),'slot-return':()=>setFloat(false),
@@ -662,8 +691,15 @@
   function start() { outer.observe(document.body,{childList:true,subtree:true}); observe(); mount(); }
   const optionsLife={signal:life.signal};
   document.addEventListener('click',e=>{
-    if (state.active && e.target.closest?.('.chat-youtube-tabs [data-mode],#chat-cinema-tab,#dpnl .th-dpnl-close,#settings .SERT,#d0 [data-key]')) leave();
+    if (!state.active) return;
+    if (e.target.closest?.('.chat-youtube-tabs [data-mode],#chat-cinema-tab')) leave();
+    else if (state.row && e.target.closest?.('#dpnl .th-dpnl-close,#settings .SERT,#d0 [data-key]')) setFloat(true);
   },{capture:true,signal:life.signal});
+  document.addEventListener('focusin', e => {
+    if (state.active && state.row && !state.floating &&
+        e.target.matches?.('textarea,input:not([type]),input[type=text],[contenteditable=true]') &&
+        !els.panel.contains(e.target)) setFloat(true);
+  },optionsLife);
   window.addEventListener('pagehide',leave,optionsLife);
   window.addEventListener('resize',paintBox,optionsLife);
   window[key]={destroy() {
