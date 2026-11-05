@@ -10,7 +10,7 @@
   window.__CHAT_SPORTS_TEST__?.destroy?.();
   document.getElementById('bein-chat-test')?.remove();
 
-  const relay = '/sports-live/';
+  const relay = 'http://127.0.0.1:8091/sports-live/';
   const hlsScript =
     'https://cdn.jsdelivr.net/npm/hls.js@1.6.13/dist/hls.min.js';
 
