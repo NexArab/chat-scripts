@@ -395,18 +395,21 @@ const libraryUrl =
 
     .floating .grip {
       position: absolute;
-      right: 2px;
-      bottom: 2px;
+      right: 0;
+      bottom: 0;
       z-index: 3;
       display: grid;
       place-items: center;
-      width: 40px;
-      height: 40px;
-      border: 1px solid #ffffff88;
-      border-radius: 6px;
-      background: #103d34;
+      width: 36px;
+      height: 18px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 4px 0 0 0;
+      background: #343a40;
       color: #fff;
-      font-size: 20px;
+      font-size: 16px;
+      line-height: 18px;
       cursor: nwse-resize;
       touch-action: none;
       user-select: none;
