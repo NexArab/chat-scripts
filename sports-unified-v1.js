@@ -239,14 +239,19 @@
     ["رياضة عربية أخرى","فلسطين الرياضية","فلسطين الرياضية","4K",[492271]],
     ["رياضة عربية أخرى","ليبيا الرياضية","ليبيا الرياضية 1","4K",[492262]],
     ["رياضة عربية أخرى","ليبيا الرياضية","ليبيا الرياضية 2","4K",[492263]]];
-  const libraryUrl =
+const libraryUrl =
     'https://cdn.jsdelivr.net/npm/hls.js@1.6.13/dist/hls.min.js';
 
   const style = document.createElement('style');
 
+  /* FIX: scrollbar-gutter يمنع تغيّر العرض عند ظهور/اختفاء شريط التمرير على اللابتوب */
   style.textContent = `
     #chat-tv > .sd-sports {
       display: none !important;
+    }
+
+    #chat-tv.sd-open {
+      scrollbar-gutter: stable;
     }
 
     #chat-tv.sd-open > :not(.sd-sports) {
@@ -285,13 +290,20 @@
       gap: 9px;
     }
 
+    /* FIX: الارتفاع صار بالـ CSS (نسبة 16:9 + 44px للهيدر) بدل ما نكتبه بالجافاسكربت.
+       هذا يقطع حلقة: ارتفاع -> شريط تمرير -> عرض -> ارتفاع */
     .slot {
       position: relative;
       width: 100%;
-      min-height: 150px;
+      height: 0;
+      padding-bottom: calc(56.25% + 44px);
+      min-height: 0;
     }
 
     .slot.away {
+      height: auto;
+      padding-bottom: 0;
+      min-height: 150px;
       display: grid;
       place-items: center;
       border: 1px dashed #b6cac5;
@@ -428,6 +440,7 @@
       gap: 5px;
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
+      scrollbar-gutter: stable;
     }
 
     .filters {
@@ -607,7 +620,8 @@
     media: false,
     restoring: false,
     layoutFrame: 0,
-    resizeObserver: null
+    resizeObserver: null,
+    lastClip: ''
   };
 
   if (
@@ -962,11 +976,12 @@
   function geometry(box) {
     if (!els.screen) return;
 
+    /* FIX: تقريب القيم لأعداد صحيحة حتى ما يصير اهتزاز بسبب الكسور */
     const values = {
-      left: box.x + 'px',
-      top: box.y + 'px',
-      width: box.width + 'px',
-      height: box.height + 'px'
+      left: Math.round(box.x) + 'px',
+      top: Math.round(box.y) + 'px',
+      width: Math.round(box.width) + 'px',
+      height: Math.round(box.height) + 'px'
     };
 
     for (const [name, value] of Object.entries(values)) {
@@ -974,6 +989,13 @@
         els.screen.style[name] = value;
       }
     }
+  }
+
+  function setClip(value) {
+    if (state.lastClip === value) return;
+
+    state.lastClip = value;
+    els.screen.style.clipPath = value;
   }
 
   function paintBox() {
@@ -1023,7 +1045,7 @@
     );
 
     els.screen.hidden = false;
-    els.screen.style.clipPath = 'none';
+    setClip('none');
 
     geometry(box);
   }
@@ -1053,11 +1075,8 @@
       return;
     }
 
+    /* FIX: لا نكتب ارتفاع الـ slot بالجافاسكربت بعد الآن (صار بالـ CSS) */
     const height = rect.width * 9 / 16 + 44;
-
-    if (els.slot.style.height !== height + 'px') {
-      els.slot.style.height = height + 'px';
-    }
 
     geometry({
       x: rect.left,
@@ -1099,13 +1118,14 @@
 
     els.screen.hidden = right <= left || bottom <= top;
 
-    els.screen.style.clipPath =
+    setClip(
       'inset(' +
-        Math.max(0, top - rect.top) + 'px ' +
-        Math.max(0, rect.right - right) + 'px ' +
-        Math.max(0, rect.top + height - bottom) + 'px ' +
-        Math.max(0, left - rect.left) + 'px' +
-      ')';
+        Math.round(Math.max(0, top - rect.top)) + 'px ' +
+        Math.round(Math.max(0, rect.right - right)) + 'px ' +
+        Math.round(Math.max(0, rect.top + height - bottom)) + 'px ' +
+        Math.round(Math.max(0, left - rect.left)) + 'px' +
+      ')'
+    );
   }
 
   function requestLayout() {
@@ -1680,6 +1700,7 @@
 
     cancelAnimationFrame(state.layoutFrame);
     state.layoutFrame = 0;
+    state.lastClip = '';
 
     els.portal?.remove();
     els.panel?.remove();
