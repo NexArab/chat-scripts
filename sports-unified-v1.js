@@ -1,7 +1,16 @@
 (function () {
   'use strict';
 
-  if (!['chatsaudia.com', 'www.chatsaudia.com'].includes(location.hostname)) return;
+  if (![
+    'chatsaudia.com',
+    'www.chatsaudia.com',
+    'chatghina.com',
+    'www.chatghina.com',
+    'alldewan.com',
+    'www.alldewan.com',
+    'sh8awh.com',
+    'www.sh8awh.com'
+  ].includes(location.hostname)) return;
 
   const key = '__CHAT_SPORTS_SD_V1__';
   window[key]?.destroy();
@@ -385,18 +394,23 @@ const libraryUrl =
     }
 
     .floating .grip {
+      position: absolute;
+      right: 6px;
+      bottom: 52px;
+      z-index: 3;
       display: grid;
       place-items: center;
       width: 40px;
-      height: 38px;
-      border: 1px solid #ffffff66;
-      border-radius: 5px;
+      height: 40px;
+      border: 1px solid #ffffff88;
+      border-radius: 6px;
+      background: #103d34;
+      color: #fff;
+      font-size: 20px;
       cursor: nwse-resize;
       touch-action: none;
       user-select: none;
       -webkit-user-select: none;
-      color: white;
-      font-size: 20px;
     }
 
     .tools {
@@ -843,6 +857,7 @@ const libraryUrl =
 
     const instance = new Hls({
       maxBufferLength: 30,
+      backBufferLength: 30,
       liveSyncDurationCount: 3,
       lowLatencyMode: false
     });
@@ -1129,6 +1144,7 @@ const libraryUrl =
   }
 
   function requestLayout() {
+    if (!state.active && !state.floating) return;
     if (state.layoutFrame) return;
 
     state.layoutFrame = requestAnimationFrame(() => {
@@ -1759,7 +1775,7 @@ const libraryUrl =
 
     els.tab = document.createElement('button');
     els.tab.type = 'button';
-    els.tab.textContent = '⚽ ' + T.sports;
+    els.tab.textContent = T.sports;
     els.tab.setAttribute('aria-pressed', 'false');
 
     on(els.tab, 'click', activate);
