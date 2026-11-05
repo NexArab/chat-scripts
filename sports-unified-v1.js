@@ -395,8 +395,8 @@ const libraryUrl =
 
     .floating .grip {
       position: absolute;
-      right: 6px;
-      bottom: 52px;
+      right: 2px;
+      bottom: 2px;
       z-index: 3;
       display: grid;
       place-items: center;
