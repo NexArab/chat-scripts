@@ -6,6 +6,7 @@
 
   const service = new URL('https://domino-server-5xbx.onrender.com/');
   const site = location.hostname.replace(/^www\./i, '');
+
   let game = null;
   let pendingChallenge = null;
   let challengeSequence = 0;
@@ -15,7 +16,10 @@
   const style = document.createElement('style');
   style.id = styleId;
   style.textContent = `
-    .domino-online-row { margin-top: 6px; }
+    .domino-online-row {
+      margin-top: 6px;
+    }
+
     .domino-online-icon {
       display: inline-block;
       width: 1.2em;
@@ -43,7 +47,9 @@
       flex-direction: column;
     }
 
-    #domino-online-dialog::backdrop { background: #000b; }
+    #domino-online-dialog::backdrop {
+      background: #000b;
+    }
 
     .domino-online-header {
       display: flex;
@@ -78,14 +84,12 @@
       cursor: pointer;
     }
 
-    #domino-online-dialog button,
-    #domino-online-invite button {
+    #domino-online-dialog button {
       background: transparent;
       color: inherit;
     }
 
     #domino-online-dock,
-    #domino-online-invite,
     #domino-online-notice {
       position: fixed;
       inset-inline-end: 12px;
@@ -102,12 +106,57 @@
     }
 
     #domino-online-invite {
+      position: fixed;
       z-index: 10021;
-      bottom: calc(112px + env(safe-area-inset-bottom));
-      padding: 14px;
-      border-radius: 10px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(420px, calc(100vw - 32px));
+      max-height: calc(100vh - 32px);
+      max-height: calc(100dvh - 32px);
+      overflow: auto;
+      box-sizing: border-box;
+      padding: 24px;
+      border-radius: 14px;
       background: var(--domino-accent);
       color: var(--domino-ink);
+      text-align: center;
+      box-shadow: 0 10px 36px #0006;
+    }
+
+    #domino-online-invite strong {
+      display: block;
+      font-size: 20px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    #domino-online-invite .domino-online-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    #domino-online-invite .domino-online-controls button {
+      flex: 1;
+      min-height: 44px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    #domino-online-invite .domino-invite-accept {
+      background: #166534;
+      border-color: #166534;
+    }
+
+    #domino-online-invite .domino-invite-decline {
+      background: #b91c1c;
+      border-color: #b91c1c;
+    }
+
+    #domino-online-invite button:disabled {
+      opacity: .65;
+      cursor: wait;
     }
 
     #domino-online-notice {
@@ -142,7 +191,10 @@
     icon.setAttribute('class', 'domino-online-icon');
 
     const outline = document.createElementNS(ns, 'path');
-    outline.setAttribute('d', 'M4 7h20a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H4a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3zm10 0v14');
+    outline.setAttribute(
+      'd',
+      'M4 7h20a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H4a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3zm10 0v14'
+    );
     outline.setAttribute('fill', 'none');
     outline.setAttribute('stroke', 'currentColor');
     outline.setAttribute('stroke-width', '2');
@@ -181,6 +233,7 @@
     const result = typeof TH_LUDO_GROUP_GET_ONLINE_ITEMS === 'function'
       ? TH_LUDO_GROUP_GET_ONLINE_ITEMS()
       : [];
+
     const items = Array.isArray(result) ? result : [];
     const ownEntry = items.find(item => item && String(item.id) === id);
 
@@ -240,10 +293,15 @@
       if (alpha < 240 || Math.min(r, g, b) > 240) continue;
 
       const channels = [r, g, b];
-      const accent = '#' + channels.map(n => n.toString(16).padStart(2, '0')).join('');
+      const accent = '#' + channels
+        .map(n => n.toString(16).padStart(2, '0'))
+        .join('');
+
       const [red, green, blue] = channels.map(n => {
-        const v = n / 255;
-        return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+        const value = n / 255;
+        return value <= 0.04045
+          ? value / 12.92
+          : ((value + 0.055) / 1.055) ** 2.4;
       });
 
       const luminance = red * 0.2126 + green * 0.7152 + blue * 0.0722;
@@ -282,12 +340,17 @@
     node.style.setProperty('--domino-ink', theme.ink);
   }
 
+  function removeInvite() {
+    game.panel?.remove();
+    game.panel = null;
+  }
+
   function removeGame() {
     if (!game) return;
+    removeInvite();
     game.dialog.close();
     game.dialog.remove();
     game.dock.remove();
-    game.panel?.remove();
     game = null;
   }
 
@@ -320,8 +383,7 @@
 
     function restore() {
       if (!dialog.open) dialog.showModal();
-      game?.panel?.remove();
-      if (game) game.panel = null;
+      removeInvite();
       dock.hidden = true;
       sendContext();
     }
@@ -334,6 +396,7 @@
 
     const header = document.createElement('header');
     header.className = 'domino-online-header';
+
     const heading = document.createElement('strong');
     dominoLabel(heading, title);
 
@@ -346,13 +409,20 @@
 
     header.append(heading, controls);
     dialog.append(header, frame);
+
     dialog.addEventListener('cancel', event => {
       event.preventDefault();
       minimize();
     });
+
     frame.addEventListener('load', () => sendContext());
 
-    game = { id, dialog, frame, dock, restore, theme, panel: null };
+    game = {
+      id, dialog, frame, dock, restore, theme,
+      panel: null,
+      openAfterAccept: null
+    };
+
     frame.src = url.href;
     document.body.append(dialog, dock);
   }
@@ -372,15 +442,18 @@
 
   function openGame() {
     syncChat();
+
     if (!game) {
       showNotice('بانتظار حساب الشات. جرّب بعد ظهور اسمك بالمتصلين.');
       return;
     }
+
     game.restore();
   }
 
   function challengeFromProfile(targetId) {
     const context = readContext();
+
     if (!context) {
       showNotice('بانتظار حساب الشات. جرّب مرة ثانية.');
       return;
@@ -410,13 +483,12 @@
 
   function showInvite(invite) {
     if (!invite || game.dialog.open) {
-      game.panel?.remove();
-      game.panel = null;
+      removeInvite();
       return;
     }
 
     if (game.panel?.dataset.invite === invite.id) return;
-    game.panel?.remove();
+    removeInvite();
 
     const panel = document.createElement('section');
     panel.id = 'domino-online-invite';
@@ -430,16 +502,20 @@
 
     const controls = document.createElement('div');
     controls.className = 'domino-online-controls';
-    controls.style.marginTop = '10px';
 
     function answer(action) {
+      game.openAfterAccept = action === 'accept' ? invite.id : null;
       accept.disabled = true;
       decline.disabled = true;
       post({ type: 'domino-invite-answer', id: invite.id, action });
     }
 
     const accept = button('موافقة', () => answer('accept'));
+    accept.className = 'domino-invite-accept';
+
     const decline = button('رفض', () => answer('decline'));
+    decline.className = 'domino-invite-decline';
+
     controls.append(accept, decline);
     panel.append(title, controls);
     document.body.append(panel);
@@ -448,6 +524,7 @@
 
   function mount() {
     const cards = document.querySelector('#thGames .thGamesSection .thGamesCards');
+
     if (cards && !cards.querySelector('.domino-online-card')) {
       const node = button('', openGame);
       node.className = 'thGamesCard thGamesCardBot domino-online-card';
@@ -482,6 +559,7 @@
       const node = button('', () => challengeFromProfile(wrapper.dataset.recipient));
       node.className = 'game-btn game-ludo';
       dominoLabel(node, 'تحدّي دومينو');
+
       wrapper.append(node);
       row.after(wrapper);
     }
@@ -494,28 +572,37 @@
     const data = event.data;
 
     if (data?.type === 'domino-invite-result') {
-      pendingChallenge = null;
-      game.panel?.remove();
-      game.panel = null;
+      if (!data.answerId) pendingChallenge = null;
+      if (data.answerId === game.openAfterAccept && data.ok === false) {
+        game.openAfterAccept = null;
+      }
+      removeInvite();
       if (typeof data.text === 'string') showNotice(data.text);
       return;
     }
 
     if (data?.type !== 'domino-pending') return;
 
+    if (game.openAfterAccept && data.playingMatchId === game.openAfterAccept) {
+      game.openAfterAccept = null;
+      game.restore();
+      return;
+    }
+
+    if (game.openAfterAccept && Array.isArray(data.pendingMatchIds) &&
+        !data.pendingMatchIds.includes(game.openAfterAccept)) {
+      game.openAfterAccept = null;
+    }
+
     const invites = Array.isArray(data.invites) ? data.invites : [];
-    const label = invites.length
-      ? 'دومينو · ' + invites.length + ' دعوة'
-      : data.playing
-        ? 'دومينو · الطاولة جاهزة'
-        : 'دومينو';
+    const label = data.playing ? 'دومينو · الطاولة جاهزة' : 'دومينو';
 
     if (game.dock.dataset.label !== label) {
       dominoLabel(game.dock, label);
       game.dock.dataset.label = label;
     }
 
-    if ((invites.length || data.playing) && !game.dialog.open) {
+    if (data.playing && !game.dialog.open && !game.openAfterAccept) {
       game.dock.hidden = false;
     }
 
@@ -525,6 +612,7 @@
   const observer = new MutationObserver(() => {
     if (scheduled) return;
     scheduled = true;
+
     requestAnimationFrame(() => {
       scheduled = false;
       mount();
