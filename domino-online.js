@@ -195,7 +195,7 @@
     const frame = document.createElement('iframe');
     frame.title = heading;
     frame.src = url.href;
-    frame.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+    frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms');
 
     dialog.append(header, frame);
     dialog.addEventListener('cancel', event => {
