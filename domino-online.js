@@ -257,9 +257,6 @@
     }
   `;
   document.head.append(style);
-    }
-  `;
-  document.head.append(style);
 
   function button(label, click) {
     const node = document.createElement('button');
@@ -538,9 +535,6 @@
       dock.hidden = true;
     }
 
-      dialog.close();
-      dock.hidden = true;
-    }
 
     const header = document.createElement('header');
     header.className = 'domino-online-header';
