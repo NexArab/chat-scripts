@@ -14,6 +14,7 @@
   let game = null;
   let pendingChallenge = null;
   let challengeSequence = 0;
+  let closeSequence = 0;
   let noticeTimer;
   let scheduled = false;
   let inviteSwitch = null;
@@ -477,6 +478,7 @@
   function removeGame() {
     if (!game) return;
     removeInvite();
+    clearTimeout(game.closeTimer);
     game.dialog.close();
     game.dialog.remove();
     game.dock.remove();
@@ -546,6 +548,31 @@
     }
 
     function closeGame() {
+      if (game.closeRequest) return;
+      game.closeRequest = ++closeSequence;
+      closeButton.disabled = true;
+      closeButton.textContent = 'جاري الخروج…';
+      sendContext(readContext(), true);
+      post({ type: 'domino-close-request', requestId: game.closeRequest });
+      const currentGame = game;
+      game.closeTimer = setTimeout(() => {
+        if (game !== currentGame || !game.closeRequest) return;
+        resetCloseButton();
+        showNotice('ما وصل تأكيد الخروج. جرّب مرة ثانية.');
+      }, 45000);
+    }
+
+    function resetCloseButton() {
+      clearTimeout(game.closeTimer);
+      game.closeRequest = null;
+      closeButton.disabled = false;
+      closeButton.textContent = 'إغلاق';
+    }
+
+    function finishClose(data) {
+      if (data.requestId !== game.closeRequest && data.requestId !== undefined) return;
+      resetCloseButton();
+      if (!data.ok) return;
       dialog.close();
       dock.hidden = true;
     }
@@ -559,7 +586,8 @@
 
     const controls = document.createElement('div');
     controls.className = 'domino-online-controls';
-    controls.append(button('تصغير', minimize), button('إغلاق', closeGame));
+    const closeButton = button('إغلاق', closeGame);
+    controls.append(button('تصغير', minimize), closeButton);
 
     header.append(heading, controls);
     dialog.append(header, loading, frame);
@@ -576,7 +604,7 @@
     });
 
     game = {
-      id, dialog, frame, dock, restore, theme,
+      id, dialog, frame, dock, restore, theme, finishClose,
       panel: null,
       openAfterAccept: null,
       wasPlaying: false,
@@ -846,6 +874,17 @@
 
     const data = event.data;
 
+    if (data?.type === 'domino-close-result') {
+      game.finishClose(data);
+      return;
+    }
+
+    if (data?.type === 'domino-match-notice') {
+      if (data.decision && !game.closeRequest) game.restore();
+      if (typeof data.text === 'string' && data.text) showNotice(data.text.slice(0, 200));
+      return;
+    }
+
     if (data?.type === 'domino-invite-result') {
       if (!data.answerId) pendingChallenge = null;
       if (data.answerId === game.openAfterAccept && data.ok === false) {
@@ -869,7 +908,7 @@
     game.wasPlaying = playing;
     game.lastPlayingMatchId = matchId;
 
-    if (started) {
+    if (started && !game.closeRequest) {
       game.openAfterAccept = null;
       game.restore();
       return;
