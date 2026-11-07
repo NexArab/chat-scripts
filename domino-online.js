@@ -228,6 +228,36 @@
     #domino-online-invite[hidden] {
       display: none !important;
     }
+
+    @media (max-width: 768px), (max-height: 500px) and (pointer: coarse) {
+      #domino-online-dialog {
+        position: fixed;
+        inset: 0;
+        margin: 0;
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        max-width: none;
+        max-height: none;
+        box-sizing: border-box;
+        border: 0;
+        border-radius: 0;
+      }
+
+      #domino-online-dialog .domino-online-header {
+        flex: 0 0 auto;
+      }
+
+      #domino-online-dialog iframe {
+        display: block;
+        flex: 1 1 0;
+        min-height: 0;
+        width: 100%;
+      }
+    }
+  `;
+  document.head.append(style);
+    }
   `;
   document.head.append(style);
 
