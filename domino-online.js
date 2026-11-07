@@ -32,11 +32,12 @@
     }
 
     .games-duo-modern.domino-online-row > .game-btn {
+      position: relative;
+      direction: ltr;
       grid-column: 2;
       width: 100%;
       min-width: 0;
       box-sizing: border-box;
-      direction: rtl;
     }
 
     .domino-online-icon {
@@ -45,6 +46,17 @@
       height: 1.2em;
       margin-inline-end: .3em;
       vertical-align: middle;
+    }
+
+    .games-duo-modern.domino-online-row > .game-btn > .domino-online-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      width: 22px;
+      height: 22px;
+      margin: 0;
+      transform: translateY(-50%);
+      pointer-events: none;
     }
 
     #domino-online-dialog {
@@ -370,8 +382,8 @@
     game?.frame.contentWindow?.postMessage(message, service.origin);
   }
 
-  // يرسل السياق فقط عند تغيّره، أو كل HEARTBEAT_MS كنبضة حياة.
-  // force=true يتجاوز الفحص (عند تحميل الـ iframe أو فتح النافذة).
+  // يرسل السياق عند تغيّره، أو كل HEARTBEAT_MS كنبضة حياة.
+  // force=true يتجاوز الفحص عند تحميل الـ iframe أو فتح النافذة.
   function sendContext(context = readContext(), force = false) {
     if (!context || game?.id !== context.id) return;
 
@@ -727,7 +739,7 @@
 
       const node = button('', () => challengeFromProfile(wrapper.dataset.recipient));
       node.className = 'game-btn game-ludo';
-      dominoLabel(node, 'تحدّي دومينو');
+      dominoLabel(node, 'Domino تحدي');
 
       wrapper.append(node);
       row.after(wrapper);
