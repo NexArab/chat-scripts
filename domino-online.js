@@ -8,6 +8,9 @@
   const service = new URL('https://domino-server-5xbx.onrender.com/');
   const site = location.hostname.replace(/^www\./i, '');
 
+  // أقصى فاصل بين رسالتين للسياق إذا ما تغيّر شي (نبضة حياة)
+  const HEARTBEAT_MS = 15000;
+
   let game = null;
   let pendingChallenge = null;
   let challengeSequence = 0;
@@ -33,6 +36,7 @@
       width: 100%;
       min-width: 0;
       box-sizing: border-box;
+      direction: rtl;
     }
 
     .domino-online-icon {
@@ -69,7 +73,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 8px;
-      padding: 8px 12px;
+      padding: 3px 10px;
       background: var(--domino-accent);
       color: var(--domino-ink);
     }
@@ -113,6 +117,10 @@
     #domino-online-dialog button {
       background: transparent;
       color: inherit;
+    }
+
+    #domino-online-dialog .domino-online-controls button {
+      padding: 3px 10px;
     }
 
     #domino-online-dock,
@@ -362,11 +370,21 @@
     game?.frame.contentWindow?.postMessage(message, service.origin);
   }
 
-  function sendContext(context = readContext()) {
+  // يرسل السياق فقط عند تغيّره، أو كل HEARTBEAT_MS كنبضة حياة.
+  // force=true يتجاوز الفحص (عند تحميل الـ iframe أو فتح النافذة).
+  function sendContext(context = readContext(), force = false) {
     if (!context || game?.id !== context.id) return;
 
     game.invitesStopped = !context.invites;
     if (game.invitesStopped) removeInvite();
+
+    const snapshot = JSON.stringify(context);
+    const fresh = Date.now() - game.lastSent < HEARTBEAT_MS;
+
+    if (!force && snapshot === game.lastContext && fresh) return;
+
+    game.lastContext = snapshot;
+    game.lastSent = Date.now();
     post(context);
   }
 
@@ -464,7 +482,7 @@
       if (!dialog.open) dialog.showModal();
       removeInvite();
       dock.hidden = true;
-      sendContext();
+      sendContext(readContext(), true);
     }
 
     function minimize() {
@@ -505,7 +523,7 @@
     frame.addEventListener('load', () => {
       clearTimeout(slowTimer);
       loading.hidden = true;
-      sendContext();
+      sendContext(readContext(), true);
     });
 
     game = {
@@ -513,7 +531,9 @@
       panel: null,
       openAfterAccept: null,
       wasPlaying: false,
-      lastPlayingMatchId: null
+      lastPlayingMatchId: null,
+      lastContext: '',
+      lastSent: 0
     };
 
     armLoading();
@@ -561,7 +581,7 @@
     const member = context.roster.find(item => item.id === targetId);
 
     if (!member) {
-      showNotice('هالعضو غير متاح لاستقبال الدعوات.');
+      showNotice('هالعضو غير متصل حاليًا.');
       return;
     }
 
@@ -625,6 +645,7 @@
     function answer(action) {
       if (gameInvitesAreStopped(game.invitesStopped)) {
         removeInvite();
+        showNotice('أوقفت استقبال دعوات الألعاب.');
         return;
       }
 
