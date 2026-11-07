@@ -1,7 +1,6 @@
 (function () {
   'use strict';
 
-  // منع التحميل المزدوج (الستايل أو علامة على window)
   const styleId = 'domino-online-dialog-style';
   if (window.__dominoOnlineLoaded || document.getElementById(styleId)) return;
   window.__dominoOnlineLoaded = true;
@@ -14,11 +13,14 @@
   let challengeSequence = 0;
   let noticeTimer;
   let scheduled = false;
+  let inviteSwitch = null;
+
+  const inviteSwitchObserver = new MutationObserver(() => syncChat());
 
   const style = document.createElement('style');
   style.id = styleId;
   style.textContent = `
-        .games-duo-modern.domino-online-row {
+    .games-duo-modern.domino-online-row {
       display: grid;
       direction: ltr;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -31,14 +33,6 @@
       width: 100%;
       min-width: 0;
       box-sizing: border-box;
-    }
-
-    .domino-online-icon {
-      display: inline-block;
-      width: 1.2em;
-      height: 1.2em;
-      margin-inline-end: .3em;
-      vertical-align: middle;
     }
 
     .domino-online-icon {
@@ -63,7 +57,11 @@
       overflow: hidden;
     }
 
-    #domino-online-dialog[open] { display: flex; flex-direction: column; }
+    #domino-online-dialog[open] {
+      display: flex;
+      flex-direction: column;
+    }
+
     #domino-online-dialog::backdrop { background: #000b; }
 
     .domino-online-header {
@@ -76,7 +74,11 @@
       color: var(--domino-ink);
     }
 
-    .domino-online-controls { display: flex; flex-wrap: wrap; gap: 6px; }
+    .domino-online-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
 
     .domino-online-loading {
       display: flex;
@@ -86,6 +88,7 @@
       padding: 16px;
       text-align: center;
     }
+
     .domino-online-loading[hidden] { display: none !important; }
     .domino-online-loading button { display: none; }
     .domino-online-loading.slow button { display: inline-block; }
@@ -107,7 +110,10 @@
       cursor: pointer;
     }
 
-    #domino-online-dialog button { background: transparent; color: inherit; }
+    #domino-online-dialog button {
+      background: transparent;
+      color: inherit;
+    }
 
     #domino-online-dock,
     #domino-online-notice {
@@ -151,7 +157,11 @@
       overflow-wrap: anywhere;
     }
 
-    #domino-online-invite small { display: block; margin-top: 6px; opacity: .8; }
+    #domino-online-invite small {
+      display: block;
+      margin-top: 6px;
+      opacity: .8;
+    }
 
     #domino-online-invite .domino-online-controls {
       display: flex;
@@ -166,9 +176,20 @@
       color: #fff;
     }
 
-    #domino-online-invite .domino-invite-accept { background: #166534; border-color: #166534; }
-    #domino-online-invite .domino-invite-decline { background: #b91c1c; border-color: #b91c1c; }
-    #domino-online-invite button:disabled { opacity: .65; cursor: wait; }
+    #domino-online-invite .domino-invite-accept {
+      background: #166534;
+      border-color: #166534;
+    }
+
+    #domino-online-invite .domino-invite-decline {
+      background: #b91c1c;
+      border-color: #b91c1c;
+    }
+
+    #domino-online-invite button:disabled {
+      opacity: .65;
+      cursor: wait;
+    }
 
     #domino-online-notice {
       z-index: 10022;
@@ -178,13 +199,15 @@
       background: #222;
       color: #fff;
     }
-    /* الإشعار داخل النافذة المنبثقة (الـ dialog يغطي بقية الصفحة) */
+
     #domino-online-dialog #domino-online-notice {
       bottom: calc(16px + env(safe-area-inset-bottom));
     }
 
     #domino-online-dock[hidden],
-    #domino-online-invite[hidden] { display: none !important; }
+    #domino-online-invite[hidden] {
+      display: none !important;
+    }
   `;
   document.head.append(style);
 
@@ -236,7 +259,11 @@
     return value === true || value === 1 || value === '1' || value === 'true';
   }
 
-  // دالة الموقع قد ترمي خطأ أثناء التحميل، فنحميها
+  function gameInvitesAreStopped(fallback = false) {
+    const toggle = document.querySelector('#gameinvite .thGamesSwitchUI');
+    return toggle ? toggle.classList.contains('is-on') : fallback;
+  }
+
   function onlineItems() {
     try {
       const result = typeof TH_LUDO_GROUP_GET_ONLINE_ITEMS === 'function'
@@ -257,7 +284,6 @@
 
     const items = onlineItems();
     const ownEntry = items.find(item => item && String(item.id) === id);
-
     const name = (
       ownRow?.querySelector('.u-topic')?.textContent.trim() ||
       String(ownEntry?.topic || '').trim()
@@ -271,7 +297,7 @@
       id,
       name,
       room: typeof M_ROOM === 'undefined' ? '' : String(M_ROOM ?? ''),
-      invites: !blocksInvites(ownEntry?.nogameinvite),
+      invites: !gameInvitesAreStopped(blocksInvites(ownEntry?.nogameinvite)),
       challenge: pendingChallenge?.owner === id ? pendingChallenge : null,
       roster: items
         .filter(item => item?.id != null && String(item.id) !== id && item.topic)
@@ -337,11 +363,14 @@
   }
 
   function sendContext(context = readContext()) {
-    if (context && game?.id === context.id) post(context);
+    if (!context || game?.id !== context.id) return;
+
+    game.invitesStopped = !context.invites;
+    if (game.invitesStopped) removeInvite();
+    post(context);
   }
 
   function showNotice(text) {
-    // الـ dialog المفتوح يغطي الصفحة، فالإشعار لازم يكون داخله ليظهر
     const parent = game?.dialog.open ? game.dialog : document.body;
     let node = document.getElementById('domino-online-notice');
 
@@ -399,14 +428,15 @@
     const frame = document.createElement('iframe');
     frame.title = title;
     frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms');
-    frame.setAttribute('allow', 'autoplay');   // صوت قطع الدومينو
+    frame.setAttribute('allow', 'autoplay');
 
-    // شاشة تحميل: خوادم Render المجانية تنام وتحتاج وقت للإقلاع
     const loading = document.createElement('div');
     loading.className = 'domino-online-loading';
     loading.setAttribute('role', 'status');
+
     const loadingText = document.createElement('span');
     loadingText.textContent = 'جاري تجهيز الطاولة… إذا الخادم كان نايم قد يأخذ دقيقة.';
+
     let slowTimer;
     const armLoading = () => {
       clearTimeout(slowTimer);
@@ -414,6 +444,7 @@
       loading.classList.remove('slow');
       slowTimer = setTimeout(() => loading.classList.add('slow'), 45000);
     };
+
     const retry = button('إعادة المحاولة', () => {
       armLoading();
       frame.src = url.href;
@@ -443,12 +474,12 @@
     }
 
     function closeGame() {
-      // أثناء المباراة الإغلاق = تصغير، حتى ما يختفي زر الرجوع
       if (game?.wasPlaying) {
         minimize();
         showNotice('المباراة مستمرة. صغّرت النافذة وتقدر ترجع من زر دومينو.');
         return;
       }
+
       dialog.close();
       dock.hidden = true;
     }
@@ -528,8 +559,14 @@
     }
 
     const member = context.roster.find(item => item.id === targetId);
-    if (!member || member.blocked) {
+
+    if (!member) {
       showNotice('هالعضو غير متاح لاستقبال الدعوات.');
+      return;
+    }
+
+    if (member.blocked) {
+      showNotice('هذا المستخدم أوقف استقبال دعوات الألعاب');
       return;
     }
 
@@ -548,7 +585,8 @@
   function showInvite(invites) {
     const invite = invites[0];
 
-    if (!invite || game.dialog.open) {
+    if (!invite || game.dialog.open ||
+        gameInvitesAreStopped(game.invitesStopped)) {
       removeInvite();
       return;
     }
@@ -585,12 +623,16 @@
     decline.className = 'domino-invite-decline';
 
     function answer(action) {
+      if (gameInvitesAreStopped(game.invitesStopped)) {
+        removeInvite();
+        return;
+      }
+
       game.openAfterAccept = action === 'accept' ? invite.id : null;
       accept.disabled = true;
       decline.disabled = true;
       post({ type: 'domino-invite-answer', id: invite.id, action });
 
-      // إذا ما جاء رد من الخادم، لا تترك الأزرار معطّلة للأبد
       setTimeout(() => {
         if (game?.panel !== panel) return;
         accept.disabled = false;
@@ -605,7 +647,30 @@
     game.panel = panel;
   }
 
+  function bindGameInviteSwitch() {
+    const next = document.querySelector('#gameinvite .thGamesSwitchUI');
+
+    if (next !== inviteSwitch) {
+      inviteSwitchObserver.disconnect();
+      inviteSwitch = next;
+
+      if (inviteSwitch) {
+        inviteSwitchObserver.observe(inviteSwitch, {
+          attributes: true,
+          attributeFilter: ['class']
+        });
+        syncChat();
+      }
+    }
+
+    const subtitle = document.querySelector('#gameinvite .thGamesCardSub');
+    const label = 'لا تصلك دعوات Ludo أو X-O أو دومينو';
+    if (subtitle && subtitle.textContent !== label) subtitle.textContent = label;
+  }
+
   function mount() {
+    bindGameInviteSwitch();
+
     const cards = document.querySelector('#thGames .thGamesSection .thGamesCards');
 
     if (cards && !cards.querySelector('.domino-online-card')) {
@@ -670,7 +735,6 @@
     const playing = data.playing === true;
     const matchId = data.playingMatchId || null;
 
-    // افتح مرة واحدة عند بدء المباراة، عند المرسل والمستلم
     const started = playing && (
       !game.wasPlaying || (matchId && matchId !== game.lastPlayingMatchId)
     );
