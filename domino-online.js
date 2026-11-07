@@ -534,11 +534,9 @@
     }
 
     function closeGame() {
-      if (game?.wasPlaying) {
-        minimize();
-        showNotice('المباراة مستمرة. صغّرت النافذة وتقدر ترجع من زر دومينو.');
-        return;
-      }
+      dialog.close();
+      dock.hidden = true;
+    }
 
       dialog.close();
       dock.hidden = true;
