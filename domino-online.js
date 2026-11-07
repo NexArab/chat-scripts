@@ -255,6 +255,21 @@
         width: 100%;
       }
     }
+    .thGamesCardLobby.domino-online-card {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      background: linear-gradient(115deg, #144c67, #10213d 75%) !important;
+    }
+
+    .thGamesCardLobby.domino-online-card .domino-card-art {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
   `;
   document.head.append(style);
 
@@ -730,11 +745,68 @@
 
     if (cards && !cards.querySelector('.domino-online-card')) {
       const node = button('', openGame);
-      node.className = 'thGamesCard thGamesCardBot domino-online-card';
-      dominoLabel(node, 'دومينو جماعي · دعواتي');
-      cards.append(node);
-    }
+      node.className = 'thGamesCard thGamesCardLobby domino-online-card';
 
+      node.innerHTML = `
+        <svg class="domino-card-art" viewBox="0 0 360 110"
+             preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <pattern id="domino-card-pattern" width="24" height="24"
+                     patternUnits="userSpaceOnUse">
+              <path d="M12 2l10 10-10 10L2 12z" fill="none"
+                    stroke="#65b8de" stroke-opacity=".2"/>
+            </pattern>
+          </defs>
+          <rect width="360" height="110" fill="url(#domino-card-pattern)"/>
+
+          <g transform="translate(62 52) rotate(-27)">
+            <rect width="101" height="45" rx="7" fill="#06263c" opacity=".65"
+                  transform="translate(3 5)"/>
+            <rect width="101" height="45" rx="7" fill="#f5e4b8"
+                  stroke="#c39c66" stroke-width="2"/>
+            <path d="M50.5 4v37" stroke="#6f5135" stroke-width="2"/>
+            <g fill="#233342">
+              <circle cx="13" cy="12" r="4"/>
+              <circle cx="25" cy="22.5" r="4"/>
+              <circle cx="37" cy="33" r="4"/>
+              <circle cx="64" cy="12" r="4"/>
+              <circle cx="87" cy="12" r="4"/>
+              <circle cx="64" cy="33" r="4"/>
+              <circle cx="87" cy="33" r="4"/>
+            </g>
+          </g>
+
+          <g transform="translate(133 23) rotate(22)">
+            <rect width="86" height="40" rx="6" fill="#06263c" opacity=".65"
+                  transform="translate(3 5)"/>
+            <rect width="86" height="40" rx="6" fill="#fff2ce"
+                  stroke="#c39c66" stroke-width="2"/>
+            <path d="M43 4v32" stroke="#6f5135" stroke-width="2"/>
+            <g fill="#233342">
+              <circle cx="21.5" cy="20" r="4"/>
+              <circle cx="55" cy="11" r="4"/>
+              <circle cx="74" cy="11" r="4"/>
+              <circle cx="64.5" cy="20" r="4"/>
+              <circle cx="55" cy="29" r="4"/>
+              <circle cx="74" cy="29" r="4"/>
+            </g>
+          </g>
+        </svg>
+
+        <span class="thGamesCardLobbyOverlay">
+          <span class="thGamesCardLobbyBadge" dir="ltr">2-3-4</span>
+          <span class="thGamesCardLobbyTexts">
+            <span class="thGamesCardTitle">دومينو جماعية</span>
+            <span class="thGamesCardSub">دعوات</span>
+          </span>
+        </span>
+        <span class="thGamesCardGo" aria-hidden="true">›</span>
+      `;
+
+      const ludo = cards.querySelector('#thLudoGroupLobbyBtn');
+      if (ludo) ludo.after(node);
+      else cards.append(node);
+    }
     const rows = document.querySelectorAll(
       '.th-upro-profile-container .games-duo-modern:not(.domino-online-row)'
     );
