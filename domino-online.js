@@ -18,7 +18,28 @@
   const style = document.createElement('style');
   style.id = styleId;
   style.textContent = `
-    .domino-online-row { margin-top: 6px; }
+        .games-duo-modern.domino-online-row {
+      display: grid;
+      direction: ltr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 14px;
+      margin-top: 6px;
+    }
+
+    .games-duo-modern.domino-online-row > .game-btn {
+      grid-column: 2;
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+
+    .domino-online-icon {
+      display: inline-block;
+      width: 1.2em;
+      height: 1.2em;
+      margin-inline-end: .3em;
+      vertical-align: middle;
+    }
 
     .domino-online-icon {
       display: inline-block;
