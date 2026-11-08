@@ -509,7 +509,7 @@
 
   function createGame(id) {
     const theme = readTheme();
-    const title = 'بلياردو جماعي · ' + theme.siteName;
+    const title = 'بلياردو · ' + theme.siteName;
     const url = new URL(service.href);
     url.searchParams.set('parent', location.origin);
     url.searchParams.set('site', theme.siteName);
