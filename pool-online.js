@@ -17,6 +17,9 @@
 
   // أقصى فاصل بين رسالتين للسياق إذا ما تغيّر شي (نبضة حياة)
   const HEARTBEAT_MS = 15000;
+  const GAME_LIKES_MINIMUM = 500;
+  const GAME_LIKES_NOTICE = `تحتاج إلى ${GAME_LIKES_MINIMUM} لايك لاستخدام الألعاب`;
+  const GAME_INVITES_STOPPED_NOTICE = 'هذا المستخدم أوقف استقبال دعوات الألعاب';
 
   let game = null;
   let pendingChallenge = null;
@@ -311,6 +314,23 @@
       : '';
   }
 
+  function chatMember(id) {
+    return typeof GET_USERS_TIGERHOST === 'function' ? GET_USERS_TIGERHOST(id) : null;
+  }
+
+  function hasGameLikes(rep) {
+    return (typeof rep === 'number' || typeof rep === 'string') &&
+      Number.isFinite(Number(rep)) && Number(rep) >= GAME_LIKES_MINIMUM;
+  }
+
+  function showLikesNotice() {
+    if (!game?.dialog.open && typeof ON_DATE_SEND === 'function') {
+      ON_DATE_SEND('not', { force: true, msg: GAME_LIKES_NOTICE, user: '' });
+      return;
+    }
+    showNotice(GAME_LIKES_NOTICE);
+  }
+
   function blocksInvites(value) {
     return value === true || value === 1 || value === '1' || value === 'true';
   }
@@ -340,6 +360,8 @@
 
     const items = onlineItems();
     const ownEntry = items.find(item => item && String(item.id) === id);
+    const ownMember = chatMember(id);
+    const eligible = hasGameLikes(ownMember?.rep ?? ownEntry?.rep);
     const name = (
       ownRow?.querySelector('.u-topic')?.textContent.trim() ||
       String(ownEntry?.topic || '').trim()
@@ -353,16 +375,22 @@
       id,
       name,
       room: typeof M_ROOM === 'undefined' ? '' : String(M_ROOM ?? ''),
-      invites: !gameInvitesAreStopped(blocksInvites(ownEntry?.nogameinvite)),
-      challenge: pendingChallenge?.owner === id ? pendingChallenge : null,
-      roster: items
+      eligible,
+      invites: eligible && !gameInvitesAreStopped(blocksInvites(ownMember?.nogameinvite ?? ownEntry?.nogameinvite)),
+      challenge: eligible && pendingChallenge?.owner === id ? pendingChallenge : null,
+      roster: eligible ? items
         .filter(item => item?.id != null && String(item.id) !== id && item.topic)
-        .map(item => ({
-          id: String(item.id),
-          name: String(item.topic).trim().slice(0, 80),
-          room: String(item.roomid ?? ''),
-          blocked: blocksInvites(item.nogameinvite)
-        }))
+        .map(item => {
+          const member = chatMember(String(item.id));
+          if (!hasGameLikes(member?.rep ?? item.rep)) return null;
+          return {
+            id: String(item.id),
+            name: String(item.topic).trim().slice(0, 80),
+            room: String(item.roomid ?? ''),
+            blocked: blocksInvites(member?.nogameinvite ?? item.nogameinvite)
+          };
+        })
+        .filter(Boolean) : []
     };
   }
 
@@ -423,6 +451,7 @@
   function sendContext(context = readContext(), force = false) {
     if (!context || game?.id !== context.id) return;
 
+    game.eligible = context.eligible;
     game.invitesStopped = !context.invites;
     if (game.invitesStopped) removeInvite();
 
@@ -626,7 +655,7 @@
 
     const context = readContext();
     if (!context) return;
-    if (!game) createGame(context.id);
+    if (!game && context.eligible) createGame(context.id);
     sendContext(context);
   }
 
@@ -638,6 +667,11 @@
       return;
     }
 
+    if (!context.eligible) {
+      showLikesNotice();
+      return;
+    }
+
     if (pendingChallenge) {
       showNotice('دعوة البلياردو قيد الإرسال.');
       return;
@@ -646,12 +680,20 @@
     const member = context.roster.find(item => item.id === targetId);
 
     if (!member) {
-      showNotice('هالعضو غير متصل حاليًا.');
+      const online = onlineItems().find(item => item && String(item.id) === targetId && item.topic);
+      const recipient = online && chatMember(targetId);
+      if (blocksInvites(recipient?.nogameinvite ?? online?.nogameinvite)) {
+        showNotice(GAME_INVITES_STOPPED_NOTICE);
+      } else {
+        showNotice(online
+          ? `هالعضو يحتاج إلى ${GAME_LIKES_MINIMUM} لايك لاستخدام الألعاب`
+          : 'هالعضو غير متصل حاليًا.');
+      }
       return;
     }
 
     if (member.blocked) {
-      showNotice('هذا المستخدم أوقف استقبال دعوات الألعاب');
+      showNotice(GAME_INVITES_STOPPED_NOTICE);
       return;
     }
 
@@ -670,7 +712,7 @@
   function showInvite(invites) {
     const invite = invites[0];
 
-    if (!invite || game.dialog.open ||
+    if (!invite || !game.eligible || game.dialog.open ||
         gameInvitesAreStopped(game.invitesStopped)) {
       removeInvite();
       return;
@@ -708,6 +750,11 @@
     decline.className = 'pool-invite-decline';
 
     function answer(action) {
+      if (!readContext()?.eligible) {
+        removeInvite();
+        showLikesNotice();
+        return;
+      }
       if (gameInvitesAreStopped(game.invitesStopped)) {
         removeInvite();
         showNotice('أوقفت استقبال دعوات الألعاب.');
@@ -748,8 +795,6 @@
         syncChat();
       }
     }
-
-
   }
 
   function mount() {
