@@ -68,14 +68,16 @@
     }
 
     #pool-online-dialog {
-      width: min(96vw, 950px);
+      box-sizing: border-box;
+      width: min(calc(100vw - 12px), clamp(306px, calc((90vh - 136px) * .59 + 100px), 556px));
+      width: min(calc(100vw - 12px), clamp(306px, calc((90dvh - 136px) * .59 + 100px), 556px));
       height: 90vh;
       height: 90dvh;
       max-height: 96dvh;
       padding: 0;
       border: 1px solid var(--pool-accent);
       border-radius: 14px;
-      background: #181818;
+      background: #0d1714;
       color: #fff;
       font-family: inherit;
       overflow: hidden;
@@ -90,12 +92,28 @@
 
     .pool-online-header {
       display: flex;
+      direction: ltr;
+      flex: 0 0 auto;
       justify-content: space-between;
       align-items: center;
       gap: 8px;
       padding: 3px 10px;
       background: var(--pool-accent);
       color: var(--pool-ink);
+    }
+
+    .pool-online-header strong {
+      direction: rtl;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 12px;
+    }
+
+    .pool-online-header .pool-online-controls {
+      flex-wrap: nowrap;
+      flex: 0 0 auto;
+      direction: ltr;
     }
 
     .pool-online-controls {
@@ -140,7 +158,10 @@
     }
 
     #pool-online-dialog .pool-online-controls button {
-      padding: 3px 10px;
+      width: 29px;
+      min-height: 26px;
+      padding: 0;
+      line-height: 1;
     }
 
     #pool-online-dock,
@@ -237,30 +258,11 @@
       display: none !important;
     }
 
-    @media (max-width: 768px), (max-height: 500px) and (pointer: coarse) {
+    @media (max-width: 520px) {
       #pool-online-dialog {
-        position: fixed;
-        inset: 0;
-        margin: 0;
-        width: 100%;
-        height: 100vh;
-        height: 100dvh;
-        max-width: none;
-        max-height: none;
-        box-sizing: border-box;
-        border: 0;
-        border-radius: 0;
-      }
-
-      #pool-online-dialog .pool-online-header {
-        flex: 0 0 auto;
-      }
-
-      #pool-online-dialog iframe {
-        display: block;
-        flex: 1 1 0;
-        min-height: 0;
-        width: 100%;
+        width: min(420px, calc(100vw - 8px));
+        height: 96vh;
+        height: 96dvh;
       }
     }
   `;
@@ -543,7 +545,7 @@
       if (game.closeRequest) return;
       game.closeRequest = ++closeSequence;
       closeButton.disabled = true;
-      closeButton.textContent = 'جاري الخروج…';
+      closeButton.textContent = '…';
       sendContext(readContext(), true);
       post({ type: 'pool-close-request', requestId: game.closeRequest });
       const currentGame = game;
@@ -558,7 +560,7 @@
       clearTimeout(game.closeTimer);
       game.closeRequest = null;
       closeButton.disabled = false;
-      closeButton.textContent = 'إغلاق';
+      closeButton.textContent = '×';
     }
 
     function finishClose(data) {
@@ -578,10 +580,15 @@
 
     const controls = document.createElement('div');
     controls.className = 'pool-online-controls';
-    const closeButton = button('إغلاق', closeGame);
-    controls.append(button('تصغير', minimize), closeButton);
+    const closeButton = button('×', closeGame);
+    closeButton.setAttribute('aria-label', 'إغلاق');
+    closeButton.title = 'إغلاق';
+    const minimizeButton = button('−', minimize);
+    minimizeButton.setAttribute('aria-label', 'تصغير');
+    minimizeButton.title = 'تصغير';
+    controls.append(closeButton, minimizeButton);
 
-    header.append(heading, controls);
+    header.append(controls, heading);
     dialog.append(header, loading, frame);
 
     dialog.addEventListener('cancel', event => {
