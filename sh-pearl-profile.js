@@ -10,7 +10,7 @@
        شعار النخلة والسيفين بالأسود
        ========================================== */
 
-    const NAME = "\u2800 SH";
+    const NAME = "SH";
     const BODY = "sh-pearl-profile";
     const SCOPE = "sh-pearl-scope";
     const STYLE = "sh-pearl-style";
