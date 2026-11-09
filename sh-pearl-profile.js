@@ -3,6 +3,7 @@
 
     /* SH PEARL PROFILE V8 — العضوية المسجّلة SH */
 
+    const ACCOUNT_NAME = "SH";
     const MEMBER_LID = "jdqp31emi90vutw6edfgte9lefrwgi9";
     const BODY = "sh-pearl-profile";
     const SCOPE = "sh-pearl-scope";
@@ -14,22 +15,32 @@
 
     function isTarget(profile) {
         const panel = profile.closest("#upro");
-        if (!panel || typeof GET_USERS_TIGERHOST !== "function") {
-            return false;
-        }
+        if (!panel) return false;
 
         const openUserId = typeof TH_UPRO_OPEN_USER_TIGERHOST !== "undefined"
             ? TH_UPRO_OPEN_USER_TIGERHOST
             : "";
-
-        const userId = openUserId ||
-            panel.querySelector(".xo-challenge[data-xo-target]")?.dataset.xoTarget ||
-            panel.querySelector(".lusoSendForUser[data-ludoid]")?.dataset.ludoid;
-
+        const userId = String(
+            profile.querySelector(".xo-challenge[data-xo-target]")?.dataset.xoTarget ||
+            profile.querySelector(".lusoSendForUser[data-ludoid]")?.dataset.ludoid ||
+            profile.querySelector(".pool-profile-challenge[data-recipient]")?.dataset.recipient ||
+            profile.querySelector(".domino-online-row[data-recipient]")?.dataset.recipient ||
+            openUserId || ""
+        );
         if (!userId) return false;
 
-        const member = GET_USERS_TIGERHOST(String(userId));
-        return String(member?.lid ?? "") === MEMBER_LID;
+        const member = typeof GET_USERS_TIGERHOST === "function"
+            ? GET_USERS_TIGERHOST(userId)
+            : null;
+        if (String(member?.lid ?? "") === MEMBER_LID ||
+            String(member?.username ?? "").trim() === ACCOUNT_NAME) {
+            return true;
+        }
+
+        const row = document.querySelector(
+            '[data-th-upro="' + CSS.escape(userId) + '"][data-th-lid]'
+        );
+        return row?.dataset.thLid === MEMBER_LID;
     }
 
     const pressTimers = new WeakMap();
@@ -278,8 +289,9 @@
 
         .sh-pearl-profile .th-upro-game-xo,
         .sh-pearl-profile .th-upro-game-ludo,
-        .sh-pearl-profile .domino-online-row > .game-btn,
-        .sh-pearl-profile .pool-online-row > .game-btn {
+        #upro .th-upro-pro.sh-pearl-profile .games-duo-modern.domino-online-row > button.game-btn,
+        #upro .th-upro-pro.sh-pearl-profile .games-duo-modern.pool-online-row > button.game-btn,
+        #upro .th-upro-pro.sh-pearl-profile button.game-btn.pool-profile-challenge {
             background: #EDF3F7 !important;
             color: #40576D !important;
             border: 1px solid #CEDAE3 !important;
@@ -613,7 +625,7 @@
             subtree: true,
             characterData: true,
             attributes: true,
-            attributeFilter: ["data-xo-target", "data-ludoid"]
+            attributeFilter: ["data-xo-target", "data-ludoid", "data-recipient", "data-th-upro", "data-th-lid"]
         });
     }
 
