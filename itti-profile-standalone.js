@@ -6,6 +6,7 @@
     window[KEY] = true;
 
     const ACCOUNT_NAME = "iTTi";
+    const MEMBER_LID = "4m19u6z1kkpyre6x374nbgryq95h740";
     const PROFILE = "itti-v4-profile";
     const SCOPE = "itti-v4-scope";
     const EMBLEM = "itti-v4-tiger";
@@ -54,9 +55,7 @@
 
     function isTarget(profile) {
         const panel = profile.closest("#upro");
-        if (!panel || typeof GET_USERS_TIGERHOST !== "function") {
-            return false;
-        }
+        if (!panel) return false;
 
         const openUserId = typeof TH_UPRO_OPEN_USER_TIGERHOST !== "undefined"
             ? TH_UPRO_OPEN_USER_TIGERHOST
@@ -70,7 +69,16 @@
         );
         if (!userId) return false;
 
-        const member = GET_USERS_TIGERHOST(userId);
+        const member = typeof GET_USERS_TIGERHOST === "function"
+            ? GET_USERS_TIGERHOST(userId)
+            : null;
+
+        const row = document.querySelector(
+            '.uzr[data-th-upro="' + CSS.escape(userId) + '"][data-th-lid]'
+        );
+        const lid = String(row?.dataset.thLid || member?.lid || "");
+        if (lid) return lid === MEMBER_LID;
+
         return typeof member?.username === "string" &&
             member.username.trim() === ACCOUNT_NAME;
     }
@@ -533,7 +541,10 @@
             subtree: true,
             characterData: true,
             attributes: true,
-            attributeFilter: ["data-xo-target", "data-ludoid", "data-recipient"]
+            attributeFilter: [
+                "data-xo-target", "data-ludoid", "data-recipient",
+                "data-th-upro", "data-th-lid"
+            ]
         });
     }
 
