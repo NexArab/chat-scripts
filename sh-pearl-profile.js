@@ -317,7 +317,7 @@
             border-radius: 5px !important;
             box-shadow: inset 0 1px 0 #FFFFFF !important;
             text-shadow: none !important;
-            font-size: 12px !important;
+            font-size: 14px !important;
             font-weight: 700 !important;
             line-height: 1.25 !important;
             text-align: center !important;
@@ -512,7 +512,7 @@
 
             .th-upro-pro.sh-pearl-profile > center > a.th-upro-action,
             .th-upro-pro.sh-pearl-profile > center > a.th-upro-action-no-margin {
-                font-size: 11px !important;
+                font-size: 13px !important;
                 height: 35px !important;
                 min-height: 35px !important;
             }
