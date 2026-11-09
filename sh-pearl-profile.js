@@ -152,6 +152,7 @@
         }
 
         .sh-pearl-profile .th-upro-cover {
+            position: relative;
             border-bottom: 3px solid #C4AC86 !important;
         }
 
@@ -526,6 +527,52 @@
             }
         }
 
+        .sh-pearl-stars {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .sh-pearl-star {
+            position: absolute;
+            top: 0;
+            left: var(--star-left);
+            color: #fff4d6;
+            font-size: var(--star-size);
+            line-height: 1;
+            text-shadow: 0 0 6px #fff, 0 0 12px #ffd78d;
+            animation: sh-pearl-star-fall var(--star-time) ease-in var(--star-delay) both;
+        }
+
+        @keyframes sh-pearl-star-fall {
+            0% {
+                opacity: 0;
+                transform: translate3d(0, -16px, 0) scale(.5);
+            }
+
+            22% {
+                opacity: 1;
+                transform: translate3d(3px, calc(var(--star-fall) * .18), 0) scale(1.15);
+            }
+
+            52% {
+                opacity: .35;
+                transform: translate3d(-3px, calc(var(--star-fall) * .46), 0) scale(.8);
+            }
+
+            70% {
+                opacity: .95;
+                transform: translate3d(4px, calc(var(--star-fall) * .68), 0) scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate3d(0, var(--star-fall), 0) scale(.55);
+            }
+        }
+
         @media (prefers-reduced-motion: reduce) {
             .sh-pearl-profile a.th-upro-action,
             .sh-pearl-profile a.th-upro-action-no-margin {
@@ -537,6 +584,62 @@
         document.head.appendChild(style);
     }
 
+    const starredProfiles = new WeakSet();
+    const watchedStarPanels = new WeakSet();
+
+    function syncProfileStars(profile, matched) {
+        const panel = profile.closest("#upro");
+        if (!panel) return;
+
+        if (!watchedStarPanels.has(panel)) {
+            watchedStarPanels.add(panel);
+            new MutationObserver(updateProfiles).observe(panel, {
+                attributes: true,
+                attributeFilter: ["class", "style", "aria-hidden"]
+            });
+        }
+
+        const visible = panel.getClientRects().length > 0 &&
+            panel.getAttribute("aria-hidden") !== "true";
+
+        if (!matched || !visible) {
+            starredProfiles.delete(profile);
+            profile.querySelector(".sh-pearl-stars")?.remove();
+            return;
+        }
+
+        if (starredProfiles.has(profile) ||
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            return;
+        }
+
+        const cover = profile.querySelector(".th-upro-cover");
+        if (!cover || !cover.clientHeight) return;
+
+        starredProfiles.add(profile);
+
+        const layer = document.createElement("div");
+        layer.className = "sh-pearl-stars";
+        layer.setAttribute("aria-hidden", "true");
+        layer.style.setProperty("--star-fall", cover.clientHeight + "px");
+
+        for (let i = 0; i < 12; i++) {
+            const star = document.createElement("span");
+            star.className = "sh-pearl-star";
+            star.textContent = i % 3 === 0 ? "✦" : "✧";
+            star.style.setProperty("--star-left", (5 + Math.random() * 88) + "%");
+            star.style.setProperty("--star-size", (10 + Math.random() * 12) + "px");
+            star.style.setProperty("--star-time", (1500 + Math.random() * 550) + "ms");
+            star.style.setProperty("--star-delay", (Math.random() * 400) + "ms");
+            layer.appendChild(star);
+        }
+
+        cover.appendChild(layer);
+        setTimeout(function () {
+            layer.remove();
+        }, 2500);
+    }
+
     function updateProfiles() {
         const scopes = new Set();
 
@@ -546,6 +649,8 @@
             if (profile.classList.contains(BODY) !== matched) {
                 profile.classList.toggle(BODY, matched);
             }
+
+            syncProfileStars(profile, matched);
 
             const oldEmblem = profile.querySelector("." + EMBLEM);
 
