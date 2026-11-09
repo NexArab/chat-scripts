@@ -1,166 +1,143 @@
 
-/* NexArab - Automatic JavaScript Loader */
-
 (function () {
   'use strict';
 
-  var KEY = '__NEXARAB_AUTO_LOADER_V2__';
+  const OWNER = 'NexArab';
+  const REPO = 'chat-scripts';
+  const BRANCH = 'main';
+
+  const KEY = '__NEXARAB_AUTO_ALL_V2__';
 
   if (window[KEY]) return;
+
   window[KEY] = true;
 
-  var API =
-    'https://api.github.com/repos/NexArab/chat-scripts/git/trees/main?recursive=1';
+  const API =
+    'https://api.github.com/repos/' +
+    OWNER + '/' + REPO +
+    '/git/trees/' + BRANCH + '?recursive=1';
 
-  var BASE =
-    'https://nexarab.github.io/chat-scripts/';
+  const BASE =
+    'https://nexarab.github.io/' +
+    REPO + '/';
 
-  var SELF = 'auto-loader.js';
+  const selfScript = document.currentScript;
 
-  var versions = {
-    'radio-unified-v1.js': '12',
-    'cinema-unified-v2.js': '4',
-    'domino-online.js': '12',
-    'pool-online.js': '20261108-8ball'
-  };
+  const SELF_URL = selfScript
+    ? new URL(selfScript.src, location.href)
+    : new URL(BASE + 'auto-loader.js');
 
-  var ids = {
-    'tv-unified-v1.js': 'chat-tv-loader',
-    'youtube-unified-v1.js': 'chat-youtube-loader',
-    'radio-unified-v1.js': 'chat-radio-loader',
-    'cinema-unified-v2.js': 'chat-cinema-loader',
-    'domino-online.js': 'domino-online-loader',
-    'pool-online.js': 'pool-online-loader'
-  };
+  const loaded = new Set();
 
-  function alreadyLoaded(url, id) {
-    if (id && document.getElementById(id)) {
+  function normalize(url) {
+    try {
+      const u = new URL(url, location.href);
+
+      return u.origin + u.pathname;
+    } catch (e) {
+      return url;
+    }
+  }
+
+  function alreadyLoaded(url) {
+    const target = normalize(url);
+
+    if (loaded.has(target)) {
       return true;
     }
 
-    var target = new URL(url, document.baseURI);
+    const scripts =
+      document.querySelectorAll('script[src]');
 
-    return Array.prototype.some.call(
-      document.querySelectorAll('script[src]'),
-      function (script) {
-        try {
-          var current = new URL(
-            script.src,
-            document.baseURI
-          );
-
-          return (
-            current.origin === target.origin &&
-            current.pathname === target.pathname
-          );
-        } catch (error) {
-          return false;
-        }
+    for (const script of scripts) {
+      if (normalize(script.src) === target) {
+        return true;
       }
-    );
+    }
+
+    return false;
   }
 
-  function loadScript(path) {
-    var filename = path.split('/').pop();
-
-    var url = BASE + path
+  function loadFile(path) {
+    const url = BASE + path
       .split('/')
       .map(encodeURIComponent)
       .join('/');
 
-    if (versions[filename]) {
-      url += '?v=' +
-        encodeURIComponent(versions[filename]);
-    }
-
-    var id = ids[filename];
-
-    if (alreadyLoaded(url, id)) {
+    if (normalize(url) === normalize(SELF_URL.href)) {
       return;
     }
 
-    var script = document.createElement('script');
+    if (alreadyLoaded(url)) {
+      return;
+    }
+
+    loaded.add(normalize(url));
+
+    const script = document.createElement('script');
 
     script.src = url;
     script.async = false;
 
-    if (id) {
-      script.id = id;
-    }
-
-    if (filename === 'pool-online.js') {
-      script.dataset.poolService =
-        'https://pool-server-y7ra.onrender.com';
-    }
-
     script.onerror = function () {
+      loaded.delete(normalize(url));
+
       console.error(
-        '[NexArab] Failed to load:',
+        '[NexArab] تعذر تحميل الملف:',
         path
       );
-
-      script.remove();
     };
 
     document.head.appendChild(script);
   }
 
-  fetch(API, {
-    mode: 'cors',
-    cache: 'no-store'
-  })
-    .then(function (response) {
+  async function loadAll() {
+    try {
+      const response = await fetch(API, {
+        cache: 'no-store'
+      });
+
       if (!response.ok) {
         throw new Error(
-          'GitHub API error: ' + response.status
+          'GitHub API Error: ' + response.status
         );
       }
 
-      return response.json();
-    })
-    .then(function (data) {
+      const data = await response.json();
+
       if (!Array.isArray(data.tree) || data.truncated) {
         throw new Error(
-          'Repository file list unavailable'
+          'تعذر الحصول على قائمة المستودع كاملة'
         );
       }
 
-      var files = data.tree.filter(function (item) {
-        if (item.type !== 'blob') {
-          return false;
-        }
+      const files = data.tree
+        .filter(function (item) {
+          return (
+            item.type === 'blob' &&
+            /\.js$/i.test(item.path)
+          );
+        })
+        .map(function (item) {
+          return item.path;
+        })
+        .sort();
 
-        if (!/\.js$/i.test(item.path)) {
-          return false;
-        }
+      console.log(
+        '[NexArab] عدد ملفات JavaScript:',
+        files.length
+      );
 
-        if (item.path.split('/').pop() === SELF) {
-          return false;
-        }
+      files.forEach(loadFile);
 
-        if (
-          /(^|\/)(node_modules|test|tests|dist|vendor)\//i
-            .test(item.path)
-        ) {
-          return false;
-        }
-
-        return true;
-      });
-
-      files.sort(function (a, b) {
-        return a.path.localeCompare(b.path);
-      });
-
-      files.forEach(function (item) {
-        loadScript(item.path);
-      });
-    })
-    .catch(function (error) {
+    } catch (error) {
       console.error(
-        '[NexArab] Auto loader error:',
+        '[NexArab] فشل الاستدعاء الشامل:',
         error
       );
-    });
+    }
+  }
+
+  loadAll();
 
 })();
