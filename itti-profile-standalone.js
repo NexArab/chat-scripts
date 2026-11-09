@@ -11,7 +11,7 @@
     const EMBLEM = "itti-v4-tiger";
     const STYLE_ID = "itti-v4-style";
 
-    // شعار النمر مدمج، لا يحتاج رابط صورة خارجي.
+    // رابط شعار النمر.
     const TIGER = "https://nexarab.github.io/chat-scripts/tiger.png";
 
     function getScope(profile) {
@@ -83,8 +83,8 @@
         const image = document.createElement("img");
         image.src = TIGER;
         image.alt = "";
-        image.width = 112;
-        image.height = 112;
+        image.width = 102;
+        image.height = 102;
         image.decoding = "async";
 
         box.appendChild(image);
@@ -193,8 +193,8 @@
         /* النمر الجانبي */
 
         .${PROFILE} .${EMBLEM} {
-            width: 114px;
-            height: 114px;
+            width: 104px;
+            height: 104px;
             margin: 9px auto 5px;
             padding: 0;
             box-sizing: border-box;
@@ -453,8 +453,8 @@
             }
 
             .${PROFILE} .${EMBLEM} {
-                width: 100px;
-                height: 100px;
+                width: 92px;
+                height: 92px;
             }
         }
         `;
