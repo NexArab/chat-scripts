@@ -6,7 +6,7 @@
        SH PEARL PROFILE V8
        White Crystal + Black Saudi Emblem
 
-       العضوة: ⠀ SH
+       العضوة:SH
        شعار النخلة والسيفين بالأسود
        ========================================== */
 
