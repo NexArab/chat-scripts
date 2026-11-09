@@ -62,6 +62,24 @@
             action.classList.remove("sh-pearl-action-pressed");
             pressTimers.delete(action);
         }, 300));
+
+        if (action.classList.contains("ulike") &&
+            !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            const rect = action.getBoundingClientRect();
+            if (!rect.width || !rect.height) return;
+
+            const heart = document.createElement("span");
+            heart.className = "sh-pearl-floating-heart";
+            heart.setAttribute("aria-hidden", "true");
+            heart.textContent = "♥";
+            heart.style.left = (rect.left + rect.width / 2) + "px";
+            heart.style.top = (rect.top + rect.height / 2) + "px";
+
+            document.body.appendChild(heart);
+            setTimeout(function () {
+                heart.remove();
+            }, 800);
+        }
     }
 
     function getScope(profile) {
@@ -139,11 +157,30 @@
         }
 
         .th-upro-pro.sh-pearl-profile {
+            position: relative;
             background: #F8FAFC !important;
             color: #40576D !important;
             border: 1px solid #D5E0E9 !important;
             border-radius: 12px !important;
             box-shadow: 0 3px 12px rgba(45, 68, 88, .08) !important;
+        }
+
+        .th-upro-pro.sh-pearl-profile::after {
+            content: "";
+            position: absolute;
+            inset: 6px;
+            z-index: 3;
+            pointer-events: none;
+            --crystal-line: linear-gradient(#b7c5d3, #b7c5d3);
+            background:
+                var(--crystal-line) left top / 16px 2px no-repeat,
+                var(--crystal-line) left top / 2px 16px no-repeat,
+                var(--crystal-line) right top / 16px 2px no-repeat,
+                var(--crystal-line) right top / 2px 16px no-repeat,
+                var(--crystal-line) left bottom / 16px 2px no-repeat,
+                var(--crystal-line) left bottom / 2px 16px no-repeat,
+                var(--crystal-line) right bottom / 16px 2px no-repeat,
+                var(--crystal-line) right bottom / 2px 16px no-repeat;
         }
 
         .sh-pearl-profile .th-upro-profile-container {
@@ -159,7 +196,19 @@
         .sh-pearl-profile .th-upro-picture {
             border: 3px solid #E3D2B4 !important;
             border-radius: 50% !important;
-            box-shadow: 0 0 0 3px #FFF, 0 3px 10px rgba(45, 68, 88, .14) !important;
+            box-shadow:
+                0 0 0 2px #FFF,
+                0 0 0 3px #d2af69,
+                0 3px 10px rgba(45, 68, 88, .14) !important;
+        }
+
+        .sh-pearl-profile.sh-pearl-opening .th-upro-picture {
+            animation: sh-pearl-picture-glow 1.2s ease-out both;
+        }
+
+        @keyframes sh-pearl-picture-glow {
+            0%, 100% { filter: drop-shadow(0 0 0 transparent); }
+            35% { filter: drop-shadow(0 0 8px rgba(232, 183, 86, .8)); }
         }
 
         .sh-pearl-profile .th-upro-profile-content {
@@ -184,6 +233,8 @@
         }
 
         .sh-pearl-profile .sh-pearl-saudi-emblem {
+            position: relative;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -197,6 +248,36 @@
             border-radius: 13px;
             box-shadow: inset 0 1px 0 #FFFFFF, 0 2px 7px rgba(30, 46, 60, .08);
             pointer-events: none;
+        }
+
+        .sh-pearl-profile .sh-pearl-saudi-emblem.sh-pearl-emblem-shine::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(110deg, transparent 39%, #fffb 49%, #fff6 54%, transparent 63%);
+            animation: sh-pearl-emblem-sweep 950ms ease-out both;
+        }
+
+        @keyframes sh-pearl-emblem-sweep {
+            from { transform: translateX(-105%); }
+            to { transform: translateX(105%); }
+        }
+
+        .sh-pearl-floating-heart {
+            position: fixed;
+            z-index: 2147483647;
+            pointer-events: none;
+            color: #cc376d;
+            font-size: 21px;
+            line-height: 1;
+            text-shadow: 0 2px 8px rgba(155, 30, 82, .24);
+            animation: sh-pearl-heart-rise 750ms ease-out both;
+        }
+
+        @keyframes sh-pearl-heart-rise {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(.65); }
+            20% { opacity: 1; transform: translate(-50%, -90%) scale(1.15); }
+            100% { opacity: 0; transform: translate(-50%, -230%) scale(.85); }
         }
 
         .sh-pearl-profile .sh-pearl-saudi-emblem img {
@@ -539,12 +620,10 @@
             position: absolute;
             top: 0;
             left: var(--star-left);
-            color: #000000;
             color: #000 !important;
             -webkit-text-fill-color: #000 !important;
             text-shadow: 0 0 6px #0008;
             line-height: 1;
-            text-shadow: 0 0 6px #fff, 0 0 12px #ffd78d;
             animation: sh-pearl-star-fall var(--star-time) ease-in var(--star-delay) both;
         }
 
@@ -576,6 +655,12 @@
         }
 
         @media (prefers-reduced-motion: reduce) {
+            .sh-pearl-profile.sh-pearl-opening .th-upro-picture,
+            .sh-pearl-profile .sh-pearl-saudi-emblem.sh-pearl-emblem-shine::after,
+            .sh-pearl-floating-heart {
+                animation: none !important;
+            }
+
             .sh-pearl-profile a.th-upro-action,
             .sh-pearl-profile a.th-upro-action-no-margin {
                 transition: none !important;
@@ -606,6 +691,8 @@
 
         if (!matched || !visible) {
             starredProfiles.delete(profile);
+            profile.classList.remove("sh-pearl-opening");
+            profile.querySelector("." + EMBLEM)?.classList.remove("sh-pearl-emblem-shine");
             profile.querySelector(".sh-pearl-stars")?.remove();
             return;
         }
@@ -619,6 +706,7 @@
         if (!cover || !cover.clientHeight) return;
 
         starredProfiles.add(profile);
+        profile.classList.add("sh-pearl-opening");
 
         const layer = document.createElement("div");
         layer.className = "sh-pearl-stars";
@@ -638,7 +726,12 @@
 
         cover.appendChild(layer);
         setTimeout(function () {
+            if (!layer.parentNode) return;
             layer.remove();
+            if (panel.getClientRects().length > 0 &&
+                panel.getAttribute("aria-hidden") !== "true" && isTarget(profile)) {
+                profile.querySelector("." + EMBLEM)?.classList.add("sh-pearl-emblem-shine");
+            }
         }, 5900);
     }
 
