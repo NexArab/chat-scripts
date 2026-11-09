@@ -539,7 +539,7 @@
             position: absolute;
             top: 0;
             left: var(--star-left);
-            color: #fff4d6;
+            color: #000000;
             font-size: var(--star-size);
             line-height: 1;
             text-shadow: 0 0 6px #fff, 0 0 12px #ffd78d;
@@ -629,7 +629,7 @@
             star.textContent = i % 3 === 0 ? "✦" : "✧";
             star.style.setProperty("--star-left", (5 + Math.random() * 88) + "%");
             star.style.setProperty("--star-size", (10 + Math.random() * 12) + "px");
-            star.style.setProperty("--star-time", (1500 + Math.random() * 550) + "ms");
+            star.style.setProperty("--star-time", (2500 + Math.random() * 850) + "ms");
             star.style.setProperty("--star-delay", (Math.random() * 400) + "ms");
             layer.appendChild(star);
         }
@@ -637,7 +637,7 @@
         cover.appendChild(layer);
         setTimeout(function () {
             layer.remove();
-        }, 2500);
+        }, 3500);
     }
 
     function updateProfiles() {
