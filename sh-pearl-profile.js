@@ -540,7 +540,9 @@
             top: 0;
             left: var(--star-left);
             color: #000000;
-            font-size: var(--star-size);
+            color: #000 !important;
+            -webkit-text-fill-color: #000 !important;
+            text-shadow: 0 0 6px #0008;
             line-height: 1;
             text-shadow: 0 0 6px #fff, 0 0 12px #ffd78d;
             animation: sh-pearl-star-fall var(--star-time) ease-in var(--star-delay) both;
@@ -629,7 +631,7 @@
             star.textContent = i % 3 === 0 ? "✦" : "✧";
             star.style.setProperty("--star-left", (5 + Math.random() * 88) + "%");
             star.style.setProperty("--star-size", (10 + Math.random() * 12) + "px");
-            star.style.setProperty("--star-time", (2500 + Math.random() * 850) + "ms");
+            star.style.setProperty("--star-time", (4500 + Math.random() * 850) + "ms");
             star.style.setProperty("--star-delay", (Math.random() * 400) + "ms");
             layer.appendChild(star);
         }
@@ -637,7 +639,7 @@
         cover.appendChild(layer);
         setTimeout(function () {
             layer.remove();
-        }, 3500);
+        }, 5900);
     }
 
     function updateProfiles() {
