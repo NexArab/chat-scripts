@@ -116,7 +116,7 @@
 
         .sh-pearl-scope .th-upro-title {
             color: #40576D !important;
-            font-size: 12px !important;
+            font-size: 14px !important;
             font-weight: 800 !important;
         }
 
@@ -239,7 +239,7 @@
             border: 1px solid #D7E0E8 !important;
             border-radius: 8px !important;
             padding: 3px 6px !important;
-            font-size: 11px !important;
+            font-size: 13px !important;
             font-weight: 700 !important;
         }
 
