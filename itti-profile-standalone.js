@@ -5,7 +5,7 @@
     if (window[KEY]) return;
     window[KEY] = true;
 
-    const TARGET = "\u3164\u3164\u3164\u3164iTTi";
+    const ACCOUNT_NAME = "iTTi";
     const PROFILE = "itti-v4-profile";
     const SCOPE = "itti-v4-scope";
     const EMBLEM = "itti-v4-tiger";
@@ -53,16 +53,26 @@
     }
 
     function isTarget(profile) {
-        const name = profile.querySelector(
-            ".th-upro-profile-name"
+        const panel = profile.closest("#upro");
+        if (!panel || typeof GET_USERS_TIGERHOST !== "function") {
+            return false;
+        }
+
+        const openUserId = typeof TH_UPRO_OPEN_USER_TIGERHOST !== "undefined"
+            ? TH_UPRO_OPEN_USER_TIGERHOST
+            : "";
+        const userId = String(
+            profile.querySelector(".xo-challenge[data-xo-target]")?.dataset.xoTarget ||
+            profile.querySelector(".lusoSendForUser[data-ludoid]")?.dataset.ludoid ||
+            profile.querySelector(".pool-profile-challenge[data-recipient]")?.dataset.recipient ||
+            profile.querySelector(".domino-online-row[data-recipient]")?.dataset.recipient ||
+            openUserId || ""
         );
+        if (!userId) return false;
 
-        if (!name) return false;
-
-        return name.textContent.replace(
-            /^[ \t\r\n]+|[ \t\r\n]+$/g,
-            ""
-        ) === TARGET;
+        const member = GET_USERS_TIGERHOST(userId);
+        return typeof member?.username === "string" &&
+            member.username.trim() === ACCOUNT_NAME;
     }
 
     function createTiger() {
@@ -113,21 +123,21 @@
             background: linear-gradient(
                 115deg, #101114, #29271B
             ) !important;
-            color: #F5CC24 !important;
+            color: #E2B91F !important;
             border: 0 !important;
-            border-bottom: 2px solid #F5CC24 !important;
+            border-bottom: 2px solid #E2B91F !important;
             padding: 8px 10px !important;
             box-shadow: none !important;
         }
 
         .${SCOPE} .th-upro-title,
         .${SCOPE} .th-upro-header .fa-times {
-            color: #F5CC24 !important;
+            color: #E2B91F !important;
         }
 
         .${SCOPE} .th-upro-header .clickable.badge {
             background: #29271C !important;
-            color: #F5CC24 !important;
+            color: #E2B91F !important;
             border: 1px solid #77682E !important;
             border-radius: 6px !important;
         }
@@ -151,11 +161,11 @@
         /* الصورة والغلاف الأصليان يبقيان */
 
         .${PROFILE} .th-upro-cover {
-            border-bottom: 3px solid #F5CC24 !important;
+            border-bottom: 3px solid #E2B91F !important;
         }
 
         .${PROFILE} .th-upro-picture {
-            border: 3px solid #F5CC24 !important;
+            border: 3px solid #E2B91F !important;
             border-radius: 50% !important;
             box-shadow:
                 0 0 0 3px #141518,
@@ -173,7 +183,7 @@
         }
 
         .${PROFILE} .th-upro-profile-name {
-            color: #F5CC24 !important;
+            color: #E2B91F !important;
             font-size: 19px !important;
             font-weight: 800 !important;
             line-height: 1.7 !important;
@@ -230,7 +240,7 @@
         .${PROFILE} .thProfilePointsNum,
         .${PROFILE} .thProfileEye,
         .${PROFILE} .thProfilePointsIcon {
-            color: #F5CC24 !important;
+            color: #E2B91F !important;
         }
 
         /* الدولة والغرفة */
@@ -266,17 +276,24 @@
             background: #1E1F21 !important;
             color: #E9E6D9 !important;
             border: 1px solid #49442B !important;
-            border-right: 3px solid #F5CC24 !important;
+            border-right: 3px solid #E2B91F !important;
             border-radius: 8px !important;
             padding: 9px !important;
             line-height: 1.7 !important;
             box-shadow: none !important;
         }
 
+        #upro .th-upro-pro.${PROFILE} a.ulike {
+            display: none !important;
+        }
+
         .${PROFILE} .th-upro-game-xo,
-        .${PROFILE} .th-upro-game-ludo {
+        .${PROFILE} .th-upro-game-ludo,
+        #upro .th-upro-pro.${PROFILE} .games-duo-modern.domino-online-row > button.game-btn,
+        #upro .th-upro-pro.${PROFILE} .games-duo-modern.pool-online-row > button.game-btn,
+        #upro .th-upro-pro.${PROFILE} button.game-btn.pool-profile-challenge {
             background: #29281D !important;
-            color: #F5CC24 !important;
+            color: #E2B91F !important;
             border: 1px solid #78672C !important;
             border-radius: 7px !important;
             box-shadow: none !important;
@@ -300,8 +317,8 @@
             ) !important;
             border: 1px solid #77662B !important;
             border-radius: 7px !important;
-            color: #F5CC24 !important;
-            -webkit-text-fill-color: #F5CC24 !important;
+            color: #E2B91F !important;
+            -webkit-text-fill-color: #E2B91F !important;
             font-size: 12px !important;
             font-weight: 700 !important;
             line-height: 1.4 !important;
@@ -314,8 +331,8 @@
         .${PROFILE} > center > a.th-upro-action-no-margin::before,
         .${PROFILE} > center > a.th-upro-action i,
         .${PROFILE} > center > a.th-upro-action-no-margin i {
-            color: #F5CC24 !important;
-            -webkit-text-fill-color: #F5CC24 !important;
+            color: #E2B91F !important;
+            -webkit-text-fill-color: #E2B91F !important;
         }
 
         .${PROFILE} > center::after {
@@ -328,7 +345,7 @@
             .${PROFILE} > center > a.th-upro-action:hover,
             .${PROFILE} > center > a.th-upro-action-no-margin:hover {
                 background: #38321C !important;
-                border-color: #F5CC24 !important;
+                border-color: #E2B91F !important;
             }
         }
 
@@ -376,14 +393,14 @@
         .${SCOPE} .th-upro-edit-box label,
         .${SCOPE} .th-upro-power-box label,
         .${SCOPE} .th-upro-room-box label {
-            color: #F5CC24 !important;
+            color: #E2B91F !important;
         }
 
         .${SCOPE} .th-upro-edit-label,
         .${SCOPE} .th-upro-like-label,
         .${SCOPE} .th-upro-eva-label {
             background: #302D1E !important;
-            color: #F5CC24 !important;
+            color: #E2B91F !important;
             border: 1px solid #66582A !important;
             border-radius: 6px !important;
         }
@@ -409,15 +426,15 @@
         .${SCOPE} .th-upro-room-box select:focus {
             outline: 2px solid rgba(245,204,36,.3) !important;
             outline-offset: 1px !important;
-            border-color: #F5CC24 !important;
+            border-color: #E2B91F !important;
         }
 
         .${SCOPE} .th-upro-save-small,
         .${SCOPE} .th-upro-edit-box .u-nickc {
-            background: #F5CC24 !important;
+            background: #E2B91F !important;
             color: #131416 !important;
             -webkit-text-fill-color: #131416 !important;
-            border: 1px solid #F5CC24 !important;
+            border: 1px solid #E2B91F !important;
             border-radius: 6px !important;
             text-shadow: none !important;
             box-shadow: none !important;
@@ -514,7 +531,9 @@
         observer.observe(document.body, {
             childList: true,
             subtree: true,
-            characterData: true
+            characterData: true,
+            attributes: true,
+            attributeFilter: ["data-xo-target", "data-ludoid", "data-recipient"]
         });
     }
 
