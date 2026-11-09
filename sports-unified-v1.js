@@ -1,16 +1,37 @@
 (function () {
   'use strict';
 
-  if (![
-    'chatsaudia.com',
-    'www.chatsaudia.com',
-    'chatghina.com',
-    'www.chatghina.com',
+  const allowedHosts = [
+    '2l-f.com',
+    '3shwai.com',
+    '7abaybna.com',
     'alldewan.com',
-    'www.alldewan.com',
+    'chat-alkhaleej.com',
+    'chat-romance.com',
+    'chatasal.com',
+    'chatbo7.com',
+    'chatfadfada.com',
+    'chatghina.com',
+    'chatkitabi.com',
+    'chatsaudia.com',
+    'chatsawa.com',
+    'chatsawalf.com',
+    'dl3-n.com',
+    'glaksa.net',
+    'hejaz.chat',
+    'iraaqna.com',
+    'krrrz.net',
+    'sawti.chat',
     'sh8awh.com',
-    'www.sh8awh.com'
-  ].includes(location.hostname)) return;
+    'shfaq.com',
+    'shfaq.net',
+    'shuq1.com',
+    'ta3arf.com',
+    'taabqalbi.com'
+  ];
+
+  const host = location.hostname.toLowerCase().replace(/^www\./, '');
+  if (!allowedHosts.includes(host)) return;
 
   const key = '__CHAT_SPORTS_SD_V1__';
   window[key]?.destroy();
