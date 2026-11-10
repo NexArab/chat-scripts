@@ -805,7 +805,7 @@
       wrapper.dataset.recipient = targetId;
       const node = button('', () => challengeFromProfile(wrapper.dataset.recipient));
       node.className = 'game-btn game-ludo uno-profile-challenge';
-      unoLabel(node, 'تحدّي أونو');
+      unoLabel(node, 'UNO تحدي');
       wrapper.append(node);
       after.after(wrapper);
     }
