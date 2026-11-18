@@ -38,7 +38,7 @@
   window.__CHAT_SPORTS_TEST__?.destroy?.();
   document.getElementById('bein-chat-test')?.remove();
 
-  const relay = 'https://allen-fit-must-parker.trycloudflare.com/sports-live/';
+  const relay = 'https://sports.chatkhleeg.com/sports-live/';
   const catalog = [["بي إن سبورت","SD","بي إن سبورت","SD",[491751]],
     ["بي إن سبورت","SD","بي إن سبورت 1","SD",[491608,491753]],
     ["بي إن سبورت","SD","بي إن سبورت 2","SD",[491609,491754]],
