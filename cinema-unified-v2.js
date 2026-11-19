@@ -465,8 +465,13 @@
       .floating .server-bar{background:#252a32}
       .floating .server-bar button{background:#454b55;color:#fff;border-color:#555}
       .floating .server-bar button[aria-pressed="true"]{background:#fff;color:#222}
-      .floating .float-foot{display:flex;align-items:center;justify-content:center;position:relative;height:35px;background:#343a40;gap:9px}
-      .float-foot button{padding:2px 10px;background:#505663;color:#fff;border:0}
+      .floating .float-foot{display:none!important}
+      .float-head .head-scale{display:flex;align-items:center;justify-content:center;gap:5px;flex:0 0 auto;margin:0 auto}
+      .float-head .head-scale button{width:25px;height:25px;font:700 15px/23px Tahoma,sans-serif;border-color:#ffffff40;background:#ffffff16;color:white}
+      .floating .server-bar{gap:3px;padding:3px 4px;background:#343a40}
+      .floating .server-bar button{border-radius:5px;padding:3px 1px;font-size:10px;line-height:1.3;min-height:25px}
+      .floating .server-bar button[aria-pressed="true"]{background:#fff;color:#252a32}
+      .floating .resize-edge{height:0!important}
       .floating .resize-edge{position:absolute;right:0;bottom:0;width:25px;height:28px;background:transparent;z-index:2;display:block}
       .floating [data-resize]{right:0;left:auto;bottom:0;width:25px;height:28px;cursor:nwse-resize;background:transparent;color:#fff}
       .float-head button[aria-pressed="true"]{background:#f9d86c;color:#111}
@@ -520,6 +525,7 @@
     <div class="screen">
       <div class="float-head">
         <strong>سينما · اسحب هنا</strong>
+        <span class="head-scale"><button type="button" data-shrink title="تصغير">−</button><button type="button" data-grow title="تكبير">+</button></span>
         <button type="button" data-pin title="تثبيت مكان النافذة" aria-pressed="false">📌</button>
         <button type="button" data-dock title="إرجاع للقائمة">↩</button>
         <button type="button" data-float-close title="إيقاف وإغلاق">×</button>
@@ -539,7 +545,6 @@
         <button type="button" data-server="2" aria-pressed="false">سيرفر 3</button>
         <button type="button" data-server="3" aria-pressed="false">سيرفر 4</button>
       </div>
-      <div class="float-foot"><button type="button" data-shrink>−</button><button type="button" data-grow>＋</button></div>
       <div class="resize-edge">
         <span data-resize role="button" tabindex="0"
           aria-label="تغيير العرض والارتفاع بالسحب أو الأسهم">⤡</span>
@@ -1013,7 +1018,9 @@
     if (frame) frame.remove();
     directUrl = sourceUrl(season, episode);
     frame = document.createElement('iframe');
-    frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
+    // CineSrc works sandboxed. Other tested embeds explicitly reject sandbox.
+    // Only these fixed, reviewed provider URLs are ever loaded without it.
+    if (serverIndex === 0) frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
     frame.title = selected.title;
     frame.allow = 'autoplay; fullscreen; picture-in-picture';
     frame.allowFullscreen = true;
