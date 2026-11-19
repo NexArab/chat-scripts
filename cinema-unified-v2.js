@@ -417,7 +417,8 @@
         box.y = current.by + dy;
       } else {
         box.w = Math.max(200, current.w + dx);
-        box.h = box.w * 9 / 16;
+        box.h = Math.max(112, current.h + dy);
+        box.ratio = 0;
       }
       schedulePaint();
     });
@@ -468,11 +469,11 @@
       .floating .float-foot{display:none!important}
       .float-head .head-scale{display:flex;align-items:center;justify-content:center;gap:5px;flex:0 0 auto;margin:0 auto}
       .float-head .head-scale button{width:25px;height:25px;font:700 15px/23px Tahoma,sans-serif;border-color:#ffffff40;background:#ffffff16;color:white}
-      .floating .server-bar{gap:3px;padding:3px 4px;background:#343a40}
+      .floating .server-bar{gap:6px;padding:4px 34px 4px 7px;background:#343a40}
       .floating .server-bar button{border-radius:5px;padding:3px 1px;font-size:10px;line-height:1.3;min-height:25px}
       .floating .server-bar button[aria-pressed="true"]{background:#fff;color:#252a32}
       .floating .resize-edge{height:0!important}
-      .floating .resize-edge{position:absolute;right:0;bottom:0;width:25px;height:28px;background:transparent;z-index:2;display:block}
+      .floating .resize-edge{position:absolute;right:4px;bottom:3px;width:25px;height:27px;background:#343a40;z-index:2;display:block;border-radius:4px}
       .floating [data-resize]{right:0;left:auto;bottom:0;width:25px;height:28px;cursor:nwse-resize;background:transparent;color:#fff}
       .float-head button[aria-pressed="true"]{background:#f9d86c;color:#111}
       .selected-show{display:flex;align-items:center;gap:9px;margin-bottom:9px}
