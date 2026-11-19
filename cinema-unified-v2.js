@@ -23,6 +23,8 @@
   var mode = 'tv';
   var dead = false;
   var frame = null;
+  var serverIndex = 0, pinned = false;
+  var suggestions = [];
   var selected = null;
   var directUrl = '';
   var loadTimer = null;
@@ -159,6 +161,8 @@
     if (frame) frame.remove();
     frame = null;
     directUrl = '';
+    serverIndex = 0;
+    updateServers();
     exitFull();
     dock();
     var title = q('[data-title]');
@@ -172,7 +176,7 @@
     var screen = root.querySelector('.screen');
     var slot = document.createElement('div');
     slot.setAttribute('data-player-slot', '');
-    slot.style.cssText = 'width:100%;height:0;padding-top:56.25%;';
+    slot.style.cssText = 'width:100%;height:0;padding-top:56.25%;margin-bottom:43px;';
     screen.parentNode.insertBefore(slot, screen);
 
     playerHost = document.createElement('div');
@@ -390,7 +394,7 @@
 
   function bindGesture(node, kind) {
     node.addEventListener('pointerdown', function (event) {
-      if (!floating || event.button !== 0 || gesture ||
+      if (!floating || pinned || event.button !== 0 || gesture ||
           (kind === 'drag' && event.target.closest('button,select'))) return;
       corner = '';
       gesture = {
@@ -412,9 +416,8 @@
         box.x = current.bx + dx;
         box.y = current.by + dy;
       } else {
-        box.w = Math.max(200, current.w - dx);
-        box.x = current.bx + current.w - box.w;
-        box.h = box.ratio ? box.w / box.ratio : current.h + dy;
+        box.w = Math.max(200, current.w + dx);
+        box.h = box.w * 9 / 16;
       }
       schedulePaint();
     });
@@ -455,12 +458,36 @@
       iframe{position:absolute;top:0;left:0;right:0;bottom:0;width:100%;height:100%;border:0;display:block}
       .screen.floating{position:fixed;z-index:10030;right:auto;bottom:auto;margin:0;border:1px solid #666;border-radius:10px;box-shadow:0 8px 30px #0006;background:#111}
       .floating .video-wrap{height:var(--video-height);aspect-ratio:auto}
-      .float-head,.resize-edge,.exit-full{display:none}
+      .float-head,.resize-edge,.exit-full,.float-foot{display:none}
+      .server-bar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:5px 3px;background:#f3f3f5}
+      .server-bar button{padding:5px 1px;font-size:11px;min-width:0;border-color:#ddd}
+      .server-bar button[aria-pressed="true"]{background:#343a40;color:#fff;border-color:#343a40}
+      .floating .server-bar{background:#252a32}
+      .floating .server-bar button{background:#454b55;color:#fff;border-color:#555}
+      .floating .server-bar button[aria-pressed="true"]{background:#fff;color:#222}
+      .floating .float-foot{display:flex;align-items:center;justify-content:center;position:relative;height:35px;background:#343a40;gap:9px}
+      .float-foot button{padding:2px 10px;background:#505663;color:#fff;border:0}
+      .floating .resize-edge{position:absolute;right:0;bottom:0;width:25px;height:28px;background:transparent;z-index:2;display:block}
+      .floating [data-resize]{right:0;left:auto;bottom:0;width:25px;height:28px;cursor:nwse-resize;background:transparent;color:#fff}
+      .float-head button[aria-pressed="true"]{background:#f9d86c;color:#111}
+      .selected-show{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+      .selected-show img{width:55px;height:82px;object-fit:cover;border-radius:6px}
+      .selected-show strong{font-size:13px}
+      [data-episode]{display:block;border:1px solid #ddd;border-radius:9px;padding:10px;background:#f8f8fa;margin:10px 0}
+      .episode-fields{display:flex;gap:7px;margin-bottom:8px}
+      .episode-fields label{flex:1;min-width:0}
+      [data-episode] button[type=submit]{width:100%;background:#343a40;color:#fff}
+      .catalog-heading{font-weight:700;font-size:13px;margin:12px 0 7px}
+      .catalog-group{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+      .suggestions{border:1px solid #ddd;border-radius:7px;margin:3px 0 6px;overflow:hidden}
+      .suggestions button{display:block;width:100%;text-align:right;border:0;border-bottom:1px solid #eee;border-radius:0;padding:6px 9px}
+      .result.is-selected{border-color:#555;background:#eee}
+
       .floating .float-head{display:flex;height:39px;align-items:center;gap:4px;padding:5px 7px;background:var(--cinema-accent,#343a40);color:white;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
       .float-head strong{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:700 11px/1.5 Tahoma,sans-serif}
       .float-head button{width:29px;height:29px;padding:0;flex-shrink:0;border:1px solid #ffffff70;border-radius:5px;font:700 18px/25px Tahoma,sans-serif}
-      .floating .resize-edge{display:block;position:relative;height:8px;background:#343a40}
-      [data-resize]{position:absolute;left:0;bottom:0;width:30px;height:18px;text-align:center;line-height:18px;font-size:15px;background:#343a40;color:#fff;cursor:nesw-resize;touch-action:none;user-select:none;-webkit-user-select:none;border-radius:0 5px 0 0}
+      .floating .resize-edge{display:block}
+      [data-resize]{position:absolute;right:0;bottom:0;width:25px;height:28px;text-align:center;line-height:28px;font-size:16px;color:#fff;cursor:nwse-resize;touch-action:none;user-select:none;-webkit-user-select:none}
       [data-resize]:focus-visible{outline:2px solid #fff;outline-offset:-2px}
       .screen.moving iframe{pointer-events:none}
       .video-wrap:-webkit-full-screen{width:100vw!important;height:100vh!important;aspect-ratio:auto;padding:0;border-radius:0}
@@ -476,10 +503,11 @@
       [data-empty]{padding:15px;text-align:center}
       [data-status],[data-catalog-status]{font-size:12px;color:#555}
       [data-resume]{width:100%;margin:6px 0}
-      [data-results]{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-      [data-results] .result{display:flex;flex-direction:column;align-items:stretch;gap:8px;width:100%;min-width:0;margin:0;padding:7px;white-space:normal;text-align:right}
+      [data-results]{display:block}
+      [data-results]>.catalog-group{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+      [data-results] .result{display:flex;flex-direction:column;align-items:stretch;gap:3px;width:100%;min-width:0;margin:0;padding:3px;white-space:normal;text-align:right}
       [data-results] img{width:100%;max-width:100%;height:auto;aspect-ratio:2/3;object-fit:cover;border-radius:6px}
-      [data-results] strong{font-size:13px;overflow-wrap:anywhere}
+      [data-results] strong{font-size:11px;overflow-wrap:anywhere;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
       small{display:block;color:#666;font-size:11px;margin-top:4px}
       [data-episode] label{flex:1;min-width:0}
       [data-more]{width:100%;margin:10px 0}
@@ -492,7 +520,7 @@
     <div class="screen">
       <div class="float-head">
         <strong>سينما · اسحب هنا</strong>
-        <button type="button" data-size title="صغير / كبير">⤢</button>
+        <button type="button" data-pin title="تثبيت مكان النافذة" aria-pressed="false">📌</button>
         <button type="button" data-dock title="إرجاع للقائمة">↩</button>
         <button type="button" data-float-close title="إيقاف وإغلاق">×</button>
       </div>
@@ -505,6 +533,13 @@
           <button type="button" data-next-cancel>إلغاء</button>
         </div>
       </div>
+      <div class="server-bar" data-servers>
+        <button type="button" data-server="0" aria-pressed="true">سيرفر 1</button>
+        <button type="button" data-server="1" aria-pressed="false">سيرفر 2</button>
+        <button type="button" data-server="2" aria-pressed="false">سيرفر 3</button>
+        <button type="button" data-server="3" aria-pressed="false">سيرفر 4</button>
+      </div>
+      <div class="float-foot"><button type="button" data-shrink>−</button><button type="button" data-grow>＋</button></div>
       <div class="resize-edge">
         <span data-resize role="button" tabindex="0"
           aria-label="تغيير العرض والارتفاع بالسحب أو الأسهم">⤡</span>
@@ -520,7 +555,7 @@
       <button type="button" data-prev>⏮ الحلقة السابقة</button>
       <button type="button" data-next>الحلقة التالية ⏭</button>
     </div>
-    <div class="tools">
+    <div class="tools" hidden>
       <button type="button" data-shape="free">حر</button>
       <button type="button" data-shape="wide">مستطيل</button>
       <button type="button" data-shape="square">مربع</button>
@@ -529,19 +564,21 @@
     </div>
     <p data-status role="status">اختر عنوانًا. توفر التشغيل والترجمة يعتمد على مصدر المشاهدة.</p>
     <button type="button" data-resume hidden></button>
+    <form data-episode hidden>
+      <div class="selected-show"><img data-selected-poster alt="" hidden><strong data-selected-name></strong></div>
+      <div class="episode-fields"><label>الموسم <select data-season required></select></label>
+      <label>الحلقة <select data-ep required></select></label></div>
+      <button type="submit">▶ تشغيل الحلقة</button>
+    </form>
     <label>ابحث عن فيلم أو مسلسل
       <input data-search type="search" placeholder="اسم الفيلم أو المسلسل" maxlength="150">
     </label>
+    <div class="suggestions" data-suggestions hidden></div>
     <div class="tools">
       <button type="button" data-filter="all" aria-pressed="true">الكل</button>
       <button type="button" data-filter="movie">أفلام</button>
       <button type="button" data-filter="tv">مسلسلات</button>
     </div>
-    <form data-episode hidden>
-      <label>الموسم <select data-season required></select></label>
-      <label>الحلقة <select data-ep required></select></label>
-      <button type="submit">تشغيل</button>
-    </form>
     <p data-catalog-status role="status"></p>
     <div data-results></div>
     <button data-more type="button" hidden>عرض المزيد</button>
@@ -589,19 +626,97 @@
     }
   }
 
+  function updateServers() {
+    if (!root) return;
+    root.querySelectorAll('[data-server]').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(Number(b.dataset.server) === serverIndex));
+    });
+    if (playerRoot) playerRoot.querySelectorAll('[data-server]').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(Number(b.dataset.server) === serverIndex));
+    });
+  }
+
+  function scrollToPlayer() {
+    if (floating || !root) return;
+    var slot = root.querySelector('[data-player-slot]');
+    if (slot) {
+      var scrollParent = slot.parentElement;
+      while (scrollParent && scrollParent !== pane && scrollParent !== document.body) {
+        if (scrollParent.scrollHeight > scrollParent.clientHeight + 5) break;
+        scrollParent = scrollParent.parentElement;
+      }
+      if (scrollParent && scrollParent !== document.body) scrollParent.scrollTop = 0;
+    }
+  }
+
+  function showSuggestions(value) {
+    var holder = q('[data-suggestions]');
+    clear(holder);
+    if (!value) { holder.hidden = true; return; }
+    var term = value.toLocaleLowerCase();
+    var hits = suggestions.filter(function (item) {
+      return item.title.toLocaleLowerCase().includes(term);
+    }).slice(0, 6);
+    hits.forEach(function (item) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = item.title + ' · ' + (item.type === 'tv' ? 'مسلسل' : 'فيلم');
+      b.onclick = function () {
+        q('[data-search]').value = item.title;
+        holder.hidden = true;
+        chooseTitle(item);
+      };
+      holder.appendChild(b);
+    });
+    holder.hidden = !hits.length;
+  }
+
   function queueSearch() {
     clearTimeout(searchTimer);
     searchVersion++;
     if (searchController) searchController.abort();
     q('[data-more]').hidden = true;
     var value = q('[data-search]').value.trim();
+    showSuggestions(value);
     if (value.length === 1) {
-      clear(q('[data-results]'));
-      catalogStatus('اكتب حرفين أو أكثر لعرض الاقتراحات.');
+      catalogStatus('اقتراحات من العناوين المحمّلة. اكتب حرفاً آخر للبحث الشامل.');
       return;
     }
     catalogStatus('جارٍ البحث…');
     searchTimer = setTimeout(function () { render(false); }, 400);
+  }
+
+  function addCard(entry, kind, parent) {
+    var type = entry.media_type || kind;
+    if (entry.adult || ['movie', 'tv'].indexOf(type) < 0 || !Number.isInteger(entry.id)) return;
+    var item = {
+      id: entry.id, type: type, title: entry.title || entry.name || '',
+      year: (entry.release_date || entry.first_air_date || '').slice(0, 4),
+      poster: entry.poster_path || ''
+    };
+    if (catalogue.some(function (x) { return x.id === item.id && x.type === item.type; })) return;
+    catalogue.push(item);
+    if (!suggestions.some(function (x) { return x.id === item.id && x.type === item.type; })) suggestions.push(item);
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'result';
+    if (/^\/[a-zA-Z0-9_.-]+$/.test(item.poster)) {
+      var img = document.createElement('img');
+      img.src = 'https://image.tmdb.org/t/p/w185' + item.poster;
+      img.alt = '';
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.onerror = function () { img.remove(); };
+      button.appendChild(img);
+    }
+    var title = document.createElement('strong');
+    title.textContent = item.title;
+    var meta = document.createElement('small');
+    meta.textContent = item.year;
+    button.appendChild(title);
+    button.appendChild(meta);
+    button.onclick = function () { chooseTitle(item); };
+    parent.appendChild(button);
   }
 
   async function render(append) {
@@ -616,85 +731,46 @@
     var currentRoot = root;
     var requestedPage = append ? page + 1 : 1;
     var kind = filter;
-    var path = query
-      ? 'search/' + (kind === 'all' ? 'multi' : kind)
-      : 'trending/' + kind + '/week';
-
     q('[data-more]').hidden = true;
-    if (!append) {
-      catalogue = [];
-      clear(q('[data-results]'));
-    }
+    if (!append) { catalogue = []; clear(q('[data-results]')); }
     catalogStatus(query ? 'جارٍ البحث…' : 'جارٍ تحميل الرائج…');
-
-    var timeout = setTimeout(function () {
-      if (version === searchVersion) ctrl.abort();
-    }, 15000);
-
+    var timeout = setTimeout(function () { if (version === searchVersion) ctrl.abort(); }, 15000);
     try {
-      var data = await tmdb(path, {
-        query: query, page: requestedPage, include_adult: false
-      }, ctrl.signal);
+      var results;
+      if (!query && kind === 'all') {
+        results = await Promise.all([
+          tmdb('trending/movie/week', { page: requestedPage }, ctrl.signal),
+          tmdb('trending/tv/week', { page: requestedPage }, ctrl.signal)
+        ]);
+      } else {
+        results = [await tmdb(query ? 'search/' + (kind === 'all' ? 'multi' : kind) : 'trending/' + kind + '/week',
+          { query: query, page: requestedPage, include_adult: false }, ctrl.signal)];
+      }
       if (dead || version !== searchVersion || currentRoot !== root) return;
       page = requestedPage;
-      totalPages = Math.min(Number(data.total_pages) || 1, 500);
-
-      (data.results || []).forEach(function (entry) {
-        var type = entry.media_type || kind;
-        if (entry.adult || ['movie', 'tv'].indexOf(type) < 0 ||
-            !Number.isInteger(entry.id)) return;
-        if (catalogue.some(function (item) {
-          return item.id === entry.id && item.type === type;
-        })) return;
-
-        var item = {
-          id: entry.id, type: type, title: entry.title || entry.name || '',
-          year: (entry.release_date || entry.first_air_date || '').slice(0, 4)
-        };
-        catalogue.push(item);
-        var button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'result';
-
-        if (/^\/[a-zA-Z0-9_.-]+$/.test(entry.poster_path || '')) {
-          var img = document.createElement('img');
-          img.src = 'https://image.tmdb.org/t/p/w185' + entry.poster_path;
-          img.alt = '';
-          img.loading = 'lazy';
-          img.decoding = 'async';
-          img.onerror = function () { img.remove(); };
-          button.appendChild(img);
-        }
-
-        var title = document.createElement('strong');
-        title.textContent = item.title;
-        var meta = document.createElement('small');
-        meta.textContent = (type === 'tv' ? 'مسلسل' : 'فيلم') + ' · ' + item.year;
-        button.appendChild(title);
-        button.appendChild(meta);
-        button.onclick = function () { chooseTitle(item); };
-        q('[data-results]').appendChild(button);
+      totalPages = Math.min(500, Math.min.apply(null, results.map(function (x) { return Number(x.total_pages) || 1; })));
+      results.forEach(function (data, i) {
+        var groupKind = results.length === 2 ? (i === 0 ? 'movie' : 'tv') : kind;
+        var heading = document.createElement('div');
+        heading.className = 'catalog-heading';
+        heading.textContent = results.length === 2 ? (i === 0 ? '🎬 أفلام رائجة' : '📺 مسلسلات رائجة') : (query ? 'نتائج البحث' : 'الرائج هذا الأسبوع');
+        var group = document.createElement('div');
+        group.className = 'catalog-group';
+        q('[data-results]').appendChild(heading);
+        q('[data-results]').appendChild(group);
+        (data.results || []).forEach(function (entry) { addCard(entry, groupKind, group); });
       });
-
-      catalogStatus(catalogue.length
-        ? (query ? 'نتائج البحث' : 'الرائج هذا الأسبوع')
-        : 'لا توجد نتائج أفلام أو مسلسلات في هذه الصفحة.');
+      catalogStatus(catalogue.length ? '' : 'لا توجد نتائج.');
       q('[data-more]').hidden = page >= totalPages;
+      showSuggestions(query);
     } catch (error) {
       if (dead || version !== searchVersion || currentRoot !== root) return;
-      catalogStatus(error.name === 'AbortError'
-        ? 'انتهت مهلة الاتصال. أعد البحث.' : error.message);
+      catalogStatus(error.name === 'AbortError' ? 'انتهت مهلة الاتصال. أعد البحث.' : error.message);
       var retry = document.createElement('button');
-      retry.type = 'button';
-      retry.textContent = 'إعادة المحاولة';
-      retry.onclick = function () {
-        retry.remove();
-        render(append);
-      };
+      retry.type = 'button'; retry.textContent = 'إعادة المحاولة';
+      retry.onclick = function () { retry.remove(); render(append); };
       q('[data-results]').appendChild(retry);
-    } finally {
-      clearTimeout(timeout);
-    }
+    } finally { clearTimeout(timeout); }
   }
 
   function option(select, value, label) {
@@ -707,15 +783,21 @@
   async function chooseTitle(item, opts) {
     opts = opts || {};
     selected = item;
+    q('[data-selected-name]').textContent = item.title + ' · اختر الموسم والحلقة';
+    var poster = q('[data-selected-poster]');
+    poster.hidden = !/^\/[a-zA-Z0-9_.-]+$/.test(item.poster || '');
+    if (!poster.hidden) poster.src = 'https://image.tmdb.org/t/p/w185' + item.poster;
     if (detailController) detailController.abort();
     var version = ++detailVersion;
     var currentRoot = root;
     q('[data-episode]').hidden = item.type !== 'tv';
+    q('[data-suggestions]').hidden = true;
     q('[data-nav]').hidden = item.type !== 'tv';
     if (item.type !== 'tv') {
       play();
       return;
     }
+    q('[data-episode]').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
     var seSel = q('[data-season]');
     clear(seSel);
@@ -896,6 +978,22 @@
     q('.float-head strong').textContent = title;
   }
 
+  function sourceUrl(season, episode) {
+    if (serverIndex === 0) {
+      var u = new URL('/embed/' + selected.type + '/' + selected.id, ORIGIN);
+      u.searchParams.set('autoplay', 'false');
+      u.searchParams.set('back', 'close');
+      u.searchParams.set('autonext', 'false');
+      if (selected.type === 'tv') { u.searchParams.set('s', season); u.searchParams.set('e', episode); }
+      return u.href;
+    }
+    var domains = ['', 'https://vidrock.net', 'https://vidcore.net', 'https://vidfast.vc'];
+    var path = selected.type === 'tv'
+      ? '/tv/' + selected.id + '/' + season + '/' + episode
+      : '/movie/' + selected.id;
+    return domains[serverIndex] + path;
+  }
+
   function play() {
     if (!selected) return;
     if (mode !== 'cinema') activate();
@@ -913,16 +1011,7 @@
     clearTimeout(loadTimer);
     cancelCountdown();
     if (frame) frame.remove();
-    var url = new URL('/embed/' + selected.type + '/' + selected.id, ORIGIN);
-    url.searchParams.set('autoplay', 'false');
-    url.searchParams.set('back', 'close');
-    url.searchParams.set('autonext', 'false');
-    if (selected.type === 'tv') {
-      url.searchParams.set('s', season);
-      url.searchParams.set('e', episode);
-    }
-
-    directUrl = url.href;
+    directUrl = sourceUrl(season, episode);
     frame = document.createElement('iframe');
     frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
     frame.title = selected.title;
@@ -930,21 +1019,23 @@
     frame.allowFullscreen = true;
     frame.referrerPolicy = 'strict-origin-when-cross-origin';
     frame.src = directUrl;
+    updateServers();
     q('.video-wrap').appendChild(frame);
     q('[data-empty]').hidden = true;
     q('[data-nav]').hidden = selected.type !== 'tv';
     setTitle(season, episode);
     saveProgress(season, episode);
-    say('اضغط تشغيل داخل المشغّل. اختر العربية من قائمة الترجمة إن توفرت.');
+    say('السيرفر ' + (serverIndex + 1) + ': اضغط تشغيل داخل المشغّل، واختر الترجمة إن توفرت.');
     loadTimer = setTimeout(function () {
-      if (frame) say('إذا لم يبدأ الفيديو، جرّب مصدرًا آخر داخل المشغّل.');
+      if (frame) say('تأخر السيرفر ' + (serverIndex + 1) + '؟ اختر سيرفراً آخر من الأزرار تحت الفيديو.');
     }, 45000);
     schedulePlayer();
+    scrollToPlayer();
   }
 
   async function onMessage(event) {
     if (!frame || event.source !== frame.contentWindow ||
-        event.origin !== ORIGIN || !event.data) return;
+        event.origin !== ORIGIN || serverIndex !== 0 || !event.data) return;
     var data = event.data;
 
     if (data.type === 'cinesrc:ready' || data.type === 'cinesrc:play') {
@@ -1099,13 +1190,23 @@
     q('[data-next-now]').onclick = function () { cancelCountdown(); step(1); };
     q('[data-next-cancel]').onclick = cancelCountdown;
 
-    q('[data-size]').onclick = function () {
-      box.w = box.w > 260 ? 240 : 340;
-      box.h = box.w * 9 / 16;
-      box.ratio = 0;
-      paint();
-      saveBox();
+    playerRoot.querySelectorAll('[data-server]').forEach(function (b) {
+      b.onclick = function () {
+        var next = Number(b.dataset.server);
+        if (next === serverIndex) return;
+        serverIndex = next;
+        updateServers();
+        if (selected && frame) play();
+      };
+    });
+    q('[data-pin]').onclick = function () {
+      pinned = !pinned;
+      q('[data-pin]').setAttribute('aria-pressed', String(pinned));
+      q('[data-pin]').textContent = '📌';
+      q('[data-pin]').title = pinned ? 'فك التثبيت' : 'تثبيت مكان النافذة';
     };
+    q('[data-grow]').onclick = function () { if (floating && !pinned) scaleFloat(1.08); };
+    q('[data-shrink]').onclick = function () { if (floating && !pinned) scaleFloat(1/1.08); };
     root.querySelectorAll('[data-scale]').forEach(function (button) {
       button.onclick = function () {
         if (!floating) toggleFloat();
@@ -1285,7 +1386,7 @@
     delete window[KEY];
   }
 
-  window[KEY] = { destroy: destroy, stop: stop, version: '3.0.0' };
+  window[KEY] = { destroy: destroy, stop: stop, version: '4.0.0-test' };
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init, { once: true });
   } else {
