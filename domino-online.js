@@ -5,7 +5,7 @@
   if (window.__dominoOnlineLoaded || document.getElementById(styleId)) return;
   window.__dominoOnlineLoaded = true;
 
-  const service = new URL('https://domino-server-5xbx.onrender.com/');
+  const service = new URL('https://games.chatkhleeg.com/');
   const site = location.hostname.replace(/^www\./i, '');
 
   // أقصى فاصل بين رسالتين للسياق إذا ما تغيّر شي (نبضة حياة)
