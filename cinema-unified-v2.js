@@ -1,1 +1,1294 @@
-(function(){const t=location.hostname.toLowerCase().replace(/^www\./,"");if(!["2l-f.com","3shwai.com","7abaybna.com","alldewan.com","bnatjeddah.com","chat-alkhaleej.com","chat-romance.com","chatasal.com","chatbo7.com","chatfadfada.com","chatghina.com","chatkitabi.com","chatsaudia.com","chatsawa.com","chatsawalf.com","dl3-n.com","glaksa.net","hejaz.chat","iraaqna.com","krrrz.net","sawti.chat","sh8awh.com","shfaq.com","shfaq.net","shuq1.com","ta3arf.com","taabqalbi.com"].includes(t))return;(function(){"use strict";var t="__CHAT_CINEMA_V1__";var e="https://cinesrc.st";var n="https://nexarab-cinema-api.king-divel2007.workers.dev/3/";if(window[t])window[t].destroy();var a,i,r,o,s,l,d;var c=null,u=null,p=null;var f=null;var m,h,v;var b=0,w=0;var y=1,x=1;var g=false;var k=[];var E="all";var C=0,L=0,A=0;var z=false,M=false,I=false;var S=null;var q="";var T={x:12,y:70,w:240,h:135,ratio:0};var N="tv";var P=false;var _=null;var F=null;var D="";var R=null;var V=0;var B=new Map;var O=new MutationObserver(Dt);var K={get:function(t,e){try{var n=localStorage.getItem("chatCinema:"+t);return n?JSON.parse(n):e}catch(t){return e}},set:function(t,e){try{localStorage.setItem("chatCinema:"+t,JSON.stringify(e))}catch(t){}}};function j(t){while(t&&t.firstChild)t.removeChild(t.firstChild)}function U(t){return r&&r.querySelector(t)||u&&u.querySelector(t)}function H(t){var e=U("[data-status]");if(e)e.textContent=t}function W(t){var e=U("[data-catalog-status]");if(e)e.textContent=t}function X(){return!!(document.fullscreenElement||document.webkitFullscreenElement||u&&(u.fullscreenElement||u.webkitFullscreenElement))}function $(){var t=U(".screen");return!!(t&&t.classList.contains("pseudo-full"))}function J(t,e){return new Promise((function(n,a){var i=setTimeout(n,t);if(e){e.addEventListener("abort",(function(){clearTimeout(i);var t=new Error("aborted");t.name="AbortError";a(t)}))}}))}function Y(){var t=U(".screen");if(t){t.classList.add("pseudo-full");t.style.display="block"}at()}function Z(){var t=U(".screen");if(t)t.classList.remove("pseudo-full");var e=document.exitFullscreen||document.webkitExitFullscreen;if(e&&(document.fullscreenElement||document.webkitFullscreenElement)){try{var n=e.call(document);if(n&&n.catch)n.catch((function(){}))}catch(t){}}at()}function G(){if(!_){H("اختر فيديو أولًا.");return}if(X()||$()){Z();return}var t=U(".video-wrap");var e=t.requestFullscreen||t.webkitRequestFullscreen;if(!e){Y();return}try{var n=e.call(t);if(n&&n.catch)n.catch(Y)}catch(t){Y()}}function Q(){clearInterval(V);V=0;var t=U("[data-next-up]");if(t)t.hidden=true}function tt(){if(!F||F.type!=="tv"||!_)return;var t=U("[data-ep]"),e=U("[data-season]");var n=t.selectedIndex<t.options.length-1||e.selectedIndex<e.options.length-1;if(!n)return;Q();var a=5;var i=U("[data-next-up]");var r=U("[data-next-text]");i.hidden=false;r.textContent="الحلقة التالية خلال "+a+" ث";V=setInterval((function(){a--;if(a<=0){Q();Ct(1)}else{r.textContent="الحلقة التالية خلال "+a+" ث"}}),1e3)}function et(){clearTimeout(R);Q();if(_)_.remove();_=null;D="";Z();ft();var t=U("[data-title]");var e=U(".float-head strong");if(t)t.textContent="أفلام ومسلسلات";if(e)e.textContent="سينما · اسحب هنا";if(U("[data-empty]"))U("[data-empty]").hidden=false}function nt(){var t=r.querySelector(".screen");var e=document.createElement("div");e.setAttribute("data-player-slot","");e.style.cssText="width:100%;height:0;padding-top:56.25%;";t.parentNode.insertBefore(e,t);c=document.createElement("div");c.id="chat-cinema-player";c.style.cssText="all:initial!important;zoom:1!important;display:block!important;"+"position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;"+"z-index:10030!important;pointer-events:none!important;";u=c.attachShadow({mode:"open"});var n=document.createElement("style");n.textContent=r.querySelector("style").textContent+`\n      :host{background:transparent!important;pointer-events:none!important}\n      .screen{position:fixed;pointer-events:auto;direction:rtl;\n        font:13px/1.6 Tahoma,sans-serif;color:#222}\n      .screen.floating{clip-path:none!important}\n    `;u.appendChild(n);u.appendChild(t);document.documentElement.appendChild(c);if(typeof ResizeObserver==="function"){p=new ResizeObserver(at);p.observe(e)}at()}function at(){if(!P&&!C)C=requestAnimationFrame(it)}function it(){C=0;if(!u||!a||!a.isConnected)return;if(X()||$())return;var t=u.querySelector(".screen");if(z){t.style.display="block";lt();return}var e=r.querySelector("[data-player-slot]");var n=N==="cinema"&&a.classList.contains("active")&&e.getClientRects().length>0&&getComputedStyle(i).visibility!=="hidden";if(!n){t.style.display="none";return}var o=e.getBoundingClientRect();var s=a.getBoundingClientRect();var l=Math.max(o.top,s.top,0);var d=Math.min(o.bottom,s.bottom,window.innerHeight);var c=Math.max(o.left,s.left,0);var p=Math.min(o.right,s.right,window.innerWidth);if(d<=l||p<=c){t.style.display="none";return}t.style.display="block";t.style.left=o.left+"px";t.style.top=o.top+"px";t.style.width=o.width+"px";t.style.clipPath="inset("+Math.max(0,l-o.top)+"px "+Math.max(0,o.right-p)+"px "+Math.max(0,o.bottom-d)+"px "+Math.max(0,c-o.left)+"px)"}function rt(){var t=window.visualViewport;return{x:t?t.offsetLeft:0,y:t?t.offsetTop:0,w:t?t.width:window.innerWidth,h:t?t.height:window.innerHeight}}function ot(){var t=rt();var e=Math.max(1,t.w-16);var n=Math.max(1,t.h-57);if(T.ratio){var a=Math.min(e,n*T.ratio);T.w=Math.max(Math.min(200,a),Math.min(T.w,a));T.h=T.w/T.ratio}else{T.w=Math.max(Math.min(200,e),Math.min(T.w,e));T.h=Math.max(Math.min(112,n),Math.min(T.h,n))}T.x=Math.max(t.x+8,Math.min(T.x,t.x+t.w-T.w-8));T.y=Math.max(t.y+8,Math.min(T.y,t.y+t.h-T.h-49));if(q){T.x=q.charAt(1)==="r"?t.x+t.w-T.w-8:t.x+8;T.y=q.charAt(0)==="b"?Math.max(t.y+8,t.y+t.h-T.h-49):t.y+8}}function st(){L=0;var t=U(".screen");if(!z||!t)return;ot();t.style.left=T.x+"px";t.style.top=T.y+"px";t.style.width=T.w+"px";t.style.setProperty("--video-height",T.h+"px")}function lt(){if(z&&!L)L=requestAnimationFrame(st)}function dt(){K.set("box",{x:T.x,y:T.y,w:T.w,h:T.h,ratio:T.ratio,corner:q})}function ct(){var t=K.get("box",null);if(!t||!isFinite(t.x)||!isFinite(t.y)||!isFinite(t.w)||!isFinite(t.h))return;T.x=t.x;T.y=t.y;T.w=t.w;T.h=t.h;T.ratio=isFinite(t.ratio)?t.ratio:0;q=/^[tb][lr]$/.test(t.corner||"")?t.corner:"";M=true;I=true}function ut(){var t=rt(),e=40;var n=T.x-(t.x+8);var a=t.x+t.w-8-(T.x+T.w);var i=T.y-(t.y+8);var r=t.y+t.h-49-(T.y+T.h);if(Math.min(n,a)<e&&Math.min(i,r)<e){q=(r<i?"b":"t")+(a<n?"r":"l");lt()}}function pt(){if(S){var t=S;S=null;try{if(t.node.hasPointerCapture(t.id)){t.node.releasePointerCapture(t.id)}}catch(t){}}if(U(".screen"))U(".screen").classList.remove("moving")}function ft(){z=false;pt();if(L)cancelAnimationFrame(L);L=0;var t=U(".screen");if(t){var e=t.classList.contains("pseudo-full");t.classList.remove("floating");t.removeAttribute("style");if(e)t.style.display="block"}if(U("[data-float]"))U("[data-float]").textContent="▣ نافذة عائمة";if(_&&a&&(!a.classList.contains("active")||!a.getClientRects().length)){var n=document.getElementById("chat-tv-open");if(n)n.click()}at()}function mt(){if(z){ft();return}if(!_){H("اختر فيلمًا أو حلقة أولًا.");return}if(X()||$()){H("اخرج من ملء الشاشة أولًا.");return}var t=rt();if(!M){T.w=t.w<=600?240:340;T.h=T.w*9/16;M=true}if(!I){T.x=t.x+16;T.y=t.y+80;I=true}z=true;var e=U(".screen");e.style.display="block";e.style.clipPath="none";e.classList.add("floating");U("[data-float]").textContent="↩ إرجاع للقائمة";st()}function ht(t){T.w*=t;T.h*=t;st();dt()}function vt(t,e){t.addEventListener("pointerdown",(function(n){if(!z||n.button!==0||S||e==="drag"&&n.target.closest("button,select"))return;q="";S={node:t,id:n.pointerId,kind:e,x:n.clientX,y:n.clientY,bx:T.x,by:T.y,w:T.w,h:T.h};try{t.setPointerCapture(n.pointerId)}catch(t){}U(".screen").classList.add("moving");n.preventDefault()}));t.addEventListener("pointermove",(function(t){var e=S;if(!e||e.id!==t.pointerId)return;var n=t.clientX-e.x;var a=t.clientY-e.y;if(e.kind==="drag"){T.x=e.bx+n;T.y=e.by+a}else{T.w=Math.max(200,e.w-n);T.x=e.bx+e.w-T.w;T.h=T.ratio?T.w/T.ratio:e.h+a}lt()}));["pointerup","pointercancel","lostpointercapture"].forEach((function(e){t.addEventListener(e,(function(t){if(S&&S.id===t.pointerId){var e=S.kind==="drag";pt();if(e)ut();dt()}}))}))}var bt=`\n    <style>\n      :host{display:block;direction:rtl;color:#222;background:#fff;font:13px/1.6 Tahoma,sans-serif}\n      *{box-sizing:border-box}\n      [hidden]{display:none!important}\n      button,input,select{font:inherit}\n      button{cursor:pointer;border:1px solid #bbb;border-radius:7px;padding:8px;color:#111;background:#fff}\n      button:disabled{opacity:.5;cursor:default}\n      button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #a00;outline-offset:2px}\n      form,.tools{display:flex;gap:6px;margin:10px 0}\n      .tools{flex-wrap:wrap}\n      .tools button{flex:1}\n      .tools button[aria-pressed="true"]{background:#eee}\n      input{width:100%;min-width:0;border:1px solid #aaa;border-radius:7px;padding:9px;background:#fff;color:#111}\n      select{width:100%;max-width:100%;min-width:0;padding:8px;box-sizing:border-box}\n      .screen{width:100%;background:#fff;border-radius:8px;overflow:hidden}\n      .video-wrap{position:relative;width:100%;aspect-ratio:16/9;background:#090b0f;color:#fff;display:grid;place-items:center}\n      @supports not (aspect-ratio:1){\n        .video-wrap{height:0;padding-top:56.25%}\n        .floating .video-wrap{padding-top:0;height:var(--video-height)}\n      }\n      iframe{position:absolute;top:0;left:0;right:0;bottom:0;width:100%;height:100%;border:0;display:block}\n      .screen.floating{position:fixed;z-index:10030;right:auto;bottom:auto;margin:0;border:1px solid #666;border-radius:10px;box-shadow:0 8px 30px #0006;background:#111}\n      .floating .video-wrap{height:var(--video-height);aspect-ratio:auto}\n      .float-head,.resize-edge,.exit-full{display:none}\n      .floating .float-head{display:flex;height:39px;align-items:center;gap:4px;padding:5px 7px;background:var(--cinema-accent,#343a40);color:white;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}\n      .float-head strong{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:700 11px/1.5 Tahoma,sans-serif}\n      .float-head button{width:29px;height:29px;padding:0;flex-shrink:0;border:1px solid #ffffff70;border-radius:5px;font:700 18px/25px Tahoma,sans-serif}\n      .floating .resize-edge{display:block;position:relative;height:8px;background:#343a40}\n      [data-resize]{position:absolute;left:0;bottom:0;width:30px;height:18px;text-align:center;line-height:18px;font-size:15px;background:#343a40;color:#fff;cursor:nesw-resize;touch-action:none;user-select:none;-webkit-user-select:none;border-radius:0 5px 0 0}\n      [data-resize]:focus-visible{outline:2px solid #fff;outline-offset:-2px}\n      .screen.moving iframe{pointer-events:none}\n      .video-wrap:-webkit-full-screen{width:100vw!important;height:100vh!important;aspect-ratio:auto;padding:0;border-radius:0}\n      .video-wrap:fullscreen{width:100vw!important;height:100vh!important;aspect-ratio:auto;padding:0;border-radius:0}\n      .screen.pseudo-full{position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;width:100%!important;height:100vh!important;height:100dvh!important;z-index:2147483647;clip-path:none!important;border-radius:0;border:0;display:block!important;background:#000}\n      .pseudo-full .video-wrap{height:100%!important;padding:0;aspect-ratio:auto;border-radius:0}\n      .pseudo-full .float-head,.pseudo-full .resize-edge{display:none!important}\n      .pseudo-full .exit-full{display:block}\n      .exit-full{position:absolute;top:10px;left:10px;z-index:6;background:#000b;color:#fff;border:1px solid #fff6;font-size:18px;line-height:1;padding:6px 11px}\n      .next-up{position:absolute;bottom:10px;left:10px;right:10px;z-index:5;display:flex;gap:6px;align-items:center;background:#000d;color:#fff;border-radius:8px;padding:6px 8px;font-size:12px}\n      .next-up span{flex:1}\n      .next-up button{padding:4px 9px}\n      [data-empty]{padding:15px;text-align:center}\n      [data-status],[data-catalog-status]{font-size:12px;color:#555}\n      [data-resume]{width:100%;margin:6px 0}\n      [data-results]{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}\n      [data-results] .result{display:flex;flex-direction:column;align-items:stretch;gap:8px;width:100%;min-width:0;margin:0;padding:7px;white-space:normal;text-align:right}\n      [data-results] img{width:100%;max-width:100%;height:auto;aspect-ratio:2/3;object-fit:cover;border-radius:6px}\n      [data-results] strong{font-size:13px;overflow-wrap:anywhere}\n      small{display:block;color:#666;font-size:11px;margin-top:4px}\n      [data-episode] label{flex:1;min-width:0}\n      [data-more]{width:100%;margin:10px 0}\n      details{margin-top:12px;font-size:11px}\n      summary{cursor:pointer}\n      @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}\n    </style>\n\n    <strong data-title>أفلام ومسلسلات</strong>\n    <div class="screen">\n      <div class="float-head">\n        <strong>سينما · اسحب هنا</strong>\n        <button type="button" data-size title="صغير / كبير">⤢</button>\n        <button type="button" data-dock title="إرجاع للقائمة">↩</button>\n        <button type="button" data-float-close title="إيقاف وإغلاق">×</button>\n      </div>\n      <div class="video-wrap">\n        <span data-empty>اختر فيلمًا أو مسلسلًا بالأسفل</span>\n        <button type="button" class="exit-full" data-exit-full aria-label="خروج من ملء الشاشة">×</button>\n        <div class="next-up" data-next-up hidden>\n          <span data-next-text></span>\n          <button type="button" data-next-now>الآن</button>\n          <button type="button" data-next-cancel>إلغاء</button>\n        </div>\n      </div>\n      <div class="resize-edge">\n        <span data-resize role="button" tabindex="0"\n          aria-label="تغيير العرض والارتفاع بالسحب أو الأسهم">⤡</span>\n      </div>\n    </div>\n\n    <div class="tools">\n      <button type="button" data-stop>■ إيقاف</button>\n      <button type="button" data-full>⛶ ملء الشاشة</button>\n      <button type="button" data-float>▣ نافذة عائمة</button>\n    </div>\n    <div class="tools" data-nav hidden>\n      <button type="button" data-prev>⏮ الحلقة السابقة</button>\n      <button type="button" data-next>الحلقة التالية ⏭</button>\n    </div>\n    <div class="tools">\n      <button type="button" data-shape="free">حر</button>\n      <button type="button" data-shape="wide">مستطيل</button>\n      <button type="button" data-shape="square">مربع</button>\n      <button type="button" data-scale="1.15" aria-label="تكبير">＋</button>\n      <button type="button" data-scale="0.87" aria-label="تصغير">−</button>\n    </div>\n    <p data-status role="status">اختر عنوانًا. توفر التشغيل والترجمة يعتمد على مصدر المشاهدة.</p>\n    <button type="button" data-resume hidden></button>\n    <label>ابحث عن فيلم أو مسلسل\n      <input data-search type="search" placeholder="اسم الفيلم أو المسلسل" maxlength="150">\n    </label>\n    <div class="tools">\n      <button type="button" data-filter="all" aria-pressed="true">الكل</button>\n      <button type="button" data-filter="movie">أفلام</button>\n      <button type="button" data-filter="tv">مسلسلات</button>\n    </div>\n    <form data-episode hidden>\n      <label>الموسم <select data-season required></select></label>\n      <label>الحلقة <select data-ep required></select></label>\n      <button type="submit">تشغيل</button>\n    </form>\n    <p data-catalog-status role="status"></p>\n    <div data-results></div>\n    <button data-more type="button" hidden>عرض المزيد</button>\n    <details>\n      <summary>مصدر معلومات الأفلام</summary>\n      <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">\n        <img alt="TMDB" width="90"\n          src="https://www.themoviedb.org/assets/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg">\n      </a>\n      <p dir="ltr">This website uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB.</p>\n      <p>بيانات الفهرس لا تعني توفر جميع العناوين للمشاهدة.</p>\n      <p>اختصارات: F ملء الشاشة · M نافذة عائمة · N التالية · P السابقة · Esc خروج</p>\n    </details>\n  `;async function wt(t,e,a){var i=new URL(n+t);Object.keys(e||{}).forEach((function(t){i.searchParams.set(t,e[t])}));var r=i.href;var o=B.get(r);if(o&&Date.now()-o.t<3e5)return o.data;var s=0;while(true){try{var l=await fetch(r,{signal:a,credentials:"omit"});if(!l.ok){var d=new Error(l.status===429?"طلبات كثيرة، انتظر قليلًا ثم أعد المحاولة.":"تعذر جلب البيانات. حاول مرة أخرى.");d.fatal=l.status<500&&l.status!==429;throw d}var c=await l.json();B.set(r,{t:Date.now(),data:c});if(B.size>100)B.delete(B.keys().next().value);return c}catch(t){if(t.name==="AbortError"||t.fatal||s>=2)throw t;await J(800*Math.pow(2,s),a);s++}}}function yt(){clearTimeout(m);b++;if(h)h.abort();U("[data-more]").hidden=true;var t=U("[data-search]").value.trim();if(t.length===1){j(U("[data-results]"));W("اكتب حرفين أو أكثر لعرض الاقتراحات.");return}W("جارٍ البحث…");m=setTimeout((function(){xt(false)}),400)}async function xt(t){if(P||!r)return;clearTimeout(m);var e=U("[data-search]").value.trim();if(e.length===1)return;if(h)h.abort();var n=new AbortController;h=n;var a=++b;var i=r;var o=t?y+1:1;var s=E;var l=e?"search/"+(s==="all"?"multi":s):"trending/"+s+"/week";U("[data-more]").hidden=true;if(!t){k=[];j(U("[data-results]"))}W(e?"جارٍ البحث…":"جارٍ تحميل الرائج…");var d=setTimeout((function(){if(a===b)n.abort()}),15e3);try{var c=await wt(l,{query:e,page:o,include_adult:false},n.signal);if(P||a!==b||i!==r)return;y=o;x=Math.min(Number(c.total_pages)||1,500);(c.results||[]).forEach((function(t){var e=t.media_type||s;if(t.adult||["movie","tv"].indexOf(e)<0||!Number.isInteger(t.id))return;if(k.some((function(n){return n.id===t.id&&n.type===e})))return;var n={id:t.id,type:e,title:t.title||t.name||"",year:(t.release_date||t.first_air_date||"").slice(0,4)};k.push(n);var a=document.createElement("button");a.type="button";a.className="result";if(/^\/[a-zA-Z0-9_.-]+$/.test(t.poster_path||"")){var i=document.createElement("img");i.src="https://image.tmdb.org/t/p/w185"+t.poster_path;i.alt="";i.loading="lazy";i.decoding="async";i.onerror=function(){i.remove()};a.appendChild(i)}var r=document.createElement("strong");r.textContent=n.title;var o=document.createElement("small");o.textContent=(e==="tv"?"مسلسل":"فيلم")+" · "+n.year;a.appendChild(r);a.appendChild(o);a.onclick=function(){kt(n)};U("[data-results]").appendChild(a)}));W(k.length?e?"نتائج البحث":"الرائج هذا الأسبوع":"لا توجد نتائج أفلام أو مسلسلات في هذه الصفحة.");U("[data-more]").hidden=y>=x}catch(e){if(P||a!==b||i!==r)return;W(e.name==="AbortError"?"انتهت مهلة الاتصال. أعد البحث.":e.message);var u=document.createElement("button");u.type="button";u.textContent="إعادة المحاولة";u.onclick=function(){u.remove();xt(t)};U("[data-results]").appendChild(u)}finally{clearTimeout(d)}}function gt(t,e,n){var a=document.createElement("option");a.value=e;a.textContent=n;t.appendChild(a)}async function kt(t,e){e=e||{};F=t;if(v)v.abort();var n=++w;var a=r;U("[data-episode]").hidden=t.type!=="tv";U("[data-nav]").hidden=t.type!=="tv";if(t.type!=="tv"){qt();return}var i=U("[data-season]");j(i);j(U("[data-ep]"));U("[data-episode] button").disabled=true;H("جارٍ تحميل مواسم "+t.title);v=new AbortController;try{var o=await wt("tv/"+t.id,{},v.signal);if(P||n!==w||a!==r)return;(o.seasons||[]).filter((function(t){return t.season_number>0&&t.episode_count>0})).forEach((function(t){gt(i,t.season_number,t.name||"الموسم "+t.season_number)}));if(!i.options.length){H("لا توجد مواسم متاحة في الفهرس.");return}if(Number.isInteger(e.season)){i.value=String(e.season);if(i.selectedIndex<0)i.selectedIndex=0}var s=await Et(e.ep);if(s&&e.play&&F===t&&!P)qt()}catch(t){if(!P&&n===w&&a===r&&t.name!=="AbortError"){H(t.message+" اختر المسلسل لإعادة المحاولة.")}}}async function Et(t){if(!F||F.type!=="tv")return false;if(v)v.abort();v=new AbortController;var e=++w;var n=r;var a=F.id;var i=Number(U("[data-season]").value);var o=U("[data-ep]");j(o);U("[data-episode] button").disabled=true;H("جارٍ تحميل الحلقات…");try{var s=await wt("tv/"+a+"/season/"+i,{},v.signal);if(P||e!==w||n!==r)return false;(s.episodes||[]).filter((function(t){return t.episode_number>0})).forEach((function(t){gt(o,t.episode_number,t.episode_number+" — "+(t.name||"حلقة"))}));if(o.options.length){if(t==="last"){o.selectedIndex=o.options.length-1}else if(Number.isInteger(t)){o.value=String(t);if(o.selectedIndex<0)o.selectedIndex=0}else{o.selectedIndex=0}}U("[data-episode] button").disabled=!o.options.length;H(o.options.length?"اختر الموسم والحلقة ثم اضغط تشغيل.":"لا توجد حلقات في الفهرس.");return o.options.length>0}catch(t){if(!P&&e===w&&n===r&&t.name!=="AbortError"){H(t.message+" أعد اختيار الموسم للمحاولة.")}return false}}async function Ct(t){if(!F||F.type!=="tv")return;Q();var e=U("[data-ep]"),n=U("[data-season]");var a=e.selectedIndex+t;if(a>=0&&a<e.options.length){e.selectedIndex=a;qt();return}var i=n.selectedIndex+t;if(i<0||i>=n.options.length){H(t>0?"هذه آخر حلقة متاحة.":"هذه أول حلقة.");return}n.selectedIndex=i;var r=await Et(t>0?undefined:"last");if(r)qt()}function Lt(t,e){if(!F)return;K.set("last",{id:F.id,type:F.type,title:F.title,year:F.year||"",season:t,ep:e});At()}function At(){var t=U("[data-resume]");if(!t)return;var e=K.get("last",null);if(!e||!Number.isInteger(e.id)||e.type!=="movie"&&e.type!=="tv"){t.hidden=true;return}t.hidden=false;t.textContent="▶ متابعة: "+e.title+(e.type==="tv"?" · "+e.season+" / "+e.ep:"");t.onclick=function(){kt({id:e.id,type:e.type,title:String(e.title||""),year:e.year||""},{season:Number(e.season),ep:Number(e.ep),play:true})}}function zt(){var t=document.querySelector("#chat-tv-floating [data-float-close]");if(t)t.click();var e=a.querySelector("[data-tv-stop]");if(e)e.click();var n=document.getElementById("chat-youtube-panel");var i=n&&n.shadowRoot&&n.shadowRoot.querySelector("[data-stop]");if(i)i.click();document.querySelectorAll("#settings [data-kr-stop]").forEach((function(t){t.click()}))}function Mt(){if(N==="cinema"){at();return}var t=s&&s.querySelector('[data-mode="tv"]');if(t)t.click();zt();N="cinema";a.classList.add("chat-cinema-mode");s.querySelectorAll("button").forEach((function(t){t.setAttribute("aria-pressed","false")}));l.setAttribute("aria-pressed","true");if(!g){g=true;xt(false)}at()}function It(){if(N!=="cinema")return;N="tv";et();if(a)a.classList.remove("chat-cinema-mode");if(l)l.setAttribute("aria-pressed","false")}function St(t,e){if(!F)return;var n=F.title+(F.type==="tv"?" · "+t+" / "+e:"");U("[data-title]").textContent=n;U(".float-head strong").textContent=n}function qt(){if(!F)return;if(N!=="cinema")Mt();var t=Number(U("[data-season]").value);var n=Number(U("[data-ep]").value);if(F.type==="tv"&&(!Number.isInteger(t)||t<1||t>999||!Number.isInteger(n)||n<1||n>9999)){H("أدخل رقم موسم وحلقة صحيحًا.");return}zt();clearTimeout(R);Q();if(_)_.remove();var a=new URL("/embed/"+F.type+"/"+F.id,e);a.searchParams.set("autoplay","false");a.searchParams.set("back","close");a.searchParams.set("autonext","false");if(F.type==="tv"){a.searchParams.set("s",t);a.searchParams.set("e",n)}D=a.href;_=document.createElement("iframe");_.setAttribute("sandbox","allow-scripts allow-same-origin allow-presentation");_.title=F.title;_.allow="autoplay; fullscreen; picture-in-picture";_.allowFullscreen=true;_.referrerPolicy="strict-origin-when-cross-origin";_.src=D;U(".video-wrap").appendChild(_);U("[data-empty]").hidden=true;U("[data-nav]").hidden=F.type!=="tv";St(t,n);Lt(t,n);H("اضغط تشغيل داخل المشغّل. اختر العربية من قائمة الترجمة إن توفرت.");R=setTimeout((function(){if(_)H("إذا لم يبدأ الفيديو، جرّب مصدرًا آخر داخل المشغّل.")}),45e3);at()}async function Tt(t){if(!_||t.source!==_.contentWindow||t.origin!==e||!t.data)return;var n=t.data;if(n.type==="cinesrc:ready"||n.type==="cinesrc:play"){clearTimeout(R)}if(n.type==="cinesrc:play")H("بدأ التشغيل.");if(n.type==="cinesrc:error"){clearTimeout(R);H("تعذّر تشغيل هذا المصدر. جرّب مصدرًا آخر داخل المشغّل.")}if(n.type==="cinesrc:close")et();if(n.type==="cinesrc:ended")tt();if(n.type==="cinesrc:nextepisode"&&F&&F.type==="tv"&&Number.isInteger(n.season)&&n.season>0&&Number.isInteger(n.episode)&&n.episode>0&&D){var a=_;var i=F;var r=new URL(D);if(r.pathname!=="/embed/tv/"+i.id)return;var o=U("[data-season]");var s=U("[data-ep]");if(!Array.from(o.options).some((function(t){return Number(t.value)===n.season})))return;if(Number(o.value)!==n.season||!s.options.length){o.value=String(n.season);var l=Et(n.episode);var d=w;var c=await l;if(!c||P||_!==a||F!==i||w!==d||Number(o.value)!==n.season)return}if(!Array.from(s.options).some((function(t){return Number(t.value)===n.episode})))return;s.value=String(n.episode);r.searchParams.set("s",n.season);r.searchParams.set("e",n.episode);D=r.href;St(n.season,n.episode);Lt(n.season,n.episode)}}function Nt(t){if(P||N!=="cinema"||t.ctrlKey||t.metaKey||t.altKey)return;var e=t.composedPath?t.composedPath()[0]:t.target;if(e&&(/^(INPUT|SELECT|TEXTAREA)$/.test(e.tagName||"")||e.isContentEditable))return;if(t.key==="Escape"){if(X()||$()){Z();t.preventDefault()}else if(z){ft();t.preventDefault()}return}if(!_)return;var n=true;switch(t.code){case"KeyF":G();break;case"KeyM":mt();break;case"KeyN":Ct(1);break;case"KeyP":Ct(-1);break;default:n=false}if(n)t.preventDefault()}function Pt(){N="tv";et();O.disconnect();if(p)p.disconnect();if(a)a.classList.remove("chat-cinema-mode");[l,o,c].forEach((function(t){if(t)t.remove()}));l=o=r=u=c=null}function _t(){var t=document.getElementById("chat-tv");var e=document.querySelector("#dpnl .chat-youtube-tabs");if(!t||!e)return;var n=null;if(r&&_&&F){n={item:F,season:Number(U("[data-season]").value),ep:Number(U("[data-ep]").value)}}Pt();a=t;s=e;i=document.getElementById("dpnl");l=document.createElement("button");l.type="button";l.id="chat-cinema-tab";l.textContent="نتفلكس";l.setAttribute("aria-pressed","false");l.onclick=Mt;s.appendChild(l);o=document.createElement("div");o.id="chat-cinema-panel";r=o.attachShadow({mode:"open"});r.innerHTML=bt;a.appendChild(o);nt();var d=getComputedStyle(a).getPropertyValue("--tv-accent").trim();if(d)c.style.setProperty("--cinema-accent",d);U("[data-search]").oninput=yt;U("[data-search]").onkeydown=function(t){if(t.key==="Enter"){t.preventDefault();xt(false)}};U("[data-more]").onclick=function(){xt(true)};U("[data-season]").onchange=function(){Et()};U("[data-episode]").onsubmit=function(t){t.preventDefault();qt()};r.querySelectorAll("[data-filter]").forEach((function(t){t.onclick=function(){E=t.dataset.filter;r.querySelectorAll("[data-filter]").forEach((function(e){e.setAttribute("aria-pressed",String(e===t))}));xt(false)}}));U("[data-stop]").onclick=et;U("[data-float-close]").onclick=et;U("[data-dock]").onclick=ft;U("[data-float]").onclick=mt;U("[data-full]").onclick=G;U("[data-exit-full]").onclick=Z;U("[data-prev]").onclick=function(){Ct(-1)};U("[data-next]").onclick=function(){Ct(1)};U("[data-next-now]").onclick=function(){Q();Ct(1)};U("[data-next-cancel]").onclick=Q;U("[data-size]").onclick=function(){T.w=T.w>260?240:340;T.h=T.w*9/16;T.ratio=0;st();dt()};r.querySelectorAll("[data-scale]").forEach((function(t){t.onclick=function(){if(!z)mt();if(z)ht(Number(t.dataset.scale))}}));r.querySelectorAll("[data-shape]").forEach((function(t){t.onclick=function(){if(!z)mt();if(!z)return;var e=t.dataset.shape;T.ratio=e==="wide"?16/9:e==="square"?1:0;if(T.ratio)T.h=T.w/T.ratio;st();dt()}}));vt(U(".float-head"),"drag");vt(U("[data-resize]"),"resize");U("[data-resize]").onkeydown=function(t){var e=["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"];if(!z||e.indexOf(t.key)<0)return;t.preventDefault();var n=t.shiftKey?30:10;if(t.key==="ArrowLeft")T.w-=n;if(t.key==="ArrowRight")T.w+=n;if(t.key==="ArrowUp")T.h-=n;if(t.key==="ArrowDown")T.h+=n;if(T.ratio)T.h=T.w/T.ratio;st();dt()};for(var u=a;u;u=u.parentElement){O.observe(u,{attributes:true,attributeFilter:["class","style","hidden"]})}g=false;At();watchCinemaStructure();if(n){kt(n.item,{season:n.season,ep:n.ep,play:true})}}function Ft(){A=0;if(P)return;if(!o||!o.isConnected||!l||!l.isConnected||!a||!a.isConnected)_t();if(!o||!a)return;var t=a.classList.contains("active")&&a.getClientRects().length>0&&getComputedStyle(i).visibility!=="hidden";if(!t&&N==="cinema"&&_&&!z&&!X()&&!$())mt();at()}function Dt(){if(!P&&!A)A=requestAnimationFrame(Ft)}function Rt(t){var e=t.target;if(!e||!e.closest)return;if(e.closest(".chat-youtube-tabs [data-mode], #chat-tv [data-tv-start], #chat-tv [data-tv-channel]")){It()}if(e.closest("#settings .SERT, #settings [data-kr-play]"))et();Dt()}function Vt(){et()}function Bt(){at()}function Ot(){if(P)return;ct();d=document.createElement("style");d.id="chat-cinema-style";d.textContent=`\n      #chat-tv > #chat-cinema-panel{display:none!important}\n      #chat-tv.chat-cinema-mode > :not(#chat-cinema-panel){display:none!important}\n      #chat-tv.chat-cinema-mode > #chat-cinema-panel{display:block!important}\n      #dpnl .chat-youtube-tabs{flex-wrap:wrap!important;max-width:calc(100% - 48px)}\n      #dpnl .chat-youtube-tabs button{white-space:nowrap}\n      #dpnl #chat-cinema-tab{font-size:12px;padding:5px 7px}\n    `;document.head.appendChild(d);function watchCinemaStructure(){if(!f)return;f.disconnect();if(!o||!o.isConnected||!l||!l.isConnected||!a||!a.isConnected){watchCinemaStructure();return}var seen=new Set;[o,l,a].forEach(function(node){for(var p=node.parentElement;p&&p.nodeType===1;p=p.parentElement){if(!seen.has(p)){f.observe(p,{childList:true});seen.add(p)}}})}f=new MutationObserver((function(){if(P)return;if(!o||!o.isConnected||!l||!l.isConnected||!a||!a.isConnected){watchCinemaStructure();Dt()}}));watchCinemaStructure();document.addEventListener("click",Rt,true);document.addEventListener("keydown",Nt,true);document.addEventListener("scroll",at,true);document.addEventListener("fullscreenchange",Bt);document.addEventListener("webkitfullscreenchange",Bt);window.addEventListener("message",Tt);window.addEventListener("pagehide",Vt);window.addEventListener("resize",lt);window.addEventListener("resize",at);if(window.visualViewport){window.visualViewport.addEventListener("resize",lt);window.visualViewport.addEventListener("scroll",lt);window.visualViewport.addEventListener("resize",at);window.visualViewport.addEventListener("scroll",at)}Dt()}function Kt(){P=true;if(f)f.disconnect();clearTimeout(m);if(h)h.abort();if(v)v.abort();Pt();document.removeEventListener("DOMContentLoaded",Ot);document.removeEventListener("click",Rt,true);document.removeEventListener("keydown",Nt,true);document.removeEventListener("scroll",at,true);document.removeEventListener("fullscreenchange",Bt);document.removeEventListener("webkitfullscreenchange",Bt);window.removeEventListener("message",Tt);window.removeEventListener("pagehide",Vt);window.removeEventListener("resize",lt);window.removeEventListener("resize",at);if(window.visualViewport){window.visualViewport.removeEventListener("resize",lt);window.visualViewport.removeEventListener("scroll",lt);window.visualViewport.removeEventListener("resize",at);window.visualViewport.removeEventListener("scroll",at)}[A,C,L].forEach(cancelAnimationFrame);if(d)d.remove();delete window[t]}window[t]={destroy:Kt,stop:et,version:"3.0.0"};if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",Ot,{once:true})}else{Ot()}})()}).call(window);
+(function () {
+  'use strict';
+
+  var KEY = '__CHAT_CINEMA_V1__';
+  var ORIGIN = 'https://cinesrc.st';
+  var API = 'https://nexarab-cinema-api.king-divel2007.workers.dev/3/';
+  if (window[KEY]) window[KEY].destroy();
+
+  var pane, host, root, shell, nav, tab, style;
+  var playerHost = null, playerRoot = null, playerObserver = null;
+  var structureObserver = null;
+  var searchTimer, searchController, detailController;
+  var searchVersion = 0, detailVersion = 0;
+  var page = 1, totalPages = 1;
+  var catalogueStarted = false;
+  var catalogue = [];
+  var filter = 'all';
+  var playerJob = 0, paintJob = 0, job = 0;
+  var floating = false, floatSized = false, hasPos = false;
+  var gesture = null;
+  var corner = '';
+  var box = { x: 12, y: 70, w: 240, h: 135, ratio: 0 };
+  var mode = 'tv';
+  var dead = false;
+  var frame = null;
+  var selected = null;
+  var directUrl = '';
+  var loadTimer = null;
+  var countdownTimer = 0;
+  var cache = new Map();
+  var stateObserver = new MutationObserver(schedule);
+
+  var store = {
+    get: function (k, d) {
+      try {
+        var v = localStorage.getItem('chatCinema:' + k);
+        return v ? JSON.parse(v) : d;
+      } catch (e) { return d; }
+    },
+    set: function (k, v) {
+      try {
+        localStorage.setItem('chatCinema:' + k, JSON.stringify(v));
+      } catch (e) {}
+    }
+  };
+
+  function clear(node) {
+    while (node && node.firstChild) node.removeChild(node.firstChild);
+  }
+
+  function q(selector) {
+    return (root && root.querySelector(selector)) ||
+      (playerRoot && playerRoot.querySelector(selector));
+  }
+
+  function say(text) {
+    var node = q('[data-status]');
+    if (node) node.textContent = text;
+  }
+
+  function catalogStatus(text) {
+    var node = q('[data-catalog-status]');
+    if (node) node.textContent = text;
+  }
+
+  function isFullscreen() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement ||
+      (playerRoot && (playerRoot.fullscreenElement || playerRoot.webkitFullscreenElement)));
+  }
+
+  function isPseudo() {
+    var s = q('.screen');
+    return !!(s && s.classList.contains('pseudo-full'));
+  }
+
+  function wait(ms, signal) {
+    return new Promise(function (resolve, reject) {
+      var t = setTimeout(resolve, ms);
+      if (signal) {
+        signal.addEventListener('abort', function () {
+          clearTimeout(t);
+          var e = new Error('aborted');
+          e.name = 'AbortError';
+          reject(e);
+        });
+      }
+    });
+  }
+
+
+
+  function pseudoFull() {
+    var s = q('.screen');
+    if (s) {
+      s.classList.add('pseudo-full');
+      s.style.display = 'block';
+    }
+    schedulePlayer();
+  }
+
+  function exitFull() {
+    var s = q('.screen');
+    if (s) s.classList.remove('pseudo-full');
+    var fn = document.exitFullscreen || document.webkitExitFullscreen;
+    if (fn && (document.fullscreenElement || document.webkitFullscreenElement)) {
+      try {
+        var r = fn.call(document);
+        if (r && r.catch) r.catch(function () {});
+      } catch (e) {}
+    }
+    schedulePlayer();
+  }
+
+  function toggleFull() {
+    if (!frame) { say('اختر فيديو أولًا.'); return; }
+    if (isFullscreen() || isPseudo()) { exitFull(); return; }
+    var el = q('.video-wrap');
+    var fn = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (!fn) { pseudoFull(); return; }
+    try {
+      var r = fn.call(el);
+      if (r && r.catch) r.catch(pseudoFull);
+    } catch (e) { pseudoFull(); }
+  }
+
+  function cancelCountdown() {
+    clearInterval(countdownTimer);
+    countdownTimer = 0;
+    var bar = q('[data-next-up]');
+    if (bar) bar.hidden = true;
+  }
+
+  function startCountdown() {
+    if (!selected || selected.type !== 'tv' || !frame) return;
+    var epSel = q('[data-ep]'), seSel = q('[data-season]');
+    var hasNext = epSel.selectedIndex < epSel.options.length - 1 ||
+      seSel.selectedIndex < seSel.options.length - 1;
+    if (!hasNext) return;
+    cancelCountdown();
+    var left = 5;
+    var bar = q('[data-next-up]');
+    var text = q('[data-next-text]');
+    bar.hidden = false;
+    text.textContent = 'الحلقة التالية خلال ' + left + ' ث';
+    countdownTimer = setInterval(function () {
+      left--;
+      if (left <= 0) {
+        cancelCountdown();
+        step(1);
+      } else {
+        text.textContent = 'الحلقة التالية خلال ' + left + ' ث';
+      }
+    }, 1000);
+  }
+
+  function stop() {
+    clearTimeout(loadTimer);
+    cancelCountdown();
+    if (frame) frame.remove();
+    frame = null;
+    directUrl = '';
+    exitFull();
+    dock();
+    var title = q('[data-title]');
+    var floatingTitle = q('.float-head strong');
+    if (title) title.textContent = 'أفلام ومسلسلات';
+    if (floatingTitle) floatingTitle.textContent = 'سينما · اسحب هنا';
+    if (q('[data-empty]')) q('[data-empty]').hidden = false;
+  }
+
+  function mountPlayer() {
+    var screen = root.querySelector('.screen');
+    var slot = document.createElement('div');
+    slot.setAttribute('data-player-slot', '');
+    slot.style.cssText = 'width:100%;height:0;padding-top:56.25%;';
+    screen.parentNode.insertBefore(slot, screen);
+
+    playerHost = document.createElement('div');
+    playerHost.id = 'chat-cinema-player';
+    playerHost.style.cssText =
+      'all:initial!important;zoom:1!important;display:block!important;' +
+      'position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;' +
+      'z-index:10030!important;pointer-events:none!important;';
+
+    playerRoot = playerHost.attachShadow({ mode: 'open' });
+    var css = document.createElement('style');
+    css.textContent = root.querySelector('style').textContent + `
+      :host{background:transparent!important;pointer-events:none!important}
+      .screen{position:fixed;pointer-events:auto;direction:rtl;
+        font:13px/1.6 Tahoma,sans-serif;color:#222}
+      .screen.floating{clip-path:none!important}
+    `;
+    playerRoot.appendChild(css);
+    playerRoot.appendChild(screen);
+    document.documentElement.appendChild(playerHost);
+
+    if (typeof ResizeObserver === 'function') {
+      playerObserver = new ResizeObserver(schedulePlayer);
+      playerObserver.observe(slot);
+    }
+    schedulePlayer();
+  }
+
+  function schedulePlayer() {
+    if (!dead && !playerJob) playerJob = requestAnimationFrame(placePlayer);
+  }
+
+  function placePlayer() {
+    playerJob = 0;
+    if (!playerRoot || !pane || !pane.isConnected) return;
+    if (isFullscreen() || isPseudo()) return;
+    var screen = playerRoot.querySelector('.screen');
+
+    if (floating) {
+      screen.style.display = 'block';
+      schedulePaint();
+      return;
+    }
+
+    var slot = root.querySelector('[data-player-slot]');
+    var visible = mode === 'cinema' && pane.classList.contains('active') &&
+      slot.getClientRects().length > 0 &&
+      getComputedStyle(host).visibility !== 'hidden';
+
+    if (!visible) {
+      screen.style.display = 'none';
+      return;
+    }
+
+    var r = slot.getBoundingClientRect();
+    var p = pane.getBoundingClientRect();
+    var top = Math.max(r.top, p.top, 0);
+    var bottom = Math.min(r.bottom, p.bottom, window.innerHeight);
+    var left = Math.max(r.left, p.left, 0);
+    var right = Math.min(r.right, p.right, window.innerWidth);
+
+    if (bottom <= top || right <= left) {
+      screen.style.display = 'none';
+      return;
+    }
+
+    screen.style.display = 'block';
+    screen.style.left = r.left + 'px';
+    screen.style.top = r.top + 'px';
+    screen.style.width = r.width + 'px';
+    screen.style.clipPath = 'inset(' +
+      Math.max(0, top - r.top) + 'px ' +
+      Math.max(0, r.right - right) + 'px ' +
+      Math.max(0, r.bottom - bottom) + 'px ' +
+      Math.max(0, left - r.left) + 'px)';
+  }
+
+  function viewport() {
+    var v = window.visualViewport;
+    return {
+      x: v ? v.offsetLeft : 0,
+      y: v ? v.offsetTop : 0,
+      w: v ? v.width : window.innerWidth,
+      h: v ? v.height : window.innerHeight
+    };
+  }
+
+  function fitBox() {
+    var v = viewport();
+    var maxW = Math.max(1, v.w - 16);
+    var maxH = Math.max(1, v.h - 57);
+    if (box.ratio) {
+      var max = Math.min(maxW, maxH * box.ratio);
+      box.w = Math.max(Math.min(200, max), Math.min(box.w, max));
+      box.h = box.w / box.ratio;
+    } else {
+      box.w = Math.max(Math.min(200, maxW), Math.min(box.w, maxW));
+      box.h = Math.max(Math.min(112, maxH), Math.min(box.h, maxH));
+    }
+    box.x = Math.max(v.x + 8, Math.min(box.x, v.x + v.w - box.w - 8));
+    box.y = Math.max(v.y + 8, Math.min(box.y, v.y + v.h - box.h - 49));
+    if (corner) {
+      box.x = corner.charAt(1) === 'r' ? v.x + v.w - box.w - 8 : v.x + 8;
+      box.y = corner.charAt(0) === 'b'
+        ? Math.max(v.y + 8, v.y + v.h - box.h - 49) : v.y + 8;
+    }
+  }
+
+  function paint() {
+    paintJob = 0;
+    var screen = q('.screen');
+    if (!floating || !screen) return;
+    fitBox();
+    screen.style.left = box.x + 'px';
+    screen.style.top = box.y + 'px';
+    screen.style.width = box.w + 'px';
+    screen.style.setProperty('--video-height', box.h + 'px');
+  }
+
+  function schedulePaint() {
+    if (floating && !paintJob) paintJob = requestAnimationFrame(paint);
+  }
+
+  function saveBox() {
+    store.set('box', { x: box.x, y: box.y, w: box.w, h: box.h, ratio: box.ratio, corner: corner });
+  }
+
+  function loadBox() {
+    var s = store.get('box', null);
+    if (!s || !isFinite(s.x) || !isFinite(s.y) || !isFinite(s.w) || !isFinite(s.h)) return;
+    box.x = s.x; box.y = s.y; box.w = s.w; box.h = s.h;
+    box.ratio = isFinite(s.ratio) ? s.ratio : 0;
+    corner = /^[tb][lr]$/.test(s.corner || '') ? s.corner : '';
+    floatSized = true;
+    hasPos = true;
+  }
+
+  function snapCorner() {
+    var v = viewport(), m = 40;
+    var l = box.x - (v.x + 8);
+    var r = (v.x + v.w - 8) - (box.x + box.w);
+    var t = box.y - (v.y + 8);
+    var b = (v.y + v.h - 49) - (box.y + box.h);
+    if (Math.min(l, r) < m && Math.min(t, b) < m) {
+      corner = (b < t ? 'b' : 't') + (r < l ? 'r' : 'l');
+      schedulePaint();
+    }
+  }
+
+  function endGesture() {
+    if (gesture) {
+      var current = gesture;
+      gesture = null;
+      try {
+        if (current.node.hasPointerCapture(current.id)) {
+          current.node.releasePointerCapture(current.id);
+        }
+      } catch (error) {}
+    }
+    if (q('.screen')) q('.screen').classList.remove('moving');
+  }
+
+  function dock() {
+    floating = false;
+    endGesture();
+    if (paintJob) cancelAnimationFrame(paintJob);
+    paintJob = 0;
+    var screen = q('.screen');
+    if (screen) {
+      var keepPseudo = screen.classList.contains('pseudo-full');
+      screen.classList.remove('floating');
+      screen.removeAttribute('style');
+      if (keepPseudo) screen.style.display = 'block';
+    }
+    if (q('[data-float]')) q('[data-float]').textContent = '▣ نافذة عائمة';
+    if (frame && pane &&
+        (!pane.classList.contains('active') || !pane.getClientRects().length)) {
+      var openButton = document.getElementById('chat-tv-open');
+      if (openButton) openButton.click();
+    }
+    schedulePlayer();
+  }
+
+  function toggleFloat() {
+    if (floating) { dock(); return; }
+    if (!frame) { say('اختر فيلمًا أو حلقة أولًا.'); return; }
+    if (isFullscreen() || isPseudo()) { say('اخرج من ملء الشاشة أولًا.'); return; }
+
+    var v = viewport();
+    if (!floatSized) {
+      box.w = v.w <= 600 ? 240 : 340;
+      box.h = box.w * 9 / 16;
+      floatSized = true;
+    }
+    if (!hasPos) {
+      box.x = v.x + 16;
+      box.y = v.y + 80;
+      hasPos = true;
+    }
+    floating = true;
+    var screen = q('.screen');
+    screen.style.display = 'block';
+    screen.style.clipPath = 'none';
+    screen.classList.add('floating');
+    q('[data-float]').textContent = '↩ إرجاع للقائمة';
+    paint();
+  }
+
+  function scaleFloat(factor) {
+    box.w *= factor;
+    box.h *= factor;
+    paint();
+    saveBox();
+  }
+
+  function bindGesture(node, kind) {
+    node.addEventListener('pointerdown', function (event) {
+      if (!floating || event.button !== 0 || gesture ||
+          (kind === 'drag' && event.target.closest('button,select'))) return;
+      corner = '';
+      gesture = {
+        node: node, id: event.pointerId, kind: kind,
+        x: event.clientX, y: event.clientY,
+        bx: box.x, by: box.y, w: box.w, h: box.h
+      };
+      try { node.setPointerCapture(event.pointerId); } catch (error) {}
+      q('.screen').classList.add('moving');
+      event.preventDefault();
+    });
+
+    node.addEventListener('pointermove', function (event) {
+      var current = gesture;
+      if (!current || current.id !== event.pointerId) return;
+      var dx = event.clientX - current.x;
+      var dy = event.clientY - current.y;
+      if (current.kind === 'drag') {
+        box.x = current.bx + dx;
+        box.y = current.by + dy;
+      } else {
+        box.w = Math.max(200, current.w - dx);
+        box.x = current.bx + current.w - box.w;
+        box.h = box.ratio ? box.w / box.ratio : current.h + dy;
+      }
+      schedulePaint();
+    });
+
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (name) {
+      node.addEventListener(name, function (event) {
+        if (gesture && gesture.id === event.pointerId) {
+          var wasDrag = gesture.kind === 'drag';
+          endGesture();
+          if (wasDrag) snapCorner();
+          saveBox();
+        }
+      });
+    });
+  }
+
+  var TEMPLATE = `
+    <style>
+      :host{display:block;direction:rtl;color:#222;background:#fff;font:13px/1.6 Tahoma,sans-serif}
+      *{box-sizing:border-box}
+      [hidden]{display:none!important}
+      button,input,select{font:inherit}
+      button{cursor:pointer;border:1px solid #bbb;border-radius:7px;padding:8px;color:#111;background:#fff}
+      button:disabled{opacity:.5;cursor:default}
+      button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #a00;outline-offset:2px}
+      form,.tools{display:flex;gap:6px;margin:10px 0}
+      .tools{flex-wrap:wrap}
+      .tools button{flex:1}
+      .tools button[aria-pressed="true"]{background:#eee}
+      input{width:100%;min-width:0;border:1px solid #aaa;border-radius:7px;padding:9px;background:#fff;color:#111}
+      select{width:100%;max-width:100%;min-width:0;padding:8px;box-sizing:border-box}
+      .screen{width:100%;background:#fff;border-radius:8px;overflow:hidden}
+      .video-wrap{position:relative;width:100%;aspect-ratio:16/9;background:#090b0f;color:#fff;display:grid;place-items:center}
+      @supports not (aspect-ratio:1){
+        .video-wrap{height:0;padding-top:56.25%}
+        .floating .video-wrap{padding-top:0;height:var(--video-height)}
+      }
+      iframe{position:absolute;top:0;left:0;right:0;bottom:0;width:100%;height:100%;border:0;display:block}
+      .screen.floating{position:fixed;z-index:10030;right:auto;bottom:auto;margin:0;border:1px solid #666;border-radius:10px;box-shadow:0 8px 30px #0006;background:#111}
+      .floating .video-wrap{height:var(--video-height);aspect-ratio:auto}
+      .float-head,.resize-edge,.exit-full{display:none}
+      .floating .float-head{display:flex;height:39px;align-items:center;gap:4px;padding:5px 7px;background:var(--cinema-accent,#343a40);color:white;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+      .float-head strong{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:700 11px/1.5 Tahoma,sans-serif}
+      .float-head button{width:29px;height:29px;padding:0;flex-shrink:0;border:1px solid #ffffff70;border-radius:5px;font:700 18px/25px Tahoma,sans-serif}
+      .floating .resize-edge{display:block;position:relative;height:8px;background:#343a40}
+      [data-resize]{position:absolute;left:0;bottom:0;width:30px;height:18px;text-align:center;line-height:18px;font-size:15px;background:#343a40;color:#fff;cursor:nesw-resize;touch-action:none;user-select:none;-webkit-user-select:none;border-radius:0 5px 0 0}
+      [data-resize]:focus-visible{outline:2px solid #fff;outline-offset:-2px}
+      .screen.moving iframe{pointer-events:none}
+      .video-wrap:-webkit-full-screen{width:100vw!important;height:100vh!important;aspect-ratio:auto;padding:0;border-radius:0}
+      .video-wrap:fullscreen{width:100vw!important;height:100vh!important;aspect-ratio:auto;padding:0;border-radius:0}
+      .screen.pseudo-full{position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;width:100%!important;height:100vh!important;height:100dvh!important;z-index:2147483647;clip-path:none!important;border-radius:0;border:0;display:block!important;background:#000}
+      .pseudo-full .video-wrap{height:100%!important;padding:0;aspect-ratio:auto;border-radius:0}
+      .pseudo-full .float-head,.pseudo-full .resize-edge{display:none!important}
+      .pseudo-full .exit-full{display:block}
+      .exit-full{position:absolute;top:10px;left:10px;z-index:6;background:#000b;color:#fff;border:1px solid #fff6;font-size:18px;line-height:1;padding:6px 11px}
+      .next-up{position:absolute;bottom:10px;left:10px;right:10px;z-index:5;display:flex;gap:6px;align-items:center;background:#000d;color:#fff;border-radius:8px;padding:6px 8px;font-size:12px}
+      .next-up span{flex:1}
+      .next-up button{padding:4px 9px}
+      [data-empty]{padding:15px;text-align:center}
+      [data-status],[data-catalog-status]{font-size:12px;color:#555}
+      [data-resume]{width:100%;margin:6px 0}
+      [data-results]{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+      [data-results] .result{display:flex;flex-direction:column;align-items:stretch;gap:8px;width:100%;min-width:0;margin:0;padding:7px;white-space:normal;text-align:right}
+      [data-results] img{width:100%;max-width:100%;height:auto;aspect-ratio:2/3;object-fit:cover;border-radius:6px}
+      [data-results] strong{font-size:13px;overflow-wrap:anywhere}
+      small{display:block;color:#666;font-size:11px;margin-top:4px}
+      [data-episode] label{flex:1;min-width:0}
+      [data-more]{width:100%;margin:10px 0}
+      details{margin-top:12px;font-size:11px}
+      summary{cursor:pointer}
+      @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+    </style>
+
+    <strong data-title>أفلام ومسلسلات</strong>
+    <div class="screen">
+      <div class="float-head">
+        <strong>سينما · اسحب هنا</strong>
+        <button type="button" data-size title="صغير / كبير">⤢</button>
+        <button type="button" data-dock title="إرجاع للقائمة">↩</button>
+        <button type="button" data-float-close title="إيقاف وإغلاق">×</button>
+      </div>
+      <div class="video-wrap">
+        <span data-empty>اختر فيلمًا أو مسلسلًا بالأسفل</span>
+        <button type="button" class="exit-full" data-exit-full aria-label="خروج من ملء الشاشة">×</button>
+        <div class="next-up" data-next-up hidden>
+          <span data-next-text></span>
+          <button type="button" data-next-now>الآن</button>
+          <button type="button" data-next-cancel>إلغاء</button>
+        </div>
+      </div>
+      <div class="resize-edge">
+        <span data-resize role="button" tabindex="0"
+          aria-label="تغيير العرض والارتفاع بالسحب أو الأسهم">⤡</span>
+      </div>
+    </div>
+
+    <div class="tools">
+      <button type="button" data-stop>■ إيقاف</button>
+      <button type="button" data-full>⛶ ملء الشاشة</button>
+      <button type="button" data-float>▣ نافذة عائمة</button>
+    </div>
+    <div class="tools" data-nav hidden>
+      <button type="button" data-prev>⏮ الحلقة السابقة</button>
+      <button type="button" data-next>الحلقة التالية ⏭</button>
+    </div>
+    <div class="tools">
+      <button type="button" data-shape="free">حر</button>
+      <button type="button" data-shape="wide">مستطيل</button>
+      <button type="button" data-shape="square">مربع</button>
+      <button type="button" data-scale="1.15" aria-label="تكبير">＋</button>
+      <button type="button" data-scale="0.87" aria-label="تصغير">−</button>
+    </div>
+    <p data-status role="status">اختر عنوانًا. توفر التشغيل والترجمة يعتمد على مصدر المشاهدة.</p>
+    <button type="button" data-resume hidden></button>
+    <label>ابحث عن فيلم أو مسلسل
+      <input data-search type="search" placeholder="اسم الفيلم أو المسلسل" maxlength="150">
+    </label>
+    <div class="tools">
+      <button type="button" data-filter="all" aria-pressed="true">الكل</button>
+      <button type="button" data-filter="movie">أفلام</button>
+      <button type="button" data-filter="tv">مسلسلات</button>
+    </div>
+    <form data-episode hidden>
+      <label>الموسم <select data-season required></select></label>
+      <label>الحلقة <select data-ep required></select></label>
+      <button type="submit">تشغيل</button>
+    </form>
+    <p data-catalog-status role="status"></p>
+    <div data-results></div>
+    <button data-more type="button" hidden>عرض المزيد</button>
+    <details>
+      <summary>مصدر معلومات الأفلام</summary>
+      <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">
+        <img alt="TMDB" width="90"
+          src="https://www.themoviedb.org/assets/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg">
+      </a>
+      <p dir="ltr">This website uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB.</p>
+      <p>بيانات الفهرس لا تعني توفر جميع العناوين للمشاهدة.</p>
+      <p>اختصارات: F ملء الشاشة · M نافذة عائمة · N التالية · P السابقة · Esc خروج</p>
+    </details>
+  `;
+
+  async function tmdb(path, params, signal) {
+    var url = new URL(API + path);
+    Object.keys(params || {}).forEach(function (key) {
+      url.searchParams.set(key, params[key]);
+    });
+    var key = url.href;
+    var hit = cache.get(key);
+    if (hit && Date.now() - hit.t < 300000) return hit.data;
+
+    var attempt = 0;
+    while (true) {
+      try {
+        var response = await fetch(key, { signal: signal, credentials: 'omit' });
+        if (!response.ok) {
+          var err = new Error(response.status === 429
+            ? 'طلبات كثيرة، انتظر قليلًا ثم أعد المحاولة.'
+            : 'تعذر جلب البيانات. حاول مرة أخرى.');
+          err.fatal = response.status < 500 && response.status !== 429;
+          throw err;
+        }
+        var data = await response.json();
+        cache.set(key, { t: Date.now(), data: data });
+        if (cache.size > 100) cache.delete(cache.keys().next().value);
+        return data;
+      } catch (error) {
+        if (error.name === 'AbortError' || error.fatal || attempt >= 2) throw error;
+        await wait(800 * Math.pow(2, attempt), signal);
+        attempt++;
+      }
+    }
+  }
+
+  function queueSearch() {
+    clearTimeout(searchTimer);
+    searchVersion++;
+    if (searchController) searchController.abort();
+    q('[data-more]').hidden = true;
+    var value = q('[data-search]').value.trim();
+    if (value.length === 1) {
+      clear(q('[data-results]'));
+      catalogStatus('اكتب حرفين أو أكثر لعرض الاقتراحات.');
+      return;
+    }
+    catalogStatus('جارٍ البحث…');
+    searchTimer = setTimeout(function () { render(false); }, 400);
+  }
+
+  async function render(append) {
+    if (dead || !root) return;
+    clearTimeout(searchTimer);
+    var query = q('[data-search]').value.trim();
+    if (query.length === 1) return;
+    if (searchController) searchController.abort();
+    var ctrl = new AbortController();
+    searchController = ctrl;
+    var version = ++searchVersion;
+    var currentRoot = root;
+    var requestedPage = append ? page + 1 : 1;
+    var kind = filter;
+    var path = query
+      ? 'search/' + (kind === 'all' ? 'multi' : kind)
+      : 'trending/' + kind + '/week';
+
+    q('[data-more]').hidden = true;
+    if (!append) {
+      catalogue = [];
+      clear(q('[data-results]'));
+    }
+    catalogStatus(query ? 'جارٍ البحث…' : 'جارٍ تحميل الرائج…');
+
+    var timeout = setTimeout(function () {
+      if (version === searchVersion) ctrl.abort();
+    }, 15000);
+
+    try {
+      var data = await tmdb(path, {
+        query: query, page: requestedPage, include_adult: false
+      }, ctrl.signal);
+      if (dead || version !== searchVersion || currentRoot !== root) return;
+      page = requestedPage;
+      totalPages = Math.min(Number(data.total_pages) || 1, 500);
+
+      (data.results || []).forEach(function (entry) {
+        var type = entry.media_type || kind;
+        if (entry.adult || ['movie', 'tv'].indexOf(type) < 0 ||
+            !Number.isInteger(entry.id)) return;
+        if (catalogue.some(function (item) {
+          return item.id === entry.id && item.type === type;
+        })) return;
+
+        var item = {
+          id: entry.id, type: type, title: entry.title || entry.name || '',
+          year: (entry.release_date || entry.first_air_date || '').slice(0, 4)
+        };
+        catalogue.push(item);
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'result';
+
+        if (/^\/[a-zA-Z0-9_.-]+$/.test(entry.poster_path || '')) {
+          var img = document.createElement('img');
+          img.src = 'https://image.tmdb.org/t/p/w185' + entry.poster_path;
+          img.alt = '';
+          img.loading = 'lazy';
+          img.decoding = 'async';
+          img.onerror = function () { img.remove(); };
+          button.appendChild(img);
+        }
+
+        var title = document.createElement('strong');
+        title.textContent = item.title;
+        var meta = document.createElement('small');
+        meta.textContent = (type === 'tv' ? 'مسلسل' : 'فيلم') + ' · ' + item.year;
+        button.appendChild(title);
+        button.appendChild(meta);
+        button.onclick = function () { chooseTitle(item); };
+        q('[data-results]').appendChild(button);
+      });
+
+      catalogStatus(catalogue.length
+        ? (query ? 'نتائج البحث' : 'الرائج هذا الأسبوع')
+        : 'لا توجد نتائج أفلام أو مسلسلات في هذه الصفحة.');
+      q('[data-more]').hidden = page >= totalPages;
+    } catch (error) {
+      if (dead || version !== searchVersion || currentRoot !== root) return;
+      catalogStatus(error.name === 'AbortError'
+        ? 'انتهت مهلة الاتصال. أعد البحث.' : error.message);
+      var retry = document.createElement('button');
+      retry.type = 'button';
+      retry.textContent = 'إعادة المحاولة';
+      retry.onclick = function () {
+        retry.remove();
+        render(append);
+      };
+      q('[data-results]').appendChild(retry);
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  function option(select, value, label) {
+    var node = document.createElement('option');
+    node.value = value;
+    node.textContent = label;
+    select.appendChild(node);
+  }
+
+  async function chooseTitle(item, opts) {
+    opts = opts || {};
+    selected = item;
+    if (detailController) detailController.abort();
+    var version = ++detailVersion;
+    var currentRoot = root;
+    q('[data-episode]').hidden = item.type !== 'tv';
+    q('[data-nav]').hidden = item.type !== 'tv';
+    if (item.type !== 'tv') {
+      play();
+      return;
+    }
+
+    var seSel = q('[data-season]');
+    clear(seSel);
+    clear(q('[data-ep]'));
+    q('[data-episode] button').disabled = true;
+    say('جارٍ تحميل مواسم ' + item.title);
+    detailController = new AbortController();
+
+    try {
+      var data = await tmdb('tv/' + item.id, {}, detailController.signal);
+      if (dead || version !== detailVersion || currentRoot !== root) return;
+      (data.seasons || []).filter(function (season) {
+        return season.season_number > 0 && season.episode_count > 0;
+      }).forEach(function (season) {
+        option(seSel, season.season_number,
+          season.name || 'الموسم ' + season.season_number);
+      });
+      if (!seSel.options.length) {
+        say('لا توجد مواسم متاحة في الفهرس.');
+        return;
+      }
+      if (Number.isInteger(opts.season)) {
+        seSel.value = String(opts.season);
+        if (seSel.selectedIndex < 0) seSel.selectedIndex = 0;
+      }
+      var ok = await loadEpisodes(opts.ep);
+      if (ok && opts.play && selected === item && !dead) play();
+    } catch (error) {
+      if (!dead && version === detailVersion && currentRoot === root &&
+          error.name !== 'AbortError') {
+        say(error.message + ' اختر المسلسل لإعادة المحاولة.');
+      }
+    }
+  }
+
+  async function loadEpisodes(target) {
+    if (!selected || selected.type !== 'tv') return false;
+    if (detailController) detailController.abort();
+    detailController = new AbortController();
+    var version = ++detailVersion;
+    var currentRoot = root;
+    var id = selected.id;
+    var season = Number(q('[data-season]').value);
+    var epSel = q('[data-ep]');
+
+    clear(epSel);
+    q('[data-episode] button').disabled = true;
+    say('جارٍ تحميل الحلقات…');
+
+    try {
+      var data = await tmdb('tv/' + id + '/season/' + season, {}, detailController.signal);
+      if (dead || version !== detailVersion || currentRoot !== root) return false;
+      (data.episodes || []).filter(function (episode) {
+        return episode.episode_number > 0;
+      }).forEach(function (episode) {
+        option(epSel, episode.episode_number,
+          episode.episode_number + ' — ' + (episode.name || 'حلقة'));
+      });
+      if (epSel.options.length) {
+        if (target === 'last') {
+          epSel.selectedIndex = epSel.options.length - 1;
+        } else if (Number.isInteger(target)) {
+          epSel.value = String(target);
+          if (epSel.selectedIndex < 0) epSel.selectedIndex = 0;
+        } else {
+          epSel.selectedIndex = 0;
+        }
+      }
+      q('[data-episode] button').disabled = !epSel.options.length;
+      say(epSel.options.length
+        ? 'اختر الموسم والحلقة ثم اضغط تشغيل.' : 'لا توجد حلقات في الفهرس.');
+      return epSel.options.length > 0;
+    } catch (error) {
+      if (!dead && version === detailVersion && currentRoot === root &&
+          error.name !== 'AbortError') {
+        say(error.message + ' أعد اختيار الموسم للمحاولة.');
+      }
+      return false;
+    }
+  }
+
+  async function step(dir) {
+    if (!selected || selected.type !== 'tv') return;
+    cancelCountdown();
+    var epSel = q('[data-ep]'), seSel = q('[data-season]');
+    var i = epSel.selectedIndex + dir;
+    if (i >= 0 && i < epSel.options.length) {
+      epSel.selectedIndex = i;
+      play();
+      return;
+    }
+    var j = seSel.selectedIndex + dir;
+    if (j < 0 || j >= seSel.options.length) {
+      say(dir > 0 ? 'هذه آخر حلقة متاحة.' : 'هذه أول حلقة.');
+      return;
+    }
+    seSel.selectedIndex = j;
+    var ok = await loadEpisodes(dir > 0 ? undefined : 'last');
+    if (ok) play();
+  }
+
+  function saveProgress(season, episode) {
+    if (!selected) return;
+    store.set('last', {
+      id: selected.id, type: selected.type, title: selected.title,
+      year: selected.year || '', season: season, ep: episode
+    });
+    updateResume();
+  }
+
+  function updateResume() {
+    var b = q('[data-resume]');
+    if (!b) return;
+    var last = store.get('last', null);
+    if (!last || !Number.isInteger(last.id) ||
+        (last.type !== 'movie' && last.type !== 'tv')) {
+      b.hidden = true;
+      return;
+    }
+    b.hidden = false;
+    b.textContent = '▶ متابعة: ' + last.title +
+      (last.type === 'tv' ? ' · ' + last.season + ' / ' + last.ep : '');
+    b.onclick = function () {
+      chooseTitle(
+        { id: last.id, type: last.type, title: String(last.title || ''), year: last.year || '' },
+        { season: Number(last.season), ep: Number(last.ep), play: true }
+      );
+    };
+  }
+
+  function stopOthers() {
+    var close = document.querySelector('#chat-tv-floating [data-float-close]');
+    if (close) close.click();
+    var tvStop = pane.querySelector('[data-tv-stop]');
+    if (tvStop) tvStop.click();
+    var yt = document.getElementById('chat-youtube-panel');
+    var ytStop = yt && yt.shadowRoot && yt.shadowRoot.querySelector('[data-stop]');
+    if (ytStop) ytStop.click();
+    document.querySelectorAll('#settings [data-kr-stop]').forEach(function (button) {
+      button.click();
+    });
+  }
+
+  function activate() {
+    if (mode === 'cinema') {
+      schedulePlayer();
+      return;
+    }
+    var tvTab = nav && nav.querySelector('[data-mode="tv"]');
+    if (tvTab) tvTab.click();
+    stopOthers();
+    mode = 'cinema';
+    pane.classList.add('chat-cinema-mode');
+    nav.querySelectorAll('button').forEach(function (button) {
+      button.setAttribute('aria-pressed', 'false');
+    });
+    tab.setAttribute('aria-pressed', 'true');
+    if (!catalogueStarted) {
+      catalogueStarted = true;
+      render(false);
+    }
+    schedulePlayer();
+  }
+
+  function deactivate() {
+    if (mode !== 'cinema') return;
+    mode = 'tv';
+    stop();
+    if (pane) pane.classList.remove('chat-cinema-mode');
+    if (tab) tab.setAttribute('aria-pressed', 'false');
+  }
+
+  function setTitle(season, episode) {
+    if (!selected) return;
+    var title = selected.title +
+      (selected.type === 'tv' ? ' · ' + season + ' / ' + episode : '');
+    q('[data-title]').textContent = title;
+    q('.float-head strong').textContent = title;
+  }
+
+  function play() {
+    if (!selected) return;
+    if (mode !== 'cinema') activate();
+    var season = Number(q('[data-season]').value);
+    var episode = Number(q('[data-ep]').value);
+    if (selected.type === 'tv' && (
+      !Number.isInteger(season) || season < 1 || season > 999 ||
+      !Number.isInteger(episode) || episode < 1 || episode > 9999
+    )) {
+      say('أدخل رقم موسم وحلقة صحيحًا.');
+      return;
+    }
+
+    stopOthers();
+    clearTimeout(loadTimer);
+    cancelCountdown();
+    if (frame) frame.remove();
+    var url = new URL('/embed/' + selected.type + '/' + selected.id, ORIGIN);
+    url.searchParams.set('autoplay', 'false');
+    url.searchParams.set('back', 'close');
+    url.searchParams.set('autonext', 'false');
+    if (selected.type === 'tv') {
+      url.searchParams.set('s', season);
+      url.searchParams.set('e', episode);
+    }
+
+    directUrl = url.href;
+    frame = document.createElement('iframe');
+    frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
+    frame.title = selected.title;
+    frame.allow = 'autoplay; fullscreen; picture-in-picture';
+    frame.allowFullscreen = true;
+    frame.referrerPolicy = 'strict-origin-when-cross-origin';
+    frame.src = directUrl;
+    q('.video-wrap').appendChild(frame);
+    q('[data-empty]').hidden = true;
+    q('[data-nav]').hidden = selected.type !== 'tv';
+    setTitle(season, episode);
+    saveProgress(season, episode);
+    say('اضغط تشغيل داخل المشغّل. اختر العربية من قائمة الترجمة إن توفرت.');
+    loadTimer = setTimeout(function () {
+      if (frame) say('إذا لم يبدأ الفيديو، جرّب مصدرًا آخر داخل المشغّل.');
+    }, 45000);
+    schedulePlayer();
+  }
+
+  async function onMessage(event) {
+    if (!frame || event.source !== frame.contentWindow ||
+        event.origin !== ORIGIN || !event.data) return;
+    var data = event.data;
+
+    if (data.type === 'cinesrc:ready' || data.type === 'cinesrc:play') {
+      clearTimeout(loadTimer);
+    }
+    if (data.type === 'cinesrc:play') say('بدأ التشغيل.');
+    if (data.type === 'cinesrc:error') {
+      clearTimeout(loadTimer);
+      say('تعذّر تشغيل هذا المصدر. جرّب مصدرًا آخر داخل المشغّل.');
+    }
+    if (data.type === 'cinesrc:close') stop();
+    if (data.type === 'cinesrc:ended') startCountdown();
+
+    if (data.type === 'cinesrc:nextepisode' && selected && selected.type === 'tv' &&
+        Number.isInteger(data.season) && data.season > 0 &&
+        Number.isInteger(data.episode) && data.episode > 0 && directUrl) {
+      var currentFrame = frame;
+      var currentItem = selected;
+      var nextUrl = new URL(directUrl);
+      if (nextUrl.pathname !== '/embed/tv/' + currentItem.id) return;
+
+      var seasonSelect = q('[data-season]');
+      var episodeSelect = q('[data-ep]');
+      if (!Array.from(seasonSelect.options).some(function (opt) {
+        return Number(opt.value) === data.season;
+      })) return;
+
+      if (Number(seasonSelect.value) !== data.season || !episodeSelect.options.length) {
+        seasonSelect.value = String(data.season);
+        var loading = loadEpisodes(data.episode);
+        var version = detailVersion;
+        var loaded = await loading;
+        if (!loaded || dead || frame !== currentFrame || selected !== currentItem ||
+            detailVersion !== version || Number(seasonSelect.value) !== data.season) return;
+      }
+
+      if (!Array.from(episodeSelect.options).some(function (opt) {
+        return Number(opt.value) === data.episode;
+      })) return;
+
+      episodeSelect.value = String(data.episode);
+      nextUrl.searchParams.set('s', data.season);
+      nextUrl.searchParams.set('e', data.episode);
+      directUrl = nextUrl.href;
+      setTitle(data.season, data.episode);
+      saveProgress(data.season, data.episode);
+    }
+  }
+
+  function onKey(event) {
+    if (dead || mode !== 'cinema' ||
+        event.ctrlKey || event.metaKey || event.altKey) return;
+    var t = event.composedPath ? event.composedPath()[0] : event.target;
+    if (t && (/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName || '') || t.isContentEditable)) return;
+
+    if (event.key === 'Escape') {
+      if (isFullscreen() || isPseudo()) { exitFull(); event.preventDefault(); }
+      else if (floating) { dock(); event.preventDefault(); }
+      return;
+    }
+    if (!frame) return;
+    var handled = true;
+    switch (event.code) {
+      case 'KeyF': toggleFull(); break;
+      case 'KeyM': toggleFloat(); break;
+      case 'KeyN': step(1); break;
+      case 'KeyP': step(-1); break;
+      default: handled = false;
+    }
+    if (handled) event.preventDefault();
+  }
+
+  function cleanup() {
+    mode = 'tv';
+    stop();
+    stateObserver.disconnect();
+    if (playerObserver) playerObserver.disconnect();
+    if (pane) pane.classList.remove('chat-cinema-mode');
+    [tab, shell, playerHost].forEach(function (node) {
+      if (node) node.remove();
+    });
+    tab = shell = root = playerRoot = playerHost = null;
+  }
+
+  function mount() {
+    var nextPane = document.getElementById('chat-tv');
+    var nextNav = document.querySelector('#dpnl .chat-youtube-tabs');
+    if (!nextPane || !nextNav) return;
+
+    var snapshot = null;
+    if (root && frame && selected) {
+      snapshot = {
+        item: selected,
+        season: Number(q('[data-season]').value),
+        ep: Number(q('[data-ep]').value)
+      };
+    }
+
+    cleanup();
+    pane = nextPane;
+    nav = nextNav;
+    host = document.getElementById('dpnl');
+    tab = document.createElement('button');
+    tab.type = 'button';
+    tab.id = 'chat-cinema-tab';
+    tab.textContent = 'نتفلكس';
+    tab.setAttribute('aria-pressed', 'false');
+    tab.onclick = activate;
+    nav.appendChild(tab);
+
+    shell = document.createElement('div');
+    shell.id = 'chat-cinema-panel';
+    root = shell.attachShadow({ mode: 'open' });
+    root.innerHTML = TEMPLATE;
+    pane.appendChild(shell);
+    mountPlayer();
+
+    var accent = getComputedStyle(pane).getPropertyValue('--tv-accent').trim();
+    if (accent) playerHost.style.setProperty('--cinema-accent', accent);
+    q('[data-search]').oninput = queueSearch;
+    q('[data-search]').onkeydown = function (event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        render(false);
+      }
+    };
+    q('[data-more]').onclick = function () { render(true); };
+    q('[data-season]').onchange = function () { loadEpisodes(); };
+    q('[data-episode]').onsubmit = function (event) {
+      event.preventDefault();
+      play();
+    };
+
+    root.querySelectorAll('[data-filter]').forEach(function (button) {
+      button.onclick = function () {
+        filter = button.dataset.filter;
+        root.querySelectorAll('[data-filter]').forEach(function (item) {
+          item.setAttribute('aria-pressed', String(item === button));
+        });
+        render(false);
+      };
+    });
+
+    q('[data-stop]').onclick = stop;
+    q('[data-float-close]').onclick = stop;
+    q('[data-dock]').onclick = dock;
+    q('[data-float]').onclick = toggleFloat;
+    q('[data-full]').onclick = toggleFull;
+    q('[data-exit-full]').onclick = exitFull;
+    q('[data-prev]').onclick = function () { step(-1); };
+    q('[data-next]').onclick = function () { step(1); };
+    q('[data-next-now]').onclick = function () { cancelCountdown(); step(1); };
+    q('[data-next-cancel]').onclick = cancelCountdown;
+
+    q('[data-size]').onclick = function () {
+      box.w = box.w > 260 ? 240 : 340;
+      box.h = box.w * 9 / 16;
+      box.ratio = 0;
+      paint();
+      saveBox();
+    };
+    root.querySelectorAll('[data-scale]').forEach(function (button) {
+      button.onclick = function () {
+        if (!floating) toggleFloat();
+        if (floating) scaleFloat(Number(button.dataset.scale));
+      };
+    });
+
+    root.querySelectorAll('[data-shape]').forEach(function (button) {
+      button.onclick = function () {
+        if (!floating) toggleFloat();
+        if (!floating) return;
+        var shape = button.dataset.shape;
+        box.ratio = shape === 'wide' ? 16 / 9 : shape === 'square' ? 1 : 0;
+        if (box.ratio) box.h = box.w / box.ratio;
+        paint();
+        saveBox();
+      };
+    });
+
+    bindGesture(q('.float-head'), 'drag');
+    bindGesture(q('[data-resize]'), 'resize');
+    q('[data-resize]').onkeydown = function (event) {
+      var arrows = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+      if (!floating || arrows.indexOf(event.key) < 0) return;
+      event.preventDefault();
+      var stepSize = event.shiftKey ? 30 : 10;
+      if (event.key === 'ArrowLeft') box.w -= stepSize;
+      if (event.key === 'ArrowRight') box.w += stepSize;
+      if (event.key === 'ArrowUp') box.h -= stepSize;
+      if (event.key === 'ArrowDown') box.h += stepSize;
+      if (box.ratio) box.h = box.w / box.ratio;
+      paint();
+      saveBox();
+    };
+
+    for (var node = pane; node; node = node.parentElement) {
+      stateObserver.observe(node, {
+        attributes: true, attributeFilter: ['class', 'style', 'hidden']
+      });
+    }
+    catalogueStarted = false;
+    updateResume();
+    if (snapshot) {
+      chooseTitle(snapshot.item, {
+        season: snapshot.season, ep: snapshot.ep, play: true
+      });
+    }
+    watchStructure();
+  }
+
+  // Watch only the structural ancestors after mounting. When dependencies are
+  // absent, temporarily watch the document for their insertion.
+  function watchStructure() {
+    if (dead || !structureObserver) return;
+    structureObserver.disconnect();
+    if (!shell || !shell.isConnected || !tab || !tab.isConnected ||
+        !pane || !pane.isConnected || !nav || !nav.isConnected ||
+        document.getElementById('chat-tv') !== pane ||
+        document.querySelector('#dpnl .chat-youtube-tabs') !== nav) {
+      structureObserver.observe(document.body || document.documentElement,
+        { childList: true, subtree: true });
+      return;
+    }
+    var watched = new Set();
+    [pane, nav].forEach(function (start) {
+      for (var node = start; node && node.nodeType === 1; node = node.parentElement) {
+        if (!watched.has(node)) {
+          structureObserver.observe(node, { childList: true });
+          watched.add(node);
+        }
+      }
+    });
+  }
+
+  function sync() {
+    job = 0;
+    if (dead) return;
+    if (!shell || !shell.isConnected || !tab || !tab.isConnected ||
+        !pane || !pane.isConnected || !nav || !nav.isConnected ||
+        document.getElementById('chat-tv') !== pane ||
+        document.querySelector('#dpnl .chat-youtube-tabs') !== nav) mount();
+    watchStructure();
+    if (!shell || !pane) return;
+
+    var active = pane.classList.contains('active') &&
+      pane.getClientRects().length > 0 &&
+      getComputedStyle(host).visibility !== 'hidden';
+    if (!active && mode === 'cinema' && frame && !floating &&
+        !isFullscreen() && !isPseudo()) toggleFloat();
+    schedulePlayer();
+  }
+
+  function schedule() {
+    if (!dead && !job) job = requestAnimationFrame(sync);
+  }
+
+  function onClick(event) {
+    var target = event.target;
+    if (!target || !target.closest) return;
+    if (target.closest('.chat-youtube-tabs [data-mode], #chat-tv [data-tv-start], #chat-tv [data-tv-channel]')) {
+      deactivate();
+    }
+    if (target.closest('#settings .SERT, #settings [data-kr-play]')) stop();
+    schedule();
+  }
+
+  function onHide() { stop(); }
+  function onFsChange() { schedulePlayer(); }
+
+  function init() {
+    if (dead) return;
+    loadBox();
+    style = document.createElement('style');
+    style.id = 'chat-cinema-style';
+    style.textContent = `
+      #chat-tv > #chat-cinema-panel{display:none!important}
+      #chat-tv.chat-cinema-mode > :not(#chat-cinema-panel){display:none!important}
+      #chat-tv.chat-cinema-mode > #chat-cinema-panel{display:block!important}
+      #dpnl .chat-youtube-tabs{flex-wrap:wrap!important;max-width:calc(100% - 48px)}
+      #dpnl .chat-youtube-tabs button{white-space:nowrap}
+      #dpnl #chat-cinema-tab{font-size:12px;padding:5px 7px}
+    `;
+    document.head.appendChild(style);
+
+    structureObserver = new MutationObserver(function () {
+      if (dead) return;
+      if (!shell || !shell.isConnected || !tab || !tab.isConnected ||
+          !pane || !pane.isConnected || !nav || !nav.isConnected ||
+          document.getElementById('chat-tv') !== pane ||
+          document.querySelector('#dpnl .chat-youtube-tabs') !== nav) schedule();
+    });
+    watchStructure();
+
+    document.addEventListener('click', onClick, true);
+    document.addEventListener('keydown', onKey, true);
+    document.addEventListener('scroll', schedulePlayer, true);
+    document.addEventListener('fullscreenchange', onFsChange);
+    document.addEventListener('webkitfullscreenchange', onFsChange);
+    window.addEventListener('message', onMessage);
+    window.addEventListener('pagehide', onHide);
+    window.addEventListener('resize', schedulePaint);
+    window.addEventListener('resize', schedulePlayer);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', schedulePaint);
+      window.visualViewport.addEventListener('scroll', schedulePaint);
+      window.visualViewport.addEventListener('resize', schedulePlayer);
+      window.visualViewport.addEventListener('scroll', schedulePlayer);
+    }
+    schedule();
+  }
+
+  function destroy() {
+    dead = true;
+    if (structureObserver) structureObserver.disconnect();
+    clearTimeout(searchTimer);
+    if (searchController) searchController.abort();
+    if (detailController) detailController.abort();
+    cleanup();
+    document.removeEventListener('DOMContentLoaded', init);
+    document.removeEventListener('click', onClick, true);
+    document.removeEventListener('keydown', onKey, true);
+    document.removeEventListener('scroll', schedulePlayer, true);
+    document.removeEventListener('fullscreenchange', onFsChange);
+    document.removeEventListener('webkitfullscreenchange', onFsChange);
+    window.removeEventListener('message', onMessage);
+    window.removeEventListener('pagehide', onHide);
+    window.removeEventListener('resize', schedulePaint);
+    window.removeEventListener('resize', schedulePlayer);
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener('resize', schedulePaint);
+      window.visualViewport.removeEventListener('scroll', schedulePaint);
+      window.visualViewport.removeEventListener('resize', schedulePlayer);
+      window.visualViewport.removeEventListener('scroll', schedulePlayer);
+    }
+    [job, playerJob, paintJob].forEach(cancelAnimationFrame);
+    if (style) style.remove();
+    delete window[KEY];
+  }
+
+  window[KEY] = { destroy: destroy, stop: stop, version: '3.0.0' };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
+})();
