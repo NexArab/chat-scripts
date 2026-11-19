@@ -1019,9 +1019,10 @@
     if (frame) frame.remove();
     directUrl = sourceUrl(season, episode);
     frame = document.createElement('iframe');
-    // CineSrc works sandboxed. Other tested embeds explicitly reject sandbox.
-    // Only these fixed, reviewed provider URLs are ever loaded without it.
-    if (serverIndex === 0) frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
+    // Experimental popup-blocking policy on all four providers.
+    // No allow-popups or allow-top-navigation permission is granted.
+    // Some third-party providers may refuse playback under this restriction.
+    frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
     frame.title = selected.title;
     frame.allow = 'autoplay; fullscreen; picture-in-picture';
     frame.allowFullscreen = true;
